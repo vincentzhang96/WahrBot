@@ -29,7 +29,7 @@
         <dependency>
             <groupId>com.mashape.unirest</groupId>
             <artifactId>unirest-java</artifactId>
-            <version>1.4.8</version>
+            <version>1.4.7</version>
         </dependency>
         <dependency>
             <groupId>org.java-websocket</groupId>
@@ -44,7 +44,12 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>19.0</version>
+            <version>18.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.14.8</version>
         </dependency>
     </dependencies>
 
