@@ -12,28 +12,31 @@
 
 package co.phoenixlab.discord.api.entities;
 
+import co.phoenixlab.discord.api.enums.DiscordPermission;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Builder;
 
-import java.time.Instant;
+import java.util.EnumSet;
 
-@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReceivedMessage implements Entity {
+@Builder
+public class Role implements Entity, Comparable<Role> {
 
     private long id;
-    private User author;
-    private long channelId;
-    private String nonce;
-    private String content;
-    private MessageAttachment[] attachments;
-    private Instant timestamp;
-    private Instant editedTimestamp;
-    private boolean mentionEveryone;
-    private User[] mentions;
+    private String name;
+    private int color;
+    private EnumSet<DiscordPermission> permissions = EnumSet.noneOf(DiscordPermission.class);
+    private int position;
+    private boolean managed;
+    private boolean hoist;
 
+
+    @Override
+    public int compareTo(Role o) {
+        return Integer.compare(position, o.position);
+    }
 }

@@ -17,23 +17,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Builder;
 
-import java.time.Instant;
-
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReceivedMessage implements Entity {
+public class ReadyMessage {
 
-    private long id;
-    private User author;
-    private long channelId;
-    private String nonce;
-    private String content;
-    private MessageAttachment[] attachments;
-    private Instant timestamp;
-    private Instant editedTimestamp;
-    private boolean mentionEveryone;
-    private User[] mentions;
+    private int v;
+    private Presence[] presences;
+    private Guild[] guilds;
+    private String sessionId;
+    private PrivateChannel[] privateChannels;
+    private SelfUser user;
+    private int heartbeatInterval;
 
 }

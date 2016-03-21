@@ -12,28 +12,21 @@
 
 package co.phoenixlab.discord.api.entities;
 
+import co.phoenixlab.discord.api.enums.ChannelType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Builder;
 
-import java.time.Instant;
-
-@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReceivedMessage implements Entity {
+public class PublicChannel extends Channel {
 
-    private long id;
-    private User author;
-    private long channelId;
-    private String nonce;
-    private String content;
-    private MessageAttachment[] attachments;
-    private Instant timestamp;
-    private Instant editedTimestamp;
-    private boolean mentionEveryone;
-    private User[] mentions;
+    private long guildId;
+    private Permission[] permissionOverwrites;
+    private String topic;
+    private int position;
+    private int bitrate;
+    private ChannelType type;
 
 }

@@ -12,28 +12,20 @@
 
 package co.phoenixlab.discord.api.entities;
 
+import co.phoenixlab.discord.api.enums.PresenceStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Builder;
 
-import java.time.Instant;
-
-@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReceivedMessage implements Entity {
+@Builder
+public class Presence {
 
-    private long id;
-    private User author;
-    private long channelId;
-    private String nonce;
-    private String content;
-    private MessageAttachment[] attachments;
-    private Instant timestamp;
-    private Instant editedTimestamp;
-    private boolean mentionEveryone;
-    private User[] mentions;
+    private PresenceGame game;
+    private PresenceUser user;
+    private PresenceStatus status;
 
 }

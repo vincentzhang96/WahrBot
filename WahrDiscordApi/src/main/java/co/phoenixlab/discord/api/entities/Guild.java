@@ -12,28 +12,36 @@
 
 package co.phoenixlab.discord.api.entities;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Builder;
 
 import java.time.Instant;
 
-@Builder
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-public class ReceivedMessage implements Entity {
+@Builder
+public class Guild implements Entity {
+
+    public static long NO_AFK_CHANNEL_ID = -1;
 
     private long id;
-    private User author;
-    private long channelId;
-    private String nonce;
-    private String content;
-    private MessageAttachment[] attachments;
-    private Instant timestamp;
-    private Instant editedTimestamp;
-    private boolean mentionEveryone;
-    private User[] mentions;
+    private String name;
+    private String icon;
+    private String region;
+    private long ownerId;
+    private int memberCount;
+    private long afkTimeout;
+    private long afkChannelId;
+    private Instant joinedAt;
+    private String[] features;
+    private Emoji[] emojis;
+    private String splash;
+    private boolean large;
+    private int verificationLevel;
+    private Presence[] presences;
+    private PublicChannel[] channels;
+    private Member[] members;
+
 
 }
