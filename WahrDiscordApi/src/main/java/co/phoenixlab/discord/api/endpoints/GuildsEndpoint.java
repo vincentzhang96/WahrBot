@@ -12,5 +12,25 @@
 
 package co.phoenixlab.discord.api.endpoints;
 
+import co.phoenixlab.discord.api.entities.Guild;
+import co.phoenixlab.discord.api.request.CreateGuildRequest;
+import co.phoenixlab.discord.api.request.EditGuildRequest;
+
 public interface GuildsEndpoint {
+
+    Guild createGuild(CreateGuildRequest request)
+            throws ApiException;
+
+    Guild editGuild(long guildId, EditGuildRequest request)
+            throws ApiException;
+
+    Guild leaveGuild(long guildId)
+            throws ApiException;
+
+    Guild deleteGuild(long guildId)
+            throws ApiException;
+
+    Guild[] getGuilds()
+            throws ApiException;
+
 }
