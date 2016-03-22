@@ -18,26 +18,41 @@ import sun.plugin2.message.Message;
 
 public interface MessagesEndpoint {
 
+    long IGNORE = 0;
+    int DEFAULT_LIMIT = 50;
+
     Message[] getMessages(long channelId, long beforeMessageId, long afterMessageId, int limit)
             throws ApiException;
 
-    Message[] getMessagesBefore(long channelId, long beforeMessageId, int limit)
-            throws ApiException;
+    default Message[] getMessagesBefore(long channelId, long beforeMessageId, int limit)
+            throws ApiException {
+        return getMessages(channelId, beforeMessageId, IGNORE, limit);
+    }
 
-    Message[] getMessagesBefore(long channelId, long beforeMessageId)
-            throws ApiException;
+    default Message[] getMessagesBefore(long channelId, long beforeMessageId)
+            throws ApiException {
+        return getMessagesBefore(channelId, beforeMessageId, DEFAULT_LIMIT);
+    }
 
-    Message[] getMessagesAfter(long channelId, long afterMessageId, int limit)
-            throws ApiException;
+    default Message[] getMessagesAfter(long channelId, long afterMessageId, int limit)
+            throws ApiException {
+        return getMessages(channelId, IGNORE, afterMessageId, limit);
+    }
 
-    Message[] getMessagesAfter(long channelId, long afterMessageId)
-            throws ApiException;
+    default Message[] getMessagesAfter(long channelId, long afterMessageId)
+            throws ApiException {
+        return getMessagesAfter(channelId, afterMessageId, DEFAULT_LIMIT);
+    }
 
-    Message[] getLatestMessages(long channelId, int limit)
-            throws ApiException;
+    default Message[] getLatestMessages(long channelId, int limit)
+            throws ApiException {
+        return getMessages(channelId, IGNORE, IGNORE, limit);
+    }
 
-    Message[] getLatestMessages(long channelId)
-            throws ApiException;
+    default Message[] getLatestMessages(long channelId)
+            throws ApiException {
+        return getLatestMessages(channelId, DEFAULT_LIMIT);
+    }
 
     Message sendMessage(long channelId, PostMessageRequest request)
             throws ApiException;
