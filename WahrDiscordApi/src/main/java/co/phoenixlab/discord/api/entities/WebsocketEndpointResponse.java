@@ -21,7 +21,7 @@ import lombok.experimental.Builder;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Endpoint {
+public class WebsocketEndpointResponse {
 
     private String url;
 
