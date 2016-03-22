@@ -21,7 +21,37 @@ public class Endpoints {
         return null;
     }
 
+    public BansEndpoint bans() {
+        //  TODO
+        return null;
+    }
+
+    public ChannelsEndpoint channels() {
+        //  TODO
+        return null;
+    }
+
     public GuildsEndpoint guilds() {
+        //  TODO
+        return null;
+    }
+
+    public MembersEndpoint members() {
+        //  TODO
+        return null;
+    }
+
+    public MessagesEndpoint messages() {
+        //  TODO
+        return null;
+    }
+
+    public PermissionsEndpoint permissions() {
+        //  TODO
+        return null;
+    }
+
+    public RolesEndpoint roles() {
         //  TODO
         return null;
     }
@@ -30,7 +60,5 @@ public class Endpoints {
         //  TODO
         return null;
     }
-
-
-
+    
 }
