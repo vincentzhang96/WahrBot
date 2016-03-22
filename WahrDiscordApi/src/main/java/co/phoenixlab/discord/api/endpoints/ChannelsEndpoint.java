@@ -27,6 +27,9 @@ public interface ChannelsEndpoint {
     Channel deleteChannel(long channelId)
             throws ApiException;
 
+    Channel[] getGuildChannels(long guildId)
+            throws ApiException;
+
     void broadcastTyping(long channelId)
             throws ApiException;
 
