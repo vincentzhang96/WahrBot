@@ -12,5 +12,5 @@
 
 package co.phoenixlab.discord.api.endpoints;
 
-public interface MessageEndpoint {
+public interface MessagesEndpoint {
 }
