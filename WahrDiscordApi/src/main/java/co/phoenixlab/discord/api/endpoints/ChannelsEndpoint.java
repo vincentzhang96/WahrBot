@@ -12,5 +12,22 @@
 
 package co.phoenixlab.discord.api.endpoints;
 
+import co.phoenixlab.discord.api.entities.Channel;
+import co.phoenixlab.discord.api.request.CreateChannelRequest;
+import co.phoenixlab.discord.api.request.EditChannelRequest;
+
 public interface ChannelsEndpoint {
+
+    Channel createChannel(long guildId, CreateChannelRequest request)
+            throws ApiException;
+
+    Channel editChannel(long channelId, EditChannelRequest request)
+            throws ApiException;
+
+    Channel deleteChannel(long channelId)
+            throws ApiException;
+
+    void boradcastTyping(long channelId)
+            throws ApiException;
+    
 }
