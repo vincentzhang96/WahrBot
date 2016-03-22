@@ -12,5 +12,20 @@
 
 package co.phoenixlab.discord.api.endpoints;
 
+import co.phoenixlab.discord.api.entities.BannedUser;
+
 public interface BansEndpoint {
+
+    BannedUser[] getBans(long guildId)
+        throws ApiException;
+
+    void addBan(long guildId, long userId, int deleteMessageDays)
+        throws ApiException;
+
+    default void addBan(long guildId, long userId) {
+        addBan(guildId, userId, 0);
+    }
+
+    void removeBan(long guildId, long userId);
+
 }
