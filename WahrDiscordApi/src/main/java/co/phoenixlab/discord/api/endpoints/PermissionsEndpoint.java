@@ -12,5 +12,14 @@
 
 package co.phoenixlab.discord.api.endpoints;
 
+import co.phoenixlab.discord.api.entities.Permission;
+
 public interface PermissionsEndpoint {
+
+    void createOrEditPermission(long channelId, Permission request)
+            throws ApiException;
+
+    void deletePermission(long channelId, long targetId)
+            throws ApiException;
+
 }
