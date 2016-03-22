@@ -10,49 +10,35 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.entities;
+package co.phoenixlab.discord.api.enums;
 
-import co.phoenixlab.discord.api.enums.AfkTimeout;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.google.gson.annotations.SerializedName;
 
-import java.time.Instant;
+public enum AfkTimeout {
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Guild implements Entity {
+    @SerializedName("60")
+    ONE_MIN("60"),
+    @SerializedName("300")
+    FIVE_MIN("300"),
+    @SerializedName("900")
+    FIFTEEN_MIN("900"),
+    @SerializedName("1800")
+    THIRTY_MIN("1800"),
+    @SerializedName("3600")
+    ONE_HOUR("3600");
 
-    public static long NO_AFK_CHANNEL_ID = -1;
+    private final String val;
 
-    private long id;
-    private String name;
-    private String icon;
-    private String region;
-    private long ownerId;
-    private int memberCount;
-    private AfkTimeout afkTimeout;
-    private long afkChannelId;
-    private Instant joinedAt;
-    private String[] features;
-    private Emoji[] emojis;
-    private String splash;
-    private boolean large;
-    private int verificationLevel;
-    private Presence[] presences;
-    private PublicChannel[] channels;
-    private Member[] members;
+    AfkTimeout(String val) {
+        this.val = val;
+    }
 
-    @Override
-    public boolean equals(Object o) {
-        return Entity.areEqual(this, o);
+    public String getVal() {
+        return val;
     }
 
     @Override
-    public int hashCode() {
-        return Entity.hash(this);
+    public String toString() {
+        return val;
     }
 }
