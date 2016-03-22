@@ -12,5 +12,42 @@
 
 package co.phoenixlab.discord.api.endpoints;
 
+import co.phoenixlab.discord.api.request.EditMessageRequest;
+import co.phoenixlab.discord.api.request.PostMessageRequest;
+import sun.plugin2.message.Message;
+
 public interface MessagesEndpoint {
+
+    Message[] getMessages(long channelId, long beforeMessageId, long afterMessageId, int limit)
+            throws ApiException;
+
+    Message[] getMessagesBefore(long channelId, long beforeMessageId, int limit)
+            throws ApiException;
+
+    Message[] getMessagesBefore(long channelId, long beforeMessageId)
+            throws ApiException;
+
+    Message[] getMessagesAfter(long channelId, long afterMessageId, int limit)
+            throws ApiException;
+
+    Message[] getMessagesAfter(long channelId, long afterMessageId)
+            throws ApiException;
+
+    Message[] getLatestMessages(long channelId, int limit)
+            throws ApiException;
+
+    Message[] getLatestMessages(long channelId)
+            throws ApiException;
+
+    Message sendMessage(long channelId, PostMessageRequest request)
+            throws ApiException;
+
+    Message editMessage(long channelId, long messageId, EditMessageRequest request)
+            throws ApiException;
+
+    void deleteMessage(long channelId, long messageId)
+            throws ApiException;
+
+    void ackMessage(long channelId, long messageId)
+            throws ApiException;
 }
