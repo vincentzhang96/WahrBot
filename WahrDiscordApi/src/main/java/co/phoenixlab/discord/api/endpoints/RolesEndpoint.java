@@ -12,5 +12,21 @@
 
 package co.phoenixlab.discord.api.endpoints;
 
+import co.phoenixlab.discord.api.entities.Role;
+import co.phoenixlab.discord.api.request.RoleReorderRequestEntry;
+
 public interface RolesEndpoint {
+
+    Role createRole(long guildId)
+            throws ApiException;
+
+    Role editRole(long guildId, long roleId)
+            throws ApiException;
+
+    Role[] reorderRoles(long guildId, RoleReorderRequestEntry[] request)
+            throws ApiException;
+
+    void deleteRole(long guildId, long roleId)
+            throws ApiException;
+    
 }
