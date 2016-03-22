@@ -12,22 +12,22 @@
 
 package co.phoenixlab.discord.api.endpoints;
 
-import co.phoenixlab.discord.api.entities.Channel;
+import co.phoenixlab.discord.api.entities.PublicChannel;
 import co.phoenixlab.discord.api.request.CreateChannelRequest;
 import co.phoenixlab.discord.api.request.EditChannelRequest;
 
 public interface ChannelsEndpoint {
 
-    Channel createChannel(long guildId, CreateChannelRequest request)
+    PublicChannel createChannel(long guildId, CreateChannelRequest request)
             throws ApiException;
 
-    Channel editChannel(long channelId, EditChannelRequest request)
+    PublicChannel editChannel(long channelId, EditChannelRequest request)
             throws ApiException;
 
-    Channel deleteChannel(long channelId)
+    void deleteChannel(long channelId)
             throws ApiException;
 
-    Channel[] getGuildChannels(long guildId)
+    PublicChannel[] getGuildChannels(long guildId)
             throws ApiException;
 
     void broadcastTyping(long channelId)
