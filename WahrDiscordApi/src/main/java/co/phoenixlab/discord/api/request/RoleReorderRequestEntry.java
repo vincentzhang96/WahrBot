@@ -27,4 +27,13 @@ public class RoleReorderRequestEntry implements Entity {
     private long id;
     private int position;
 
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 }

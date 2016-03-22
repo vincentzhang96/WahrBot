@@ -16,6 +16,7 @@ package co.phoenixlab.discord.api.entities;
 import com.google.common.primitives.Longs;
 
 import java.util.Base64;
+import java.util.Objects;
 
 /**
  * A uniquely identifiable entity from Discord
@@ -38,6 +39,26 @@ public interface Entity {
         }
         id = id.substring(1);
         return Longs.fromByteArray(Base64.getUrlDecoder().decode(id));
+    }
+
+    /**
+     * Checks if two objects are entities and the entities are of the same type
+     * and have the same ID.
+     * @param a The first entity to check for equality. Can be null.
+     * @param b The second entity to check for equality. Can be null.
+     * @return True iff both objects are entities, same kind of entity, and have the same ID.
+     */
+    static boolean areEqual(Object a, Object b) {
+        return a instanceof Entity && b instanceof Entity &&
+                (a == b || a.getClass() == b.getClass() &&
+                        ((Entity) a).getId() == ((Entity) b).getId());
+    }
+
+    static int hash(Entity a) {
+        if (a == null) {
+            return 0;
+        }
+        return Objects.hash(a.getId());
     }
 
 }

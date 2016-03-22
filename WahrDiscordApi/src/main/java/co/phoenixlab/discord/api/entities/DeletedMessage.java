@@ -23,4 +23,14 @@ public class DeletedMessage implements Entity {
 
     private long id;
     private long channelId;
+
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 }

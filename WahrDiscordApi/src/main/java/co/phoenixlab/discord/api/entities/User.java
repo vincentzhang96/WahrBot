@@ -17,4 +17,13 @@ public class User implements Entity {
     private String avatar;
     private boolean bot;
 
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 }

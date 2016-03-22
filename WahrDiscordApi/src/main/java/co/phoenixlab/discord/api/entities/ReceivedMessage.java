@@ -36,4 +36,13 @@ public class ReceivedMessage implements Entity {
     private boolean mentionEveryone;
     private User[] mentions;
 
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 }

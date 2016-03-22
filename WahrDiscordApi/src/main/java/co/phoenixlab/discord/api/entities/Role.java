@@ -39,4 +39,14 @@ public class Role implements Entity, Comparable<Role> {
     public int compareTo(Role o) {
         return Integer.compare(position, o.position);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 }

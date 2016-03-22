@@ -23,4 +23,13 @@ public class PresenceUser implements Entity {
 
     private long id;
 
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 }

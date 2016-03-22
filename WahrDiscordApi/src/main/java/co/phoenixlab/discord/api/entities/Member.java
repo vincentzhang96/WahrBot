@@ -23,4 +23,14 @@ public class Member implements Entity {
     public long getId() {
         return user.getId();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 }

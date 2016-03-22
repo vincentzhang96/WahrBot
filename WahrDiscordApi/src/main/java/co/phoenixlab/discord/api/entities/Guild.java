@@ -43,5 +43,13 @@ public class Guild implements Entity {
     private PublicChannel[] channels;
     private Member[] members;
 
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
 
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 }

@@ -17,4 +17,13 @@ public class MessageAttachment implements Entity {
     private String proxyUrl;
     private int size;
 
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 }

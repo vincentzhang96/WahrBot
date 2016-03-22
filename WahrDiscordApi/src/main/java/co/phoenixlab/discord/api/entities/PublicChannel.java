@@ -29,4 +29,13 @@ public class PublicChannel extends Channel {
     private int bitrate;
     private ChannelType type;
 
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 }

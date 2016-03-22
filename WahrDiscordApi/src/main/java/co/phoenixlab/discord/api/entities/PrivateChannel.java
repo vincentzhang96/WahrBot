@@ -23,4 +23,13 @@ public class PrivateChannel extends Channel {
 
     private User recipient;
 
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 }
