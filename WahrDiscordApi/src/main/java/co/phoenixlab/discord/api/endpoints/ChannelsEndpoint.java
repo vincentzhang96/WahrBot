@@ -27,7 +27,7 @@ public interface ChannelsEndpoint {
     Channel deleteChannel(long channelId)
             throws ApiException;
 
-    void boradcastTyping(long channelId)
+    void broadcastTyping(long channelId)
             throws ApiException;
-    
+
 }
