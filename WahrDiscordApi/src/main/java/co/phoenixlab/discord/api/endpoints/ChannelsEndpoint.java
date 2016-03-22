@@ -12,13 +12,18 @@
 
 package co.phoenixlab.discord.api.endpoints;
 
+import co.phoenixlab.discord.api.entities.PrivateChannel;
 import co.phoenixlab.discord.api.entities.PublicChannel;
 import co.phoenixlab.discord.api.request.CreateChannelRequest;
+import co.phoenixlab.discord.api.request.CreatePrivateChannelRequest;
 import co.phoenixlab.discord.api.request.EditChannelRequest;
 
 public interface ChannelsEndpoint {
 
     PublicChannel createChannel(long guildId, CreateChannelRequest request)
+            throws ApiException;
+
+    PrivateChannel createPrivateChannel(long myUserId, CreatePrivateChannelRequest request)
             throws ApiException;
 
     PublicChannel editChannel(long channelId, EditChannelRequest request)
