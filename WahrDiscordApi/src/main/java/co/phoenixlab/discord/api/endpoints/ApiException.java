@@ -14,6 +14,13 @@ package co.phoenixlab.discord.api.endpoints;
 
 public class ApiException extends RuntimeException {
 
+    public ApiException() {
+    }
+
+    public ApiException(String message) {
+        super(message);
+    }
+
     public ApiException(String endpoint, String message) {
         super(createMessage(endpoint, message));
     }
@@ -24,6 +31,10 @@ public class ApiException extends RuntimeException {
 
     public ApiException(String endpoint, Throwable throwable) {
         super(endpoint, throwable);
+    }
+
+    public ApiException(Throwable cause) {
+        super(cause);
     }
 
     private static String createMessage(String endpoint, String message) {
