@@ -10,46 +10,30 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.endpoints;
+package co.phoenixlab.discord.api.endpoints.async;
 
-import co.phoenixlab.discord.api.endpoints.async.*;
+import co.phoenixlab.discord.api.endpoints.ApiException;
+import co.phoenixlab.discord.api.entities.Guild;
+import co.phoenixlab.discord.api.request.CreateGuildRequest;
+import co.phoenixlab.discord.api.request.EditGuildRequest;
 
-public interface Endpoints {
-    
-    AuthenticationEndpoint auth();
+import java.util.concurrent.Future;
 
-    AuthenticationEndpointAsync authAsync();
+public interface GuildsEndpointAsync {
 
-    BansEndpoint bans();
+    Future<Guild> createGuild(CreateGuildRequest request)
+            throws ApiException;
 
-    BansEndpointAsync bansAsync();
+    Future<Guild> editGuild(long guildId, EditGuildRequest request)
+            throws ApiException;
 
-    ChannelsEndpoint channels();
+    Future<Guild> leaveGuild(long guildId)
+            throws ApiException;
 
-    ChannelsEndpointAsync channelsAsync();
+    Future<Guild> deleteGuild(long guildId)
+            throws ApiException;
 
-    GuildsEndpoint guilds();
-
-    GuildsEndpointAsync guildsAsync();
-
-    MembersEndpoint members();
-
-    MembersEndpointAsync membersAsync();
-
-    MessagesEndpoint messages();
-
-    MessagesEndpointAsync messagesAsync();
-
-    PermissionsEndpoint permissions();
-
-    PermissionsEndpointAsync permissionsAsync();
-
-    RolesEndpoint roles();
-
-    RolesEndpointAsync rolesAsync();
-
-    UsersEndpoint users();
-
-    UsersEndpointAsync usersAsync();
+    Future<Guild[]> getGuilds()
+            throws ApiException;
 
 }
