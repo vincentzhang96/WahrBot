@@ -14,9 +14,9 @@ package co.phoenixlab.discord.api.entities;
 
 import co.phoenixlab.discord.api.enums.PresenceStatus;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Builder;
 
 @Getter
 @NoArgsConstructor
