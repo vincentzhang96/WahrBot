@@ -12,53 +12,24 @@
 
 package co.phoenixlab.discord.api.endpoints;
 
-public class Endpoints {
+public interface Endpoints {
+    
+    AuthenticationEndpoint auth();
 
-    public static final String BASE_URL = "https://discordapp.com/api";
+    BansEndpoint bans();
 
-    public AuthenticationEndpoint auth() {
-        //  TODO
-        return null;
-    }
+    ChannelsEndpoint channels();
 
-    public BansEndpoint bans() {
-        //  TODO
-        return null;
-    }
+    GuildsEndpoint guilds();
 
-    public ChannelsEndpoint channels() {
-        //  TODO
-        return null;
-    }
+    MembersEndpoint members();
 
-    public GuildsEndpoint guilds() {
-        //  TODO
-        return null;
-    }
+    MessagesEndpoint messages();
 
-    public MembersEndpoint members() {
-        //  TODO
-        return null;
-    }
+    PermissionsEndpoint permissions();
 
-    public MessagesEndpoint messages() {
-        //  TODO
-        return null;
-    }
+    RolesEndpoint roles();
 
-    public PermissionsEndpoint permissions() {
-        //  TODO
-        return null;
-    }
-
-    public RolesEndpoint roles() {
-        //  TODO
-        return null;
-    }
-
-    public UsersEndpoint users() {
-        //  TODO
-        return null;
-    }
-
+    UsersEndpoint users();
+    
 }
