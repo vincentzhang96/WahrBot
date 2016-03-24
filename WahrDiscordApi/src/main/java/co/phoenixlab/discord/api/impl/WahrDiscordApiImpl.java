@@ -13,11 +13,11 @@
 package co.phoenixlab.discord.api.impl;
 
 import co.phoenixlab.discord.api.WahrDiscordApi;
-import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.entities.SelfUser;
 import co.phoenixlab.discord.api.entities.TokenResponse;
 import co.phoenixlab.discord.api.enums.ApiClientState;
 import co.phoenixlab.discord.api.enums.ApiClientTrigger;
+import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.exceptions.NotReadyException;
 import co.phoenixlab.discord.api.request.EmailPasswordLoginRequest;
 import com.codahale.metrics.Meter;
@@ -95,7 +95,11 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         config.configure(READY).
                 substateOf(CONNECTED).
                 permit(DISCONNECT, DISCONNECTED);
-        return new StateMachine<>(DISCONNECTED, config);
+        StateMachine<ApiClientState, ApiClientTrigger> ret = new StateMachine<>(DISCONNECTED, config);
+        ret.onUnhandledTrigger((state, trigger) -> {
+            throw new ApiException("Client is in invalid state " + state + " for trigger " + trigger);
+        });
+        return ret;
     }
 
     private void handleEventBusException(Throwable throwable, SubscriberExceptionContext context) {
