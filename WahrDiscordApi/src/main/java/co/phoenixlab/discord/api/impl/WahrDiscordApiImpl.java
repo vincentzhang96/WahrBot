@@ -80,27 +80,54 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
     private StateMachine<ApiClientState, ApiClientTrigger> buildStateMachine() {
         StateMachineConfig<ApiClientState, ApiClientTrigger> config = new StateMachineConfig<>();
         config.configure(DISCONNECTED).
+                onEntry(this::onDisconnected).
                 permit(CONNECT, CONNECTING).
                 ignore(DISCONNECT);
         config.configure(CONNECTING).
+                onEntry(this::onConnecting).
                 permit(CONNECT_FAIL, DISCONNECTED).
                 permit(CONNECT_OK, CONNECTED);
         config.configure(CONNECTED).
+                onEntry(this::onConnected).
                 permit(LOAD, LOADING).
                 permit(DISCONNECT, DISCONNECTED);
         config.configure(LOADING).
                 substateOf(CONNECTED).
+                onEntry(this::onLoading).
                 permit(LOAD_OK, READY).
-                permit(DISCONNECT, DISCONNECTED);
+                permit(DISCONNECT, DISCONNECTED).
+                ignore(LOAD);
         config.configure(READY).
                 substateOf(CONNECTED).
-                permit(DISCONNECT, DISCONNECTED);
+                onEntry(this::onReady).
+                permit(DISCONNECT, DISCONNECTED).
+                ignore(LOAD);
         StateMachine<ApiClientState, ApiClientTrigger> ret = new StateMachine<>(DISCONNECTED, config);
         ret.onUnhandledTrigger((state, trigger) -> {
             throw new ApiException("Failed to handle trigger",
                     new IllegalStateException("Invalid trigger " + trigger + " for current state " + state));
         });
         return ret;
+    }
+
+    private void onDisconnected() {
+
+    }
+
+    private void onConnecting() {
+
+    }
+
+    private void onConnected() {
+
+    }
+
+    private void onLoading() {
+
+    }
+
+    private void onReady() {
+
     }
 
     private void handleEventBusException(Throwable throwable, SubscriberExceptionContext context) {
