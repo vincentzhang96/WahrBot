@@ -97,7 +97,8 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
                 permit(DISCONNECT, DISCONNECTED);
         StateMachine<ApiClientState, ApiClientTrigger> ret = new StateMachine<>(DISCONNECTED, config);
         ret.onUnhandledTrigger((state, trigger) -> {
-            throw new ApiException("Client is in invalid state " + state + " for trigger " + trigger);
+            throw new ApiException("Failed to handle trigger",
+                    new IllegalStateException("Invalid trigger " + trigger + " for current state " + state));
         });
         return ret;
     }
