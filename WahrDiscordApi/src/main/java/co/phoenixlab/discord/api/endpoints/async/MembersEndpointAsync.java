@@ -20,13 +20,13 @@ import java.util.concurrent.Future;
 
 public interface MembersEndpointAsync {
 
-    Future<Void> editMember(long guildId, long userId, EditMemberRequest request)
+    Future<Void> editMemberAsync(long guildId, long userId, EditMemberRequest request)
             throws ApiException;
 
-    Future<Void> kickMember(long guildId, long userId)
+    Future<Void> kickMemberAsync(long guildId, long userId)
             throws ApiException;
 
-    Future<Member> getMember(long guildId, long userId)
+    Future<Member> getMemberAsync(long guildId, long userId)
             throws ApiException;
 
 }

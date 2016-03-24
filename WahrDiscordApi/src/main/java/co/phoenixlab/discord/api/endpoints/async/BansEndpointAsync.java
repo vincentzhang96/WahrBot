@@ -19,16 +19,16 @@ import java.util.concurrent.Future;
 
 public interface BansEndpointAsync {
 
-    Future<BannedUser[]> getBans(long guildId)
+    Future<BannedUser[]> getBansAsync(long guildId)
             throws ApiException;
 
-    Future<Void> addBan(long guildId, long userId, int deleteMessageDays)
+    Future<Void> addBanAsync(long guildId, long userId, int deleteMessageDays)
             throws ApiException;
 
-    default Future<Void> addBan(long guildId, long userId) {
-        return addBan(guildId, userId, 0);
+    default Future<Void> addBanAsync(long guildId, long userId) {
+        return addBanAsync(guildId, userId, 0);
     }
 
-    Future<Void> removeBan(long guildId, long userId);
+    Future<Void> removeBanAsync(long guildId, long userId);
 
 }

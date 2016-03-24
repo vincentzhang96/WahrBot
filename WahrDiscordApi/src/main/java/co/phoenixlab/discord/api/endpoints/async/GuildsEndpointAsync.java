@@ -21,19 +21,19 @@ import java.util.concurrent.Future;
 
 public interface GuildsEndpointAsync {
 
-    Future<Guild> createGuild(CreateGuildRequest request)
+    Future<Guild> createGuildAsync(CreateGuildRequest request)
             throws ApiException;
 
-    Future<Guild> editGuild(long guildId, EditGuildRequest request)
+    Future<Guild> editGuildAsync(long guildId, EditGuildRequest request)
             throws ApiException;
 
-    Future<Guild> leaveGuild(long guildId)
+    Future<Guild> leaveGuildAsync(long guildId)
             throws ApiException;
 
-    Future<Guild> deleteGuild(long guildId)
+    Future<Guild> deleteGuildAsync(long guildId)
             throws ApiException;
 
-    Future<Guild[]> getGuilds()
+    Future<Guild[]> getGuildsAsync()
             throws ApiException;
 
 }

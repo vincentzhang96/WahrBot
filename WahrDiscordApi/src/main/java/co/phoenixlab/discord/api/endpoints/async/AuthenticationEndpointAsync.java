@@ -21,10 +21,10 @@ import java.util.concurrent.Future;
 
 public interface AuthenticationEndpointAsync {
 
-    Future<TokenResponse> logIn(EmailPasswordLoginRequest request)
+    Future<TokenResponse> logInAsync(EmailPasswordLoginRequest request)
             throws ApiException;
 
-    Future<Void> logOut(LogoutRequest request)
+    Future<Void> logOutAsync(LogoutRequest request)
             throws ApiException;
 
 }

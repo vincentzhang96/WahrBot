@@ -20,16 +20,16 @@ import java.util.concurrent.Future;
 
 public interface RolesEndpointAsync {
 
-    Future<Role> createRole(long guildId)
+    Future<Role> createRoleAsync(long guildId)
             throws ApiException;
 
-    Future<Role> editRole(long guildId, long roleId)
+    Future<Role> editRoleAsync(long guildId, long roleId)
             throws ApiException;
 
-    Future<Role[]> reorderRoles(long guildId, RoleReorderRequestEntry[] request)
+    Future<Role[]> reorderRolesAsync(long guildId, RoleReorderRequestEntry[] request)
             throws ApiException;
 
-    Future<Void> deleteRole(long guildId, long roleId)
+    Future<Void> deleteRoleAsync(long guildId, long roleId)
             throws ApiException;
 
 }

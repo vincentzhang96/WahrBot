@@ -19,10 +19,10 @@ import java.util.concurrent.Future;
 
 public interface PermissionsEndpointAsync {
 
-    Future<Void> createOrEditPermission(long channelId, Permission request)
+    Future<Void> createOrEditPermissionAsync(long channelId, Permission request)
             throws ApiException;
 
-    Future<Void> deletePermission(long channelId, long targetId)
+    Future<Void> deletePermissionAsync(long channelId, long targetId)
             throws ApiException;
 
 }

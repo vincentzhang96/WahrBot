@@ -23,22 +23,22 @@ import java.util.concurrent.Future;
 
 public interface ChannelsEndpointAsync {
 
-    Future<PublicChannel> createChannel(long guildId, CreateChannelRequest request)
+    Future<PublicChannel> createChannelAsync(long guildId, CreateChannelRequest request)
             throws ApiException;
 
-    Future<PrivateChannel> createPrivateChannel(long myUserId, CreatePrivateChannelRequest request)
+    Future<PrivateChannel> createPrivateChannelAsync(long myUserId, CreatePrivateChannelRequest request)
             throws ApiException;
 
-    Future<PublicChannel> editChannel(long channelId, EditChannelRequest request)
+    Future<PublicChannel> editChannelAsync(long channelId, EditChannelRequest request)
             throws ApiException;
 
-    Future<Void> deleteChannel(long channelId)
+    Future<Void> deleteChannelAsync(long channelId)
             throws ApiException;
 
-    Future<PublicChannel[]> getGuildChannels(long guildId)
+    Future<PublicChannel[]> getGuildChannelsAsync(long guildId)
             throws ApiException;
 
-    Future<Void> broadcastTyping(long channelId)
+    Future<Void> broadcastTypingAsync(long channelId)
             throws ApiException;
 
 }

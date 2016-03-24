@@ -22,13 +22,13 @@ import java.util.concurrent.Future;
 
 public interface UsersEndpointAsync {
 
-    Future<BufferedImage> getAvatar(long userId, String avatar)
+    Future<BufferedImage> getAvatarAsync(long userId, String avatar)
             throws ApiException;
 
-    Future<SelfUser> editProfile(EditProfileRequest request)
+    Future<SelfUser> editProfileAsync(EditProfileRequest request)
             throws ApiException;
 
-    Future<Void> updatePresence(Presence request)
+    Future<Void> updatePresenceAsync(Presence request)
             throws ApiException;
 
 }
