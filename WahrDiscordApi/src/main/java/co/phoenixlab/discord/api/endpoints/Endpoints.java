@@ -28,6 +28,10 @@ public interface Endpoints {
 
     ChannelsEndpointAsync channelsAsync();
 
+    GatewayEndpoint gateway();
+
+    GatewayEndpointAsync gatewayAsync();
+
     GuildsEndpoint guilds();
 
     GuildsEndpointAsync guildsAsync();

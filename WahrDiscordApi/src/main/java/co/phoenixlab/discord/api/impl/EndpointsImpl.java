@@ -55,6 +55,16 @@ public class EndpointsImpl implements Endpoints {
     }
 
     @Override
+    public GatewayEndpoint gateway() {
+        return null;
+    }
+
+    @Override
+    public GatewayEndpointAsync gatewayAsync() {
+        return null;
+    }
+
+    @Override
     public GuildsEndpoint guilds() {
         return null;
     }
