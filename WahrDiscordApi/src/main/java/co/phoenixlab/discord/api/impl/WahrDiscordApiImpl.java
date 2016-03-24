@@ -161,7 +161,7 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         if (token == null) {
             throw new ApiException("No token set, please provide a token");
         }
-        //  TODO
+        stateMachine.fire(CONNECT);
     }
 
     @Override
