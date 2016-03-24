@@ -13,9 +13,9 @@
 package co.phoenixlab.discord.api.entities;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Builder;
 
 @Builder
 @Getter

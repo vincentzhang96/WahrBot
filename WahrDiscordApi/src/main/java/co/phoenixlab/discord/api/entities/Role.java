@@ -16,7 +16,7 @@ import co.phoenixlab.discord.api.enums.DiscordPermission;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Builder;
+import lombok.Builder;
 
 import java.util.EnumSet;
 

@@ -3,7 +3,7 @@ package co.phoenixlab.discord.api.entities;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Builder;
+import lombok.Builder;
 
 import java.time.Instant;
 
