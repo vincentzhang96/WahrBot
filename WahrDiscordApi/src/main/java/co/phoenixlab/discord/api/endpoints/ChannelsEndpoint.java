@@ -14,6 +14,7 @@ package co.phoenixlab.discord.api.endpoints;
 
 import co.phoenixlab.discord.api.entities.PrivateChannel;
 import co.phoenixlab.discord.api.entities.PublicChannel;
+import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.CreateChannelRequest;
 import co.phoenixlab.discord.api.request.CreatePrivateChannelRequest;
 import co.phoenixlab.discord.api.request.EditChannelRequest;

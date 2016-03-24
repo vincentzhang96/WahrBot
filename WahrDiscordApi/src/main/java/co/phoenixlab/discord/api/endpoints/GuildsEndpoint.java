@@ -13,6 +13,7 @@
 package co.phoenixlab.discord.api.endpoints;
 
 import co.phoenixlab.discord.api.entities.Guild;
+import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.CreateGuildRequest;
 import co.phoenixlab.discord.api.request.EditGuildRequest;
 

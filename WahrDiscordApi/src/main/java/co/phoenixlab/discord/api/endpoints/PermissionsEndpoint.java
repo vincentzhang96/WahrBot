@@ -13,6 +13,7 @@
 package co.phoenixlab.discord.api.endpoints;
 
 import co.phoenixlab.discord.api.entities.Permission;
+import co.phoenixlab.discord.api.exceptions.ApiException;
 
 public interface PermissionsEndpoint {
 

@@ -13,6 +13,7 @@
 package co.phoenixlab.discord.api.endpoints;
 
 import co.phoenixlab.discord.api.entities.ReceivedMessage;
+import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.EditMessageRequest;
 import co.phoenixlab.discord.api.request.PostMessageRequest;
 
