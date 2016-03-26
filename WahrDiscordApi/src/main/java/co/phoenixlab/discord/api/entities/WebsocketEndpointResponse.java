@@ -17,12 +17,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Builder;
 
+import java.net.URI;
+
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class WebsocketEndpointResponse {
 
-    private String url;
+    private URI url;
 
 }
