@@ -40,6 +40,14 @@ class WSClient extends WebSocketClient {
 
     private final Gson gson;
 
+    private int webSocketProtocolVersion;
+    private int largeThreshold;
+    private boolean compress;
+    private String operatingSystem;
+    private String browser;
+    private String referrer;
+    private String referringDomain;
+
     public WSClient(URI serverURI, WahrDiscordApiImpl api) {
         super(serverURI);
         metrics = new MetricRegistry();
@@ -47,6 +55,13 @@ class WSClient extends WebSocketClient {
         this.api = api;
         connectLatch = new CountDownLatch(2);
         gson = WahrDiscordApiUtils.createGson();
+        webSocketProtocolVersion = 3;
+        largeThreshold = 250;
+        compress = false;
+        operatingSystem = System.getProperty("os.name");
+        browser = "Java";
+        referrer = "";
+        referringDomain = "";
     }
 
     @Override
@@ -55,14 +70,14 @@ class WSClient extends WebSocketClient {
         WS_LOGGER.info("WebSocket connection opened");
         ConnectRequest request = ConnectRequest.builder().
                 token(api.getToken()).
-                v(3).
-                largeThreshold(250).
-                compress(false).
+                v(webSocketProtocolVersion).
+                largeThreshold(largeThreshold).
+                compress(compress).
                 properties(ConnectRequestProperties.builder().
-                        os(System.getProperty("os.name")).
-                        browser("Java").
-                        referrer("").
-                        referringDomain("").
+                        os(operatingSystem).
+                        browser(browser).
+                        referrer(referrer).
+                        referringDomain(referringDomain).
                         build()).
                 build();
         WSRequest req = WSRequest.builder().
@@ -74,9 +89,12 @@ class WSClient extends WebSocketClient {
 
     @Override
     public void onMessage(String message) {
-        try(Timer.Context ctx = stats.webSocketMessages.time()) {
+        try(Timer.Context ctx = stats.webSocketMessageParsing.time()) {
 
 
+        } catch (Exception e) {
+            stats.webSocketMessageErrors.mark();
+            WS_LOGGER.warn("Exception while parsing message", e);
         }
     }
 
