@@ -132,12 +132,12 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         } catch (InvalidTokenException ite) {
             API_LOGGER.warn("Unable to get websocket gateway.", ite);
             stats.connectFails.mark();
-            stateMachine.fire(DISCONNECT);
+            stateMachine.fire(CONNECT_FAIL);
             return;
         } catch (ApiException e) {
             API_LOGGER.warn("Unable to get websocket gateway. Is Discord's API down?", e);
             stats.connectFails.mark();
-            stateMachine.fire(DISCONNECT);
+            stateMachine.fire(CONNECT_FAIL);
             return;
         }
         try {
@@ -145,15 +145,15 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
                 webSocketClient.getConnectLatch().countDown();
                 Exception exception = webSocketClient.getWebsocketException();
                 stats.connectFails.mark();
-                stateMachine.fire(DISCONNECT);
+                stateMachine.fire(CONNECT_FAIL);
                 return;
             }
         } catch (InterruptedException e) {
             API_LOGGER.warn("Connection was interrupted, canceling");
-            stateMachine.fire(DISCONNECT);
+            stateMachine.fire(CONNECT_FAIL);
             return;
         }
-
+        stateMachine.fire(CONNECT_OK);
     }
 
     private void initWSClient(URI uri) {
