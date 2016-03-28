@@ -15,13 +15,17 @@ package co.phoenixlab.discord.api.impl;
 import co.phoenixlab.discord.api.WahrDiscordApi;
 import co.phoenixlab.discord.api.entities.SelfUser;
 import co.phoenixlab.discord.api.entities.TokenResponse;
+import co.phoenixlab.discord.api.entities.WebsocketEndpointResponse;
 import co.phoenixlab.discord.api.enums.ApiClientState;
 import co.phoenixlab.discord.api.enums.ApiClientTrigger;
 import co.phoenixlab.discord.api.exceptions.ApiException;
+import co.phoenixlab.discord.api.exceptions.InvalidTokenException;
 import co.phoenixlab.discord.api.exceptions.NotReadyException;
 import co.phoenixlab.discord.api.request.EmailPasswordLoginRequest;
+import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.StateMachineConfig;
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -29,9 +33,14 @@ import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.eventbus.SubscriberExceptionContext;
 import lombok.Getter;
+import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
+import java.net.URI;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -51,7 +60,7 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
     @Getter
     private volatile String token;
     private SelfUser self;
-    private WSClient websocketClient;
+    private WSClient webSocketClient;
     private final EndpointsImpl endpoints;
     @Getter
     private final AsyncEventBus eventBus;
@@ -115,7 +124,49 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
     }
 
     private void onConnecting() {
+        API_LOGGER.debug("Connecting...");
+        try {
+            stats.connectAttemptCount.inc();
+            WebsocketEndpointResponse response = endpoints.gateway().getGateway();
+            initWSClient(response.getUrl());
+        } catch (InvalidTokenException ite) {
+            API_LOGGER.warn("Unable to get websocket gateway.", ite);
+            stats.connectFails.mark();
+            stateMachine.fire(DISCONNECT);
+            return;
+        } catch (ApiException e) {
+            API_LOGGER.warn("Unable to get websocket gateway. Is Discord's API down?", e);
+            stats.connectFails.mark();
+            stateMachine.fire(DISCONNECT);
+            return;
+        }
+        try {
+            if (!webSocketClient.connectBlocking()) {
+                webSocketClient.getConnectLatch().countDown();
+                Exception exception = webSocketClient.getWebsocketException();
+                stats.connectFails.mark();
+                stateMachine.fire(DISCONNECT);
+                return;
+            }
+        } catch (InterruptedException e) {
+            API_LOGGER.warn("Connection was interrupted, canceling");
+            stateMachine.fire(DISCONNECT);
+            return;
+        }
 
+    }
+
+    private void initWSClient(URI uri) {
+        try {
+            SSLContext context = SSLContext.getInstance("TLS");
+            context.init(null, null, null);
+            webSocketClient = new WSClient(uri, this);
+            webSocketClient.setWebSocketFactory(new DefaultSSLWebSocketClientFactory(context));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Platform does not support TLS");
+        } catch (KeyManagementException kme) {
+            throw new RuntimeException("Could not set up key management", kme);
+        }
     }
 
     private void onConnected() {
@@ -218,14 +269,27 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         stats.eventBusEvents.mark();
     }
 
+    Stats getStats() {
+        return stats;
+    }
+
     class Stats {
         final Meter eventBusExceptions;
         final Meter eventBusEvents;
 
+        final Counter connectAttemptCount;
+        final Meter connectFails;
+
+        final Meter webSocketErrors;
+        final Timer webSocketMessages;
+
         Stats() {
             eventBusExceptions = metrics.meter(name(WahrDiscordApiImpl.class, "events", "errors", "uncaught"));
             eventBusEvents = metrics.meter(name(WahrDiscordApiImpl.class, "events"));
-
+            connectAttemptCount = metrics.counter(name(WahrDiscordApi.class, "connection", "attempts"));
+            connectFails = metrics.meter(name(WahrDiscordApi.class, "connection", "failures"));
+            webSocketErrors = metrics.meter(name(WSClient.class, "errors"));
+            webSocketMessages = metrics.timer(name(WSClient.class, "messages", "received"));
         }
 
     }

@@ -12,34 +12,94 @@
 
 package co.phoenixlab.discord.api.impl;
 
+import co.phoenixlab.discord.api.request.ConnectRequest;
+import co.phoenixlab.discord.api.request.ConnectRequestProperties;
+import co.phoenixlab.discord.api.request.WSRequest;
+import co.phoenixlab.discord.api.util.WahrDiscordApiUtils;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
+import com.google.gson.Gson;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.util.concurrent.CountDownLatch;
 
-public class WSClient extends WebSocketClient {
+class WSClient extends WebSocketClient {
 
-    public WSClient(URI serverURI) {
+    private static final Logger WS_LOGGER = LoggerFactory.getLogger(WSClient.class);
+
+    private final MetricRegistry metrics;
+    private final WahrDiscordApiImpl api;
+    private final WahrDiscordApiImpl.Stats stats;
+
+    private Exception websocketException;
+    private CountDownLatch connectLatch;
+
+    private final Gson gson;
+
+    public WSClient(URI serverURI, WahrDiscordApiImpl api) {
         super(serverURI);
+        metrics = new MetricRegistry();
+        stats = api.getStats();
+        this.api = api;
+        connectLatch = new CountDownLatch(2);
+        gson = WahrDiscordApiUtils.createGson();
     }
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
-
+        Thread.currentThread().setName("WebSocketClient");
+        WS_LOGGER.info("WebSocket connection opened");
+        ConnectRequest request = ConnectRequest.builder().
+                token(api.getToken()).
+                v(3).
+                largeThreshold(250).
+                compress(false).
+                properties(ConnectRequestProperties.builder().
+                        os(System.getProperty("os.name")).
+                        browser("Java").
+                        referrer("").
+                        referringDomain("").
+                        build()).
+                build();
+        WSRequest req = WSRequest.builder().
+                op(2).
+                d(request).
+                build();
+        send(gson.toJson(req));
     }
 
     @Override
     public void onMessage(String message) {
+        try(Timer.Context ctx = stats.webSocketMessages.time()) {
 
+
+        }
     }
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
 
+
     }
 
     @Override
     public void onError(Exception ex) {
-
+        websocketException = ex;
+        stats.webSocketErrors.mark();
+        WS_LOGGER.warn("Websocket exception", ex);
+        connectLatch.countDown();
     }
+
+    CountDownLatch getConnectLatch() {
+        return connectLatch;
+    }
+
+    Exception getWebsocketException() {
+        return websocketException;
+    }
+
 }
