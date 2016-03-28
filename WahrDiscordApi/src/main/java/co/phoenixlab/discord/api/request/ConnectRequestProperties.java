@@ -30,7 +30,7 @@ public class ConnectRequestProperties {
     private String browser;
     @SerializedName("$referrer")
     private String referrer;
-    @SerializedName("$referringDomain")
+    @SerializedName("$referring_domain")
     private String referringDomain;
 
 }
