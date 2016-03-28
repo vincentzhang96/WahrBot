@@ -42,6 +42,7 @@ public class Guild implements Entity {
     private String splash;
     private boolean large;
     private int verificationLevel;
+    private boolean unavailable;
     private Presence[] presences;
     private PublicChannel[] channels;
     private Member[] members;
