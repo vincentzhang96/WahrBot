@@ -15,9 +15,8 @@ package co.phoenixlab.discord.api.request;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Builder;
 
-@Builder
+@lombok.Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,5 +26,6 @@ public class ConnectRequest {
     private int v;
     private int largeThreshold;
     private boolean compress;
+    private ConnectRequestProperties properties;
 
 }
