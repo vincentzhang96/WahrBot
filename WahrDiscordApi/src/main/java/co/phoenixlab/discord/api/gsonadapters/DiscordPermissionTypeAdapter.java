@@ -10,23 +10,37 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.entities;
+package co.phoenixlab.discord.api.gsonadapters;
 
+import co.phoenixlab.discord.api.entities.DiscordPermissionSet;
 import co.phoenixlab.discord.api.enums.DiscordPermission;
-import co.phoenixlab.discord.api.gsonadapters.DiscordPermissionTypeAdapter;
-import com.google.gson.annotations.JsonAdapter;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
 
+import java.io.IOException;
 import java.util.EnumSet;
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@JsonAdapter(DiscordPermissionTypeAdapter.class)
-public class DiscordPermissionSet {
+public class DiscordPermissionTypeAdapter extends TypeAdapter<DiscordPermissionSet> {
 
-    private EnumSet<DiscordPermission> value;
+    @Override
+    public void write(JsonWriter out, DiscordPermissionSet value) throws IOException {
+        if (value == null) {
+            out.nullValue();
+            return;
+        }
+        long bits = DiscordPermission.toLong(value.getValue());
+        out.value(bits);
+    }
 
+    @Override
+    public DiscordPermissionSet read(JsonReader in) throws IOException {
+        if (in.peek() == JsonToken.NULL) {
+            in.nextNull();
+            return new DiscordPermissionSet(EnumSet.noneOf(DiscordPermission.class));
+        }
+        long bits = 0xFFFFFFFFL & in.nextInt();
+        return new DiscordPermissionSet(DiscordPermission.fromLong(bits));
+    }
 }
