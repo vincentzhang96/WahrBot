@@ -27,6 +27,7 @@ public class RoleReorderRequestEntry implements Entity {
     private long id;
     private int position;
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(Object o) {
         return Entity.areEqual(this, o);

@@ -23,6 +23,7 @@ public class PresenceUser implements Entity {
 
     private long id;
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(Object o) {
         return Entity.areEqual(this, o);

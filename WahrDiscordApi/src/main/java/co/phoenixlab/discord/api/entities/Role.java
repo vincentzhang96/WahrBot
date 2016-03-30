@@ -37,6 +37,7 @@ public class Role implements Entity, Comparable<Role> {
         return Integer.compare(position, o.position);
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(Object o) {
         return Entity.areEqual(this, o);

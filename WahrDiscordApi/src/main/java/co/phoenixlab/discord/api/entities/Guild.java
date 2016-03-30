@@ -47,6 +47,7 @@ public class Guild implements Entity {
     private PublicChannel[] channels;
     private Member[] members;
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(Object o) {
         return Entity.areEqual(this, o);

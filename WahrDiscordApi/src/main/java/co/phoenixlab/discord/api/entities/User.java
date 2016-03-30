@@ -17,6 +17,7 @@ public class User implements Entity {
     private String avatar;
     private boolean bot;
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(Object o) {
         return Entity.areEqual(this, o);

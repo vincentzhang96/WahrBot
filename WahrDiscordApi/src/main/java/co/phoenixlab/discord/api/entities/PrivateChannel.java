@@ -23,6 +23,7 @@ public class PrivateChannel extends Channel {
 
     private User recipient;
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(Object o) {
         return Entity.areEqual(this, o);

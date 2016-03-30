@@ -24,6 +24,7 @@ public class Member implements Entity {
         return user.getId();
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(Object o) {
         return Entity.areEqual(this, o);

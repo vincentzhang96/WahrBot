@@ -24,6 +24,7 @@ public class DeletedMessage implements Entity {
     private long id;
     private long channelId;
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(Object o) {
         return Entity.areEqual(this, o);

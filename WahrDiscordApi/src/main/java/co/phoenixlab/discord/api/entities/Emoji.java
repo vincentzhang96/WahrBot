@@ -29,6 +29,7 @@ public class Emoji implements Entity {
     private boolean requireColons;
     private boolean managed;
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(Object o) {
         return Entity.areEqual(this, o);

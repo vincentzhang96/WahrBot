@@ -17,6 +17,7 @@ public class MessageAttachment implements Entity {
     private String proxyUrl;
     private int size;
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(Object o) {
         return Entity.areEqual(this, o);
