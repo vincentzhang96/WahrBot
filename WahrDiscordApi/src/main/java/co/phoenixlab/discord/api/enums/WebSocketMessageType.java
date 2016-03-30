@@ -40,6 +40,6 @@ public enum WebSocketMessageType {
     CHANNEL_UPDATE,
     PRESENCE_UPDATE,
     VOICE_STATE_UPDATE,
-    VOICE_SERVER_UPDATE;
+    VOICE_SERVER_UPDATE
 
 }
