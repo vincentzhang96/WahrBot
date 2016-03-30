@@ -12,38 +12,18 @@
 
 package co.phoenixlab.discord.api.entities;
 
+import co.phoenixlab.discord.api.enums.DiscordPermission;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.EnumSet;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Role implements Entity, Comparable<Role> {
+public class DiscordPermissionSet {
 
-    private long id;
-    private String name;
-    private int color;
-    private DiscordPermissionSet permissions;
-    private int position;
-    private boolean managed;
-    private boolean hoist;
+    private EnumSet<DiscordPermission> value;
 
-
-    @Override
-    public int compareTo(Role o) {
-        return Integer.compare(position, o.position);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return Entity.areEqual(this, o);
-    }
-
-    @Override
-    public int hashCode() {
-        return Entity.hash(this);
-    }
 }

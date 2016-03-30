@@ -12,21 +12,18 @@
 
 package co.phoenixlab.discord.api.entities;
 
-import co.phoenixlab.discord.api.enums.DiscordPermission;
 import co.phoenixlab.discord.api.enums.PermissionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.EnumSet;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Permission {
 
-    private EnumSet<DiscordPermission> allow = EnumSet.noneOf(DiscordPermission.class);
-    private EnumSet<DiscordPermission> deny = EnumSet.noneOf(DiscordPermission.class);
+    private DiscordPermissionSet allow;
+    private DiscordPermissionSet deny;
     private long id;
     private PermissionType type;
 
