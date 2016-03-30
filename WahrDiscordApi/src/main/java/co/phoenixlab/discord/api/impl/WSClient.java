@@ -16,7 +16,6 @@ import co.phoenixlab.discord.api.request.ConnectRequest;
 import co.phoenixlab.discord.api.request.ConnectRequestProperties;
 import co.phoenixlab.discord.api.request.WSRequest;
 import co.phoenixlab.discord.api.util.WahrDiscordApiUtils;
-import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.gson.Gson;
 import org.java_websocket.client.WebSocketClient;
@@ -31,7 +30,6 @@ class WSClient extends WebSocketClient {
 
     private static final Logger WS_LOGGER = LoggerFactory.getLogger(WSClient.class);
 
-    private final MetricRegistry metrics;
     private final WahrDiscordApiImpl api;
     private final WahrDiscordApiImpl.Stats stats;
 
@@ -50,7 +48,6 @@ class WSClient extends WebSocketClient {
 
     public WSClient(URI serverURI, WahrDiscordApiImpl api) {
         super(serverURI);
-        metrics = new MetricRegistry();
         stats = api.getStats();
         this.api = api;
         connectLatch = new CountDownLatch(2);
