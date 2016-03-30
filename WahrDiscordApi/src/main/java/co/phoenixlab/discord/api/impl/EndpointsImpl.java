@@ -14,15 +14,14 @@ package co.phoenixlab.discord.api.impl;
 
 import co.phoenixlab.discord.api.endpoints.*;
 import co.phoenixlab.discord.api.endpoints.async.*;
+import com.google.inject.Inject;
 
 public class EndpointsImpl implements Endpoints {
 
     public static final String BASE_URL = "https://discordapp.com/api";
-    private final WahrDiscordApiImpl apiImpl;
+    @Inject
+    private WahrDiscordApiImpl apiImpl;
 
-    EndpointsImpl(WahrDiscordApiImpl apiImpl) {
-        this.apiImpl = apiImpl;
-    }
 
     @Override
     public AuthenticationEndpoint auth() {

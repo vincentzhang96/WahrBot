@@ -32,6 +32,9 @@ import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.eventbus.SubscriberExceptionContext;
+import com.google.inject.Binder;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import lombok.Getter;
 import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
 import org.slf4j.Logger;
@@ -55,6 +58,7 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
 
     @Getter
     private final MetricRegistry metrics;
+    private final Injector injector;
     private final Stats stats;
     private volatile String sessionId;
     @Getter
@@ -81,8 +85,8 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         this.executorService = Executors.newScheduledThreadPool(2);
         this.stateMachine = buildStateMachine();
         this.eventBus = new AsyncEventBus(executorService, this::handleEventBusException);
-        this.endpoints = new EndpointsImpl(this);
-
+        injector = Guice.createInjector(this::configureInjector);
+        endpoints = injector.getInstance(EndpointsImpl.class);
         this.eventBus.register(this);
     }
 
@@ -117,6 +121,14 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
                     new IllegalStateException("Invalid trigger " + trigger + " for current state " + state));
         });
         return ret;
+    }
+
+    private void configureInjector(Binder binder) {
+        binder.bind(ScheduledExecutorService.class).
+                toInstance(executorService);
+        binder.bind(WahrDiscordApi.class).
+                toInstance(this);
+
     }
 
     private void onDisconnected() {
