@@ -12,6 +12,8 @@
 
 package co.phoenixlab.discord.api.entities;
 
+import co.phoenixlab.discord.api.gsonadapters.ChannelDeserializer;
+import com.google.gson.annotations.JsonAdapter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +21,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonAdapter(ChannelDeserializer.class)
 public abstract class Channel implements Entity {
 
     public static int NULL_LAST_MESSAGE_ID = -1;
