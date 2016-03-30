@@ -14,23 +14,31 @@ package co.phoenixlab.discord.api.impl;
 
 import co.phoenixlab.discord.api.endpoints.*;
 import co.phoenixlab.discord.api.endpoints.async.*;
+import com.google.common.net.HttpHeaders;
 import com.google.inject.Inject;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
+import org.apache.http.entity.ContentType;
 
 public class EndpointsImpl implements Endpoints {
 
     public static final String BASE_URL = "https://discordapp.com/api";
     @Inject
     private WahrDiscordApiImpl apiImpl;
-
+    @Inject
+    private AuthenticationEndpointImpl auth;
 
     @Override
     public AuthenticationEndpoint auth() {
-        return null;
+        return auth;
     }
 
     @Override
     public AuthenticationEndpointAsync authAsync() {
-        return null;
+        return auth;
     }
 
     @Override
@@ -121,5 +129,40 @@ public class EndpointsImpl implements Endpoints {
     @Override
     public UsersEndpointAsync usersAsync() {
         return null;
+    }
+
+    private void addDefaultHeaders(HttpRequest request) {
+        request.header(HttpHeaders.USER_AGENT, apiImpl.getUserAgent());
+        request.header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+    }
+
+    private void addAuthHeader(HttpRequest request) {
+        request.header(HttpHeaders.AUTHORIZATION, apiImpl.getToken());
+    }
+
+    HttpResponse<String> defaultPostUnauth(String url, String body) throws UnirestException {
+        HttpRequestWithBody req = Unirest.post(url);
+        addDefaultHeaders(req);
+        return req.body(body).asString();
+    }
+
+    HttpResponse<String> defaultPost(String url, String body) throws UnirestException {
+        HttpRequestWithBody req = Unirest.post(url);
+        addDefaultHeaders(req);
+        addAuthHeader(req);
+        return req.body(body).asString();
+    }
+
+    HttpResponse<String> defaultGetUnauth(String url) throws UnirestException {
+        HttpRequest req = Unirest.get(url);
+        addDefaultHeaders(req);
+        return req.asString();
+    }
+
+    HttpResponse<String> defaultGet(String url) throws UnirestException {
+        HttpRequest req = Unirest.get(url);
+        addDefaultHeaders(req);
+        addAuthHeader(req);
+        return req.asString();
     }
 }
