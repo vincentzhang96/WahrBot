@@ -22,6 +22,7 @@ import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.exceptions.InvalidTokenException;
 import co.phoenixlab.discord.api.exceptions.NotReadyException;
 import co.phoenixlab.discord.api.request.EmailPasswordLoginRequest;
+import co.phoenixlab.discord.api.util.WahrDiscordApiUtils;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
@@ -32,6 +33,7 @@ import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.eventbus.SubscriberExceptionContext;
+import com.google.gson.Gson;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -62,6 +64,8 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
     private final Stats stats;
     private volatile String sessionId;
     @Getter
+    private final String userAgent;
+    @Getter
     private volatile String token;
     private SelfUser self;
     private WSClient webSocketClient;
@@ -74,11 +78,12 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
     private final StateMachine<ApiClientState, ApiClientTrigger> stateMachine;
 
 
-    public WahrDiscordApiImpl() {
-        this(null);
+    public WahrDiscordApiImpl(String userAgent) {
+        this(null, userAgent);
     }
 
-    public WahrDiscordApiImpl(String token) {
+    public WahrDiscordApiImpl(String userAgent, String token) {
+        this.userAgent = userAgent;
         this.metrics = new MetricRegistry();
         this.stats = new Stats();
         this.token = token;
@@ -128,11 +133,15 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
                 toInstance(executorService);
         binder.bind(WahrDiscordApi.class).
                 toInstance(this);
+        binder.bind(WahrDiscordApiImpl.class).
+                toInstance(this);
+        binder.bind(Gson.class).
+                toProvider(WahrDiscordApiUtils::createGson);
 
     }
 
     private void onDisconnected() {
-
+        API_LOGGER.info("Disconnected");
     }
 
     private void onConnecting() {
@@ -156,6 +165,7 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
             if (!webSocketClient.connectBlocking()) {
                 webSocketClient.getConnectLatch().countDown();
                 Exception exception = webSocketClient.getWebsocketException();
+                API_LOGGER.warn("Failed to connect to websocket gateway.", exception);
                 stats.connectFails.mark();
                 stateMachine.fire(CONNECT_FAIL);
                 return;
@@ -172,6 +182,7 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         try {
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(null, null, null);
+            API_LOGGER.debug("Using websocket gateway \"{}\"", uri);
             webSocketClient = new WSClient(uri, this);
             webSocketClient.setWebSocketFactory(new DefaultSSLWebSocketClientFactory(context));
         } catch (NoSuchAlgorithmException e) {
@@ -182,6 +193,7 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
     }
 
     private void onConnected() {
+        API_LOGGER.info("Connected to websocket gateway");
 
     }
 
