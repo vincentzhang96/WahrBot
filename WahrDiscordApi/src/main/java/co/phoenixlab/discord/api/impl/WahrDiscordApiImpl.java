@@ -145,7 +145,7 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
     }
 
     private void onConnecting() {
-        API_LOGGER.debug("Connecting...");
+        API_LOGGER.info("Attempting to connect using token \"{}\"", token);
         try {
             stats.connectAttemptCount.inc();
             WebsocketEndpointResponse response = endpoints.gateway().getGateway();
