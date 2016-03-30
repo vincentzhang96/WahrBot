@@ -15,7 +15,7 @@ package co.phoenixlab.discord.api.request;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Builder;
+import lombok.Builder;
 
 @Builder
 @Getter

@@ -16,7 +16,7 @@ import co.phoenixlab.discord.api.entities.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Builder;
+import lombok.Builder;
 
 @Builder
 @Getter

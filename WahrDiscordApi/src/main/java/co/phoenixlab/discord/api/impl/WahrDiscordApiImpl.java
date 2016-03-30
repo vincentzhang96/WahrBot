@@ -213,6 +213,7 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         return response;
     }
 
+    @SuppressWarnings("deprecation")
     @Deprecated
     @Override
     public Future<TokenResponse> getAndSetTokenAsync(String email, String password) throws ApiException {
