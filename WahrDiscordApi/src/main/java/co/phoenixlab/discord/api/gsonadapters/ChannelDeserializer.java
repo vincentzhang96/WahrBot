@@ -10,27 +10,31 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.util;
+package co.phoenixlab.discord.api.gsonadapters;
 
 import co.phoenixlab.discord.api.entities.Channel;
-import co.phoenixlab.discord.api.gsonadapters.ChannelDeserializer;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.LongSerializationPolicy;
+import co.phoenixlab.discord.api.entities.PrivateChannel;
+import co.phoenixlab.discord.api.entities.PublicChannel;
+import com.google.gson.*;
 
-public class WahrDiscordApiUtils {
+import java.lang.reflect.Type;
 
-    private WahrDiscordApiUtils() {
+public class ChannelDeserializer implements JsonDeserializer<Channel> {
 
+    @Override
+    public Channel deserialize(JsonElement json,
+                               Type typeOfT,
+                               JsonDeserializationContext context) throws JsonParseException {
+        JsonObject obj = json.getAsJsonObject();
+        JsonElement typeElement = obj.get("is_private");
+        if (typeElement == null) {
+            throw new JsonParseException("Object is missing required field \"is_private\"");
+        }
+        boolean isPrivate = typeElement.getAsBoolean();
+        if (isPrivate) {
+            return context.deserialize(obj, PrivateChannel.class);
+        } else {
+            return context.deserialize(obj, PublicChannel.class);
+        }
     }
-
-    public static Gson createGson() {
-        return new GsonBuilder().
-                setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).
-                setLongSerializationPolicy(LongSerializationPolicy.STRING).
-                registerTypeAdapter(Channel.class, new ChannelDeserializer()).
-                create();
-    }
-
 }
