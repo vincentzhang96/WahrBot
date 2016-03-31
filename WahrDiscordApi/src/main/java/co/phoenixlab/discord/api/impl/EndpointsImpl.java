@@ -153,7 +153,11 @@ public class EndpointsImpl implements Endpoints {
         HttpRequestWithBody req = Unirest.post(url);
         addDefaultHeaders(req);
         HttpResponse<String> response = req.body(gson.toJson(body)).asString();
-        return gson.fromJson(response.getBody(), type);
+        if (type != Void.class) {
+            return gson.fromJson(response.getBody(), type);
+        } else {
+            return null;
+        }
     }
 
     HttpResponse<String> defaultPost(String url, String body) throws UnirestException {
@@ -168,7 +172,11 @@ public class EndpointsImpl implements Endpoints {
         addDefaultHeaders(req);
         addAuthHeader(req);
         HttpResponse<String> response = req.body(gson.toJson(body)).asString();
-        return gson.fromJson(response.getBody(), type);
+        if (type != Void.class) {
+            return gson.fromJson(response.getBody(), type);
+        } else {
+            return null;
+        }
     }
 
     HttpResponse<String> defaultGetUnauth(String url) throws UnirestException {
