@@ -67,16 +67,6 @@ public class LoginEndpointsImpl
     }
 
     @Override
-    public Future<TokenResponse> logInAsync(EmailPasswordLoginRequest request) throws ApiException {
-        return executorService.submit(() -> logIn(request));
-    }
-
-    @Override
-    public Future<Void> logOutAsync(LogoutRequest request) throws ApiException {
-        return executorService.submit(() -> logOut(request), null);
-    }
-
-    @Override
     public WebsocketEndpointResponse getGateway() throws ApiException {
         try {
             WebsocketEndpointResponse ret = endpoints.
@@ -91,6 +81,16 @@ public class LoginEndpointsImpl
         } catch (Exception e) {
             throw new ApiException(GET, GATEWAY_ENDPOINT, e);
         }
+    }
+
+    @Override
+    public Future<TokenResponse> logInAsync(EmailPasswordLoginRequest request) throws ApiException {
+        return executorService.submit(() -> logIn(request));
+    }
+
+    @Override
+    public Future<Void> logOutAsync(LogoutRequest request) throws ApiException {
+        return executorService.submit(() -> logOut(request), null);
     }
 
     @Override
