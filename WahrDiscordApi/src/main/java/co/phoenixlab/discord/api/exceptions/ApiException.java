@@ -12,6 +12,8 @@
 
 package co.phoenixlab.discord.api.exceptions;
 
+import com.mashape.unirest.http.HttpMethod;
+
 public class ApiException extends RuntimeException {
 
     public ApiException() {
@@ -35,6 +37,30 @@ public class ApiException extends RuntimeException {
 
     public ApiException(Throwable cause) {
         super(cause);
+    }
+
+    public ApiException(HttpMethod method, String endpoint) {
+        super(createMessage(method, endpoint));
+    }
+
+    public ApiException(HttpMethod method, String endpoint, String message) {
+        super(createMessage(method, endpoint, message));
+    }
+
+    public ApiException(HttpMethod method, String endpoint, Throwable throwable) {
+        super(createMessage(method, endpoint), throwable);
+    }
+
+    public ApiException(HttpMethod method, String endpoint, String message, Throwable throwable) {
+        super(createMessage(method, endpoint, message), throwable);
+    }
+
+    private static String createMessage(HttpMethod method, String endpoint) {
+        return method.name() + " " + endpoint;
+    }
+
+    private static String createMessage(HttpMethod method, String endpoint, String message) {
+        return method.name() + " " + endpoint + " - " + message;
     }
 
     private static String createMessage(String endpoint, String message) {
