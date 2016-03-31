@@ -13,8 +13,11 @@
 package co.phoenixlab.discord.api.impl;
 
 import co.phoenixlab.discord.api.endpoints.AuthenticationEndpoint;
+import co.phoenixlab.discord.api.endpoints.GatewayEndpoint;
 import co.phoenixlab.discord.api.endpoints.async.AuthenticationEndpointAsync;
+import co.phoenixlab.discord.api.endpoints.async.GatewayEndpointAsync;
 import co.phoenixlab.discord.api.entities.TokenResponse;
+import co.phoenixlab.discord.api.entities.WebsocketEndpointResponse;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.EmailPasswordLoginRequest;
 import co.phoenixlab.discord.api.request.LogoutRequest;
@@ -27,10 +30,13 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static co.phoenixlab.discord.api.impl.EndpointsImpl.*;
 
-public class AuthenticationEndpointImpl implements AuthenticationEndpoint, AuthenticationEndpointAsync {
+public class LoginEndpointsImpl
+        implements AuthenticationEndpoint, AuthenticationEndpointAsync,
+        GatewayEndpoint, GatewayEndpointAsync {
 
     private static final String LOGIN_ENDPOINT = "/auth/login";
     private static final String LOGOUT_ENDPOINT = "/auth/login";
+    private static final String GATEWAY_ENDPOINT = "/gateway";
 
     @Inject
     private ScheduledExecutorService executorService;
@@ -68,5 +74,16 @@ public class AuthenticationEndpointImpl implements AuthenticationEndpoint, Authe
     @Override
     public Future<Void> logOutAsync(LogoutRequest request) throws ApiException {
         return executorService.submit(() -> logOut(request), null);
+    }
+
+    @Override
+    public WebsocketEndpointResponse getGateway() throws ApiException {
+
+        return null;
+    }
+
+    @Override
+    public Future<WebsocketEndpointResponse> getGatewayAsync() throws ApiException {
+        return null;
     }
 }

@@ -15,6 +15,7 @@ package co.phoenixlab.discord.api.impl;
 import co.phoenixlab.discord.api.endpoints.*;
 import co.phoenixlab.discord.api.endpoints.async.*;
 import com.google.common.net.HttpHeaders;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -29,16 +30,18 @@ public class EndpointsImpl implements Endpoints {
     @Inject
     private WahrDiscordApiImpl apiImpl;
     @Inject
-    private AuthenticationEndpointImpl auth;
+    private LoginEndpointsImpl login;
+    @Inject
+    private Gson gson;
 
     @Override
     public AuthenticationEndpoint auth() {
-        return auth;
+        return login;
     }
 
     @Override
     public AuthenticationEndpointAsync authAsync() {
-        return auth;
+        return login;
     }
 
     @Override
@@ -63,12 +66,12 @@ public class EndpointsImpl implements Endpoints {
 
     @Override
     public GatewayEndpoint gateway() {
-        return null;
+        return login;
     }
 
     @Override
     public GatewayEndpointAsync gatewayAsync() {
-        return null;
+        return login;
     }
 
     @Override
