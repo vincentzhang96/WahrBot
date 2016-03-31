@@ -12,6 +12,8 @@
 
 package co.phoenixlab.discord.api.exceptions;
 
+import com.mashape.unirest.http.HttpMethod;
+
 public class InvalidTokenException extends ApiException {
 
     public InvalidTokenException() {
@@ -36,4 +38,21 @@ public class InvalidTokenException extends ApiException {
     public InvalidTokenException(Throwable cause) {
         super(cause);
     }
+
+    public InvalidTokenException(HttpMethod method, String endpoint) {
+        super(method, endpoint);
+    }
+
+    public InvalidTokenException(HttpMethod method, String endpoint, String message) {
+        super(method, endpoint, message);
+    }
+
+    public InvalidTokenException(HttpMethod method, String endpoint, Throwable throwable) {
+        super(method, endpoint, throwable);
+    }
+
+    public InvalidTokenException(HttpMethod method, String endpoint, String message, Throwable throwable) {
+        super(method, endpoint, message, throwable);
+    }
+
 }

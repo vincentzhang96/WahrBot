@@ -26,7 +26,6 @@ import com.google.inject.Inject;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static co.phoenixlab.discord.api.impl.EndpointsImpl.BASE_URL;
 import static com.mashape.unirest.http.HttpMethod.GET;
 import static com.mashape.unirest.http.HttpMethod.POST;
 
@@ -46,7 +45,7 @@ public class LoginEndpointsImpl
     @Override
     public TokenResponse logIn(EmailPasswordLoginRequest request) throws ApiException {
         try {
-            return endpoints.defaultPostUnauth(BASE_URL + LOGIN_ENDPOINT, request, TokenResponse.class);
+            return endpoints.defaultPostUnauth(LOGIN_ENDPOINT, request, TokenResponse.class);
         } catch (ApiException apie) {
             //  rethrow
             throw apie;
@@ -58,7 +57,7 @@ public class LoginEndpointsImpl
     @Override
     public void logOut(LogoutRequest request) throws ApiException {
         try {
-            endpoints.defaultPostUnauth(BASE_URL + LOGOUT_ENDPOINT, request, Void.class);
+            endpoints.defaultPostUnauth(LOGOUT_ENDPOINT, request, Void.class);
         } catch (ApiException apie) {
             //  rethrow
             throw apie;
@@ -81,7 +80,7 @@ public class LoginEndpointsImpl
     public WebsocketEndpointResponse getGateway() throws ApiException {
         try {
             WebsocketEndpointResponse ret = endpoints.
-                    defaultGet(BASE_URL + GATEWAY_ENDPOINT, WebsocketEndpointResponse.class);
+                    defaultGet(GATEWAY_ENDPOINT, WebsocketEndpointResponse.class);
             if (ret == null || ret.getUrl() == null) {
                 throw new ApiException(GET, GATEWAY_ENDPOINT, "Received invalid response");
             }

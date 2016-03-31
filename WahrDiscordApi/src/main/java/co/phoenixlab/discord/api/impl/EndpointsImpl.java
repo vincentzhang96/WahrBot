@@ -18,6 +18,7 @@ import co.phoenixlab.discord.api.exceptions.InvalidTokenException;
 import com.google.common.net.HttpHeaders;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
+import com.mashape.unirest.http.HttpMethod;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -144,14 +145,14 @@ public class EndpointsImpl implements Endpoints {
         request.header(HttpHeaders.AUTHORIZATION, apiImpl.getToken());
     }
 
-    HttpResponse<String> defaultPostUnauth(String url, String body) throws UnirestException {
-        HttpRequestWithBody req = Unirest.post(url);
+    HttpResponse<String> defaultPostUnauth(String path, String body) throws UnirestException {
+        HttpRequestWithBody req = Unirest.post(BASE_URL + path);
         addDefaultHeaders(req);
         return req.body(body).asString();
     }
 
-    <T> T defaultPostUnauth(String url, Object body, Class<T> type) throws UnirestException {
-        HttpRequestWithBody req = Unirest.post(url);
+    <T> T defaultPostUnauth(String path, Object body, Class<T> type) throws UnirestException {
+        HttpRequestWithBody req = Unirest.post(BASE_URL + path);
         addDefaultHeaders(req);
         HttpResponse<String> response = req.body(gson.toJson(body)).asString();
         int status = response.getStatus();
@@ -165,22 +166,22 @@ public class EndpointsImpl implements Endpoints {
         }
     }
 
-    HttpResponse<String> defaultPost(String url, String body) throws UnirestException {
-        HttpRequestWithBody req = Unirest.post(url);
+    HttpResponse<String> defaultPost(String path, String body) throws UnirestException {
+        HttpRequestWithBody req = Unirest.post(BASE_URL + path);
         addDefaultHeaders(req);
         addAuthHeader(req);
         return req.body(body).asString();
     }
 
-    <T> T defaultPost(String url, Object body, Class<T> type)
+    <T> T defaultPost(String path, Object body, Class<T> type)
             throws UnirestException, InvalidTokenException {
-        HttpRequestWithBody req = Unirest.post(url);
+        HttpRequestWithBody req = Unirest.post(BASE_URL + path);
         addDefaultHeaders(req);
         addAuthHeader(req);
         HttpResponse<String> response = req.body(gson.toJson(body)).asString();
         int status = response.getStatus();
         if (status == 401) {
-            throw new InvalidTokenException();
+            throw new InvalidTokenException(HttpMethod.POST, path, "Bad token");
         }
         if (status != 200) {
             throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
@@ -192,43 +193,40 @@ public class EndpointsImpl implements Endpoints {
         }
     }
 
-    HttpResponse<String> defaultGetUnauth(String url) throws UnirestException {
-        HttpRequest req = Unirest.get(url);
+    HttpResponse<String> defaultGetUnauth(String path) throws UnirestException {
+        HttpRequest req = Unirest.get(BASE_URL + path);
         addDefaultHeaders(req);
         return req.asString();
     }
 
-    <T> T defaultGetUnauth(String url, Class<T> type)
+    <T> T defaultGetUnauth(String path, Class<T> type)
             throws UnirestException, InvalidTokenException {
-        HttpRequest req = Unirest.get(url);
+        HttpRequest req = Unirest.get(BASE_URL + path);
         addDefaultHeaders(req);
         HttpResponse<String> response = req.asString();
         int status = response.getStatus();
-        if (status == 401) {
-            throw new InvalidTokenException();
-        }
         if (status != 200) {
             throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
         }
         return gson.fromJson(response.getBody(), type);
     }
 
-    HttpResponse<String> defaultGet(String url) throws UnirestException {
-        HttpRequest req = Unirest.get(url);
+    HttpResponse<String> defaultGet(String path) throws UnirestException {
+        HttpRequest req = Unirest.get(BASE_URL + path);
         addDefaultHeaders(req);
         addAuthHeader(req);
         return req.asString();
     }
 
-    <T> T defaultGet(String url, Class<T> type)
+    <T> T defaultGet(String path, Class<T> type)
             throws UnirestException, InvalidTokenException {
-        HttpRequest req = Unirest.get(url);
+        HttpRequest req = Unirest.get(BASE_URL + path);
         addDefaultHeaders(req);
         addAuthHeader(req);
         HttpResponse<String> response = req.asString();
         int status = response.getStatus();
         if (status == 401) {
-            throw new InvalidTokenException();
+            throw new InvalidTokenException(HttpMethod.GET, path, "Bad token");
         }
         if (status != 200) {
             throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
