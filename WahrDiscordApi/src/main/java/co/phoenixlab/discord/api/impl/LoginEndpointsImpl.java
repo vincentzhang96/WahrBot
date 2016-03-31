@@ -21,14 +21,14 @@ import co.phoenixlab.discord.api.entities.WebsocketEndpointResponse;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.EmailPasswordLoginRequest;
 import co.phoenixlab.discord.api.request.LogoutRequest;
-import com.google.gson.Gson;
 import com.google.inject.Inject;
-import com.mashape.unirest.http.HttpResponse;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static co.phoenixlab.discord.api.impl.EndpointsImpl.*;
+import static co.phoenixlab.discord.api.impl.EndpointsImpl.BASE_URL;
+import static com.mashape.unirest.http.HttpMethod.GET;
+import static com.mashape.unirest.http.HttpMethod.POST;
 
 public class LoginEndpointsImpl
         implements AuthenticationEndpoint, AuthenticationEndpointAsync,
@@ -42,27 +42,22 @@ public class LoginEndpointsImpl
     private ScheduledExecutorService executorService;
     @Inject
     private EndpointsImpl endpoints;
-    @Inject
-    private Gson gson;
 
     @Override
     public TokenResponse logIn(EmailPasswordLoginRequest request) throws ApiException {
         try {
-            HttpResponse<String> response =
-                    endpoints.defaultPostUnauth(BASE_URL + LOGIN_ENDPOINT, gson.toJson(request));
-            return gson.fromJson(response.getBody(), TokenResponse.class);
+            return endpoints.defaultPostUnauth(BASE_URL + LOGIN_ENDPOINT, request, TokenResponse.class);
         } catch (Exception e) {
-            throw new ApiException(LOGIN_ENDPOINT, e);
+            throw new ApiException(POST, LOGIN_ENDPOINT, e);
         }
     }
 
     @Override
     public void logOut(LogoutRequest request) throws ApiException {
         try {
-            HttpResponse<String> response =
-                    endpoints.defaultPostUnauth(BASE_URL + LOGOUT_ENDPOINT, gson.toJson(request));
+            endpoints.defaultPostUnauth(BASE_URL + LOGOUT_ENDPOINT, request, Void.class);
         } catch (Exception e) {
-            throw new ApiException(LOGOUT_ENDPOINT, e);
+            throw new ApiException(POST, LOGOUT_ENDPOINT, e);
         }
     }
 
@@ -78,12 +73,15 @@ public class LoginEndpointsImpl
 
     @Override
     public WebsocketEndpointResponse getGateway() throws ApiException {
-
-        return null;
+        try {
+            return endpoints.defaultGet(BASE_URL + GATEWAY_ENDPOINT, WebsocketEndpointResponse.class);
+        } catch (Exception e) {
+            throw new ApiException(GET, GATEWAY_ENDPOINT, e);
+        }
     }
 
     @Override
     public Future<WebsocketEndpointResponse> getGatewayAsync() throws ApiException {
-        return null;
+        return executorService.submit(this::getGateway);
     }
 }
