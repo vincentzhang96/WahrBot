@@ -47,6 +47,9 @@ public class LoginEndpointsImpl
     public TokenResponse logIn(EmailPasswordLoginRequest request) throws ApiException {
         try {
             return endpoints.defaultPostUnauth(BASE_URL + LOGIN_ENDPOINT, request, TokenResponse.class);
+        } catch (ApiException apie) {
+            //  rethrow
+            throw apie;
         } catch (Exception e) {
             throw new ApiException(POST, LOGIN_ENDPOINT, e);
         }
@@ -56,6 +59,9 @@ public class LoginEndpointsImpl
     public void logOut(LogoutRequest request) throws ApiException {
         try {
             endpoints.defaultPostUnauth(BASE_URL + LOGOUT_ENDPOINT, request, Void.class);
+        } catch (ApiException apie) {
+            //  rethrow
+            throw apie;
         } catch (Exception e) {
             throw new ApiException(POST, LOGOUT_ENDPOINT, e);
         }
@@ -74,7 +80,15 @@ public class LoginEndpointsImpl
     @Override
     public WebsocketEndpointResponse getGateway() throws ApiException {
         try {
-            return endpoints.defaultGet(BASE_URL + GATEWAY_ENDPOINT, WebsocketEndpointResponse.class);
+            WebsocketEndpointResponse ret = endpoints.
+                    defaultGet(BASE_URL + GATEWAY_ENDPOINT, WebsocketEndpointResponse.class);
+            if (ret == null || ret.getUrl() == null) {
+                throw new ApiException(GET, GATEWAY_ENDPOINT, "Received invalid response");
+            }
+            return ret;
+        } catch (ApiException apie) {
+            //  rethrow
+            throw apie;
         } catch (Exception e) {
             throw new ApiException(GET, GATEWAY_ENDPOINT, e);
         }
