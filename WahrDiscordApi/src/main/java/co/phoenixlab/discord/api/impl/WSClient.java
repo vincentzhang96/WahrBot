@@ -78,7 +78,7 @@ class WSClient extends WebSocketClient {
                         build()).
                 build();
         WSRequest req = WSRequest.builder().
-                op(2).
+                op(ConnectRequest.OP_CODE).
                 d(request).
                 build();
         send(gson.toJson(req));

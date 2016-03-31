@@ -22,6 +22,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ConnectRequest {
 
+    public static int OP_CODE = 2;
+
     private String token;
     private int v;
     private int largeThreshold;
