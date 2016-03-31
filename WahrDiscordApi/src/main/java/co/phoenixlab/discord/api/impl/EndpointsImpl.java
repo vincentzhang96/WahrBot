@@ -149,11 +149,26 @@ public class EndpointsImpl implements Endpoints {
         return req.body(body).asString();
     }
 
+    <T> T defaultPostUnauth(String url, Object body, Class<T> type) throws UnirestException {
+        HttpRequestWithBody req = Unirest.post(url);
+        addDefaultHeaders(req);
+        HttpResponse<String> response = req.body(gson.toJson(body)).asString();
+        return gson.fromJson(response.getBody(), type);
+    }
+
     HttpResponse<String> defaultPost(String url, String body) throws UnirestException {
         HttpRequestWithBody req = Unirest.post(url);
         addDefaultHeaders(req);
         addAuthHeader(req);
         return req.body(body).asString();
+    }
+
+    <T> T defaultPost(String url, Object body, Class<T> type) throws UnirestException {
+        HttpRequestWithBody req = Unirest.post(url);
+        addDefaultHeaders(req);
+        addAuthHeader(req);
+        HttpResponse<String> response = req.body(gson.toJson(body)).asString();
+        return gson.fromJson(response.getBody(), type);
     }
 
     HttpResponse<String> defaultGetUnauth(String url) throws UnirestException {
@@ -162,10 +177,23 @@ public class EndpointsImpl implements Endpoints {
         return req.asString();
     }
 
+    <T> T defaultGetUnauth(String url, Class<T> type) throws UnirestException {
+        HttpRequest req = Unirest.get(url);
+        addDefaultHeaders(req);
+        return gson.fromJson(req.asString().getBody(), type);
+    }
+
     HttpResponse<String> defaultGet(String url) throws UnirestException {
         HttpRequest req = Unirest.get(url);
         addDefaultHeaders(req);
         addAuthHeader(req);
         return req.asString();
+    }
+
+    <T> T defaultGet(String url, Class<T> type) throws UnirestException {
+        HttpRequest req = Unirest.get(url);
+        addDefaultHeaders(req);
+        addAuthHeader(req);
+        return gson.fromJson(req.asString().getBody(), type);
     }
 }
