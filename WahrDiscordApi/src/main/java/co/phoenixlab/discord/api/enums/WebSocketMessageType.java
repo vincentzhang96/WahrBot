@@ -40,6 +40,15 @@ public enum WebSocketMessageType {
     CHANNEL_UPDATE,
     PRESENCE_UPDATE,
     VOICE_STATE_UPDATE,
-    VOICE_SERVER_UPDATE
+    VOICE_SERVER_UPDATE,
+    UNKNOWN;
 
+    public static WebSocketMessageType fromString(String s) {
+        for (WebSocketMessageType type : values()) {
+            if (type.name().equalsIgnoreCase(s)) {
+                return type;
+            }
+        }
+        return UNKNOWN;
+    }
 }
