@@ -13,6 +13,8 @@
 package co.phoenixlab.discord.api.entities;
 
 import co.phoenixlab.discord.api.enums.WebSocketMessageType;
+import co.phoenixlab.discord.api.gsonadapters.WebsocketMessageDeserializer;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +25,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonAdapter(WebsocketMessageDeserializer.class)
 public class WebsocketMessage {
 
     @SerializedName("message")
