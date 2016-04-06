@@ -77,7 +77,6 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
 
     private final StateMachine<ApiClientState, ApiClientTrigger> stateMachine;
 
-
     public WahrDiscordApiImpl(String userAgent) {
         this(null, userAgent);
     }
@@ -163,9 +162,7 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         }
         try {
             if (!webSocketClient.connectBlocking()) {
-                webSocketClient.getConnectLatch().countDown();
-                Exception exception = webSocketClient.getWebsocketException();
-                API_LOGGER.warn("Failed to connect to websocket gateway.", exception);
+                API_LOGGER.warn("Failed to connect to websocket gateway.");
                 stats.connectFails.mark();
                 stateMachine.fire(CONNECT_FAIL);
                 return;
@@ -195,13 +192,16 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
     private void onConnected() {
         API_LOGGER.info("Connected to websocket gateway");
 
+        stateMachine.fire(LOAD);
     }
 
     private void onLoading() {
+        API_LOGGER.info("Waiting for READY");
 
     }
 
     private void onReady() {
+        API_LOGGER.info("Websocket connection is ready");
 
     }
 

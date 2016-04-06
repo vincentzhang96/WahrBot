@@ -12,6 +12,7 @@
 
 package co.phoenixlab.discord.api.impl;
 
+import co.phoenixlab.discord.api.entities.WebsocketMessage;
 import co.phoenixlab.discord.api.request.ConnectRequest;
 import co.phoenixlab.discord.api.request.ConnectRequestProperties;
 import co.phoenixlab.discord.api.request.WSRequest;
@@ -24,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.util.concurrent.CountDownLatch;
 
 class WSClient extends WebSocketClient {
 
@@ -32,9 +32,6 @@ class WSClient extends WebSocketClient {
 
     private final WahrDiscordApiImpl api;
     private final WahrDiscordApiImpl.Stats stats;
-
-    private Exception websocketException;
-    private CountDownLatch connectLatch;
 
     private final Gson gson;
 
@@ -50,9 +47,8 @@ class WSClient extends WebSocketClient {
         super(serverURI);
         stats = api.getStats();
         this.api = api;
-        connectLatch = new CountDownLatch(2);
         gson = WahrDiscordApiUtils.createGson();
-        webSocketProtocolVersion = 3;
+        webSocketProtocolVersion = 4;
         largeThreshold = 250;
         compress = false;
         operatingSystem = System.getProperty("os.name");
@@ -87,34 +83,35 @@ class WSClient extends WebSocketClient {
     @Override
     public void onMessage(String message) {
         try(Timer.Context ctx = stats.webSocketMessageParsing.time()) {
-
-
+            WebsocketMessage msg = gson.fromJson(message, WebsocketMessage.class);
+            if (msg.getErrorMessage() != null) {
+                onDiscordError(msg.getErrorMessage());
+                return;
+            }
         } catch (Exception e) {
             stats.webSocketMessageErrors.mark();
             WS_LOGGER.warn("Exception while parsing message", e);
         }
     }
 
+    private void onDiscordError(String error) {
+        stats.webSocketMessageErrors.mark();
+        WS_LOGGER.warn("Discord error: {}", error);
+    }
+
     @Override
     public void onClose(int code, String reason, boolean remote) {
-
-
+        if (remote) {
+            WS_LOGGER.warn("Websocket closed by server. Code {}: \"{}\"", code, reason);
+        } else {
+            WS_LOGGER.info("Websocket closed by client. Code {}: \"{}\"", code, reason);
+        }
     }
 
     @Override
     public void onError(Exception ex) {
-        websocketException = ex;
         stats.webSocketErrors.mark();
         WS_LOGGER.warn("Websocket exception", ex);
-        connectLatch.countDown();
-    }
-
-    CountDownLatch getConnectLatch() {
-        return connectLatch;
-    }
-
-    Exception getWebsocketException() {
-        return websocketException;
     }
 
 }
