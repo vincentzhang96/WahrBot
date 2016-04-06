@@ -21,7 +21,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonAdapter(ChannelDeserializer.class)
 public abstract class Channel implements Entity {
 
     public static int NULL_LAST_MESSAGE_ID = -1;

@@ -12,6 +12,10 @@
 
 package co.phoenixlab.discord.api.util;
 
+import co.phoenixlab.discord.api.entities.Channel;
+import co.phoenixlab.discord.api.entities.WebsocketMessage;
+import co.phoenixlab.discord.api.gsonadapters.ChannelDeserializer;
+import co.phoenixlab.discord.api.gsonadapters.WebsocketMessageDeserializer;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -27,6 +31,8 @@ public class WahrDiscordApiUtils {
         return new GsonBuilder().
                 setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).
                 setLongSerializationPolicy(LongSerializationPolicy.STRING).
+                registerTypeAdapter(WebsocketMessage.class, new WebsocketMessageDeserializer()).
+                registerTypeAdapter(Channel.class, new ChannelDeserializer()).
                 create();
     }
 
