@@ -12,7 +12,9 @@
 
 package co.phoenixlab.discord.api.entities;
 
+import co.phoenixlab.discord.api.enums.GatewayOP;
 import co.phoenixlab.discord.api.enums.WebSocketMessageType;
+import co.phoenixlab.discord.api.request.*;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,13 +25,53 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class WebsocketMessage {
+public class GatewayPayload {
 
+    @SerializedName("op")
+    private GatewayOP opCode;
+    @SerializedName("s")
+    private int sequenceNumber;
     @SerializedName("message")
-    String errorMessage;
+    private String errorMessage;
     @SerializedName("t")
-    WebSocketMessageType type;
+    private WebSocketMessageType type;
     @SerializedName("d")
-    Object data;
+    private Object data;
+
+    public static GatewayPayload payload(GatewayOP op, Object request) {
+        return GatewayPayload.builder().
+                opCode(op).
+                data(request).
+                build();
+    }
+
+    public static GatewayPayload heartbeat(int lastSeqNum) {
+        return payload(GatewayOP.HEARTBEAT, lastSeqNum);
+    }
+
+    public static GatewayPayload identify(ConnectRequest request) {
+        return payload(GatewayOP.IDENTIFY, request);
+    }
+
+    public static GatewayPayload statusUpdate(UpdateStatusRequest request) {
+        return payload(GatewayOP.STATUS_UPDATE, request);
+    }
+
+    public static GatewayPayload voiceStateUpdate(VoiceStateUpdateRequest request) {
+        return payload(GatewayOP.VOICE_STATE_UPDATE, request);
+    }
+
+    public GatewayPayload resume(GatewayResumeRequest request) {
+        return payload(GatewayOP.RESUME, request);
+    }
+
+    public GatewayPayload requestGuildMembers(GuildMembersRequest request) {
+        return payload(GatewayOP.REQUEST_GUILD_MEMBERS, request);
+    }
+
+
+
+
+
 
 }

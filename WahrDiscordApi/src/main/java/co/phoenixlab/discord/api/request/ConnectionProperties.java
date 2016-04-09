@@ -12,22 +12,25 @@
 
 package co.phoenixlab.discord.api.request;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Builder;
 
-@lombok.Builder
+@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConnectRequest {
+public class ConnectionProperties {
 
-    public static int OP_CODE = 2;
-
-    private String token;
-    private int v;
-    private int largeThreshold;
-    private boolean compress;
-    private ConnectionProperties properties;
+    @SerializedName("$os")
+    private String os;
+    @SerializedName("$browser")
+    private String browser;
+    @SerializedName("$referrer")
+    private String referrer;
+    @SerializedName("$referring_domain")
+    private String referringDomain;
 
 }

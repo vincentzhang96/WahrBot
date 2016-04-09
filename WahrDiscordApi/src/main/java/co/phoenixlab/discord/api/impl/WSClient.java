@@ -12,10 +12,9 @@
 
 package co.phoenixlab.discord.api.impl;
 
-import co.phoenixlab.discord.api.entities.WebsocketMessage;
+import co.phoenixlab.discord.api.entities.GatewayPayload;
 import co.phoenixlab.discord.api.request.ConnectRequest;
-import co.phoenixlab.discord.api.request.ConnectRequestProperties;
-import co.phoenixlab.discord.api.request.WSRequest;
+import co.phoenixlab.discord.api.request.ConnectionProperties;
 import co.phoenixlab.discord.api.util.WahrDiscordApiUtils;
 import com.codahale.metrics.Timer;
 import com.google.gson.Gson;
@@ -66,24 +65,20 @@ class WSClient extends WebSocketClient {
                 v(webSocketProtocolVersion).
                 largeThreshold(largeThreshold).
                 compress(compress).
-                properties(ConnectRequestProperties.builder().
+                properties(ConnectionProperties.builder().
                         os(operatingSystem).
                         browser(browser).
                         referrer(referrer).
                         referringDomain(referringDomain).
                         build()).
                 build();
-        WSRequest req = WSRequest.builder().
-                op(ConnectRequest.OP_CODE).
-                d(request).
-                build();
-        send(gson.toJson(req));
+        send(gson.toJson(GatewayPayload.identify(request)));
     }
 
     @Override
     public void onMessage(String message) {
         try(Timer.Context ctx = stats.webSocketMessageParsing.time()) {
-            WebsocketMessage msg = gson.fromJson(message, WebsocketMessage.class);
+            GatewayPayload msg = gson.fromJson(message, GatewayPayload.class);
             if (msg.getErrorMessage() != null) {
                 onDiscordError(msg.getErrorMessage());
                 return;

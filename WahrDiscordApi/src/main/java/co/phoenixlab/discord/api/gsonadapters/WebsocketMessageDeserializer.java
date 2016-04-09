@@ -21,17 +21,17 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-public class WebsocketMessageDeserializer implements JsonDeserializer<WebsocketMessage> {
+public class WebsocketMessageDeserializer implements JsonDeserializer<GatewayPayload> {
 
     private Logger LOGGER = LoggerFactory.getLogger(WebsocketMessageDeserializer.class);
 
     @Override
-    public WebsocketMessage deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+    public GatewayPayload deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
         JsonObject obj = json.getAsJsonObject();
         JsonElement errorElement = obj.get("message");
         if (errorElement != null) {
-            return WebsocketMessage.builder().
+            return GatewayPayload.builder().
                     errorMessage(errorElement.getAsString()).
                     build();
         }
@@ -40,14 +40,15 @@ public class WebsocketMessageDeserializer implements JsonDeserializer<WebsocketM
             throw new JsonParseException("Object is missing required field \"t\"");
         }
         String typeStr = typeElement.getAsString();
+        LOGGER.info("Received {}", typeStr);
         WebSocketMessageType type = WebSocketMessageType.fromString(typeStr);
-        return WebsocketMessage.builder().
+        return GatewayPayload.builder().
                 type(type).
-                data(deserializeBody(obj.get("d"), typeStr, type, context)).
+                data(deserializeBody(obj.get("d").getAsJsonObject(), typeStr, type, context)).
                 build();
     }
 
-    private Object deserializeBody(JsonElement element, String typestr,
+    private Object deserializeBody(JsonObject element, String typestr,
                                    WebSocketMessageType type, JsonDeserializationContext ctx) {
         Class<?> clazz;
         switch (type) {
