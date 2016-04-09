@@ -10,27 +10,27 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.request;
+package co.phoenixlab.discord.api.gsonadapters;
 
-import com.google.gson.annotations.SerializedName;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Builder;
+import co.phoenixlab.discord.api.enums.GatewayOP;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
 
-@Builder
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ConnectRequestProperties {
+import java.io.IOException;
 
-    @SerializedName("$os")
-    private String os;
-    @SerializedName("$browser")
-    private String browser;
-    @SerializedName("$referrer")
-    private String referrer;
-    @SerializedName("$referring_domain")
-    private String referringDomain;
+public class GatewayOPTypeAdapter extends TypeAdapter<GatewayOP> {
+    @Override
+    public void write(JsonWriter out, GatewayOP value) throws IOException {
+        out.value(value.toInt());
+    }
 
+    @Override
+    public GatewayOP read(JsonReader in) throws IOException {
+        if (in.peek() == JsonToken.NULL) {
+            return GatewayOP.UNKNOWN;
+        }
+        return GatewayOP.fromInt(in.nextInt());
+    }
 }
