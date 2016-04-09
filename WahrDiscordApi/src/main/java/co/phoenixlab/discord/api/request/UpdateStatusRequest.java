@@ -25,6 +25,6 @@ import lombok.Builder;
 public class UpdateStatusRequest {
 
     private PresenceGame game;
-    private long idleSince;
+    private Long idleSince;
 
 }
