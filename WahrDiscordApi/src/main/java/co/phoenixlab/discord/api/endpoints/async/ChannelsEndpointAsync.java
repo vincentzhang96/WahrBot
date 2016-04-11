@@ -17,7 +17,7 @@ import co.phoenixlab.discord.api.entities.channel.DmChannel;
 import co.phoenixlab.discord.api.entities.channel.PublicChannel;
 import co.phoenixlab.discord.api.request.CreateChannelRequest;
 import co.phoenixlab.discord.api.request.CreatePrivateChannelRequest;
-import co.phoenixlab.discord.api.request.EditChannelRequest;
+import co.phoenixlab.discord.api.request.channel.ModifyChannelRequest;
 
 import java.util.concurrent.Future;
 
@@ -29,7 +29,7 @@ public interface ChannelsEndpointAsync {
     Future<DmChannel> createPrivateChannelAsync(long myUserId, CreatePrivateChannelRequest request)
             throws ApiException;
 
-    Future<PublicChannel> editChannelAsync(long channelId, EditChannelRequest request)
+    Future<PublicChannel> editChannelAsync(long channelId, ModifyChannelRequest request)
             throws ApiException;
 
     Future<Void> deleteChannelAsync(long channelId)

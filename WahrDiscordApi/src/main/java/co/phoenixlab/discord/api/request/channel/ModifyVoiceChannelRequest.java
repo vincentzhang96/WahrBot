@@ -10,33 +10,19 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.endpoints;
+package co.phoenixlab.discord.api.request.channel;
 
-import co.phoenixlab.discord.api.entities.channel.DmChannel;
-import co.phoenixlab.discord.api.entities.channel.PublicChannel;
-import co.phoenixlab.discord.api.exceptions.ApiException;
-import co.phoenixlab.discord.api.request.CreateChannelRequest;
-import co.phoenixlab.discord.api.request.CreatePrivateChannelRequest;
-import co.phoenixlab.discord.api.request.channel.ModifyChannelRequest;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-public interface ChannelsEndpoint {
+@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ModifyVoiceChannelRequest extends ModifyChannelRequest {
 
-    PublicChannel createChannel(long guildId, CreateChannelRequest request)
-            throws ApiException;
-
-    DmChannel createPrivateChannel(long myUserId, CreatePrivateChannelRequest request)
-            throws ApiException;
-
-    PublicChannel editChannel(long channelId, ModifyChannelRequest request)
-            throws ApiException;
-
-    void deleteChannel(long channelId)
-            throws ApiException;
-
-    PublicChannel[] getGuildChannels(long guildId)
-            throws ApiException;
-
-    void broadcastTyping(long channelId)
-            throws ApiException;
+    private int bitrate;
 
 }
