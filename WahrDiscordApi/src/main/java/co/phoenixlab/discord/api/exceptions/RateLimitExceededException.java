@@ -12,8 +12,11 @@
 
 package co.phoenixlab.discord.api.exceptions;
 
+import lombok.Getter;
+
 public class RateLimitExceededException extends ApiException {
 
+    @Getter
     private long retryIn;
 
     public RateLimitExceededException() {
@@ -33,5 +36,4 @@ public class RateLimitExceededException extends ApiException {
         super("Retry in " + retryIn + ": " + msg);
         this.retryIn = retryIn;
     }
-
 }
