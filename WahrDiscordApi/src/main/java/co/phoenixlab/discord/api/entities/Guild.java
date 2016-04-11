@@ -12,6 +12,7 @@
 
 package co.phoenixlab.discord.api.entities;
 
+import co.phoenixlab.discord.api.entities.channel.PublicChannel;
 import co.phoenixlab.discord.api.enums.AfkTimeout;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -3,19 +3,19 @@ package co.phoenixlab.discord.api.entities;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Builder;
 
-@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageAttachment implements Entity {
+public class Attachment implements Entity {
 
     private long id;
     private String filename;
+    private int size;
     private String url;
     private String proxyUrl;
-    private int size;
+    private int height;
+    private int width;
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override

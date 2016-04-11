@@ -13,8 +13,8 @@
 package co.phoenixlab.discord.api.endpoints.async;
 
 import co.phoenixlab.discord.api.exceptions.ApiException;
-import co.phoenixlab.discord.api.entities.PrivateChannel;
-import co.phoenixlab.discord.api.entities.PublicChannel;
+import co.phoenixlab.discord.api.entities.channel.DmChannel;
+import co.phoenixlab.discord.api.entities.channel.PublicChannel;
 import co.phoenixlab.discord.api.request.CreateChannelRequest;
 import co.phoenixlab.discord.api.request.CreatePrivateChannelRequest;
 import co.phoenixlab.discord.api.request.EditChannelRequest;
@@ -26,7 +26,7 @@ public interface ChannelsEndpointAsync {
     Future<PublicChannel> createChannelAsync(long guildId, CreateChannelRequest request)
             throws ApiException;
 
-    Future<PrivateChannel> createPrivateChannelAsync(long myUserId, CreatePrivateChannelRequest request)
+    Future<DmChannel> createPrivateChannelAsync(long myUserId, CreatePrivateChannelRequest request)
             throws ApiException;
 
     Future<PublicChannel> editChannelAsync(long channelId, EditChannelRequest request)

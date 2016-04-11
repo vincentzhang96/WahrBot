@@ -10,10 +10,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.entities;
+package co.phoenixlab.discord.api.entities.channel;
 
-import co.phoenixlab.discord.api.gsonadapters.ChannelDeserializer;
-import com.google.gson.annotations.JsonAdapter;
+import co.phoenixlab.discord.api.entities.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,10 +22,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public abstract class Channel implements Entity {
 
-    public static int NULL_LAST_MESSAGE_ID = -1;
-
     private long id;
     private boolean isPrivate;
-    private long lastMessageId;
 
 }

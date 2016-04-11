@@ -12,7 +12,7 @@
 
 package co.phoenixlab.discord.api.endpoints;
 
-import co.phoenixlab.discord.api.entities.ReceivedMessage;
+import co.phoenixlab.discord.api.entities.channel.Message;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.EditMessageRequest;
 import co.phoenixlab.discord.api.request.PostMessageRequest;
@@ -22,43 +22,43 @@ public interface MessagesEndpoint {
     long IGNORE = 0;
     int DEFAULT_LIMIT = 50;
 
-    ReceivedMessage[] getMessages(long channelId, long beforeMessageId, long afterMessageId, int limit)
+    Message[] getMessages(long channelId, long beforeMessageId, long afterMessageId, int limit)
             throws ApiException;
 
-    default ReceivedMessage[] getMessagesBefore(long channelId, long beforeMessageId, int limit)
+    default Message[] getMessagesBefore(long channelId, long beforeMessageId, int limit)
             throws ApiException {
         return getMessages(channelId, beforeMessageId, IGNORE, limit);
     }
 
-    default ReceivedMessage[] getMessagesBefore(long channelId, long beforeMessageId)
+    default Message[] getMessagesBefore(long channelId, long beforeMessageId)
             throws ApiException {
         return getMessagesBefore(channelId, beforeMessageId, DEFAULT_LIMIT);
     }
 
-    default ReceivedMessage[] getMessagesAfter(long channelId, long afterMessageId, int limit)
+    default Message[] getMessagesAfter(long channelId, long afterMessageId, int limit)
             throws ApiException {
         return getMessages(channelId, IGNORE, afterMessageId, limit);
     }
 
-    default ReceivedMessage[] getMessagesAfter(long channelId, long afterMessageId)
+    default Message[] getMessagesAfter(long channelId, long afterMessageId)
             throws ApiException {
         return getMessagesAfter(channelId, afterMessageId, DEFAULT_LIMIT);
     }
 
-    default ReceivedMessage[] getLatestMessages(long channelId, int limit)
+    default Message[] getLatestMessages(long channelId, int limit)
             throws ApiException {
         return getMessages(channelId, IGNORE, IGNORE, limit);
     }
 
-    default ReceivedMessage[] getLatestMessages(long channelId)
+    default Message[] getLatestMessages(long channelId)
             throws ApiException {
         return getLatestMessages(channelId, DEFAULT_LIMIT);
     }
 
-    ReceivedMessage sendMessage(long channelId, PostMessageRequest request)
+    Message sendMessage(long channelId, PostMessageRequest request)
             throws ApiException;
 
-    ReceivedMessage editMessage(long channelId, long messageId, EditMessageRequest request)
+    Message editMessage(long channelId, long messageId, EditMessageRequest request)
             throws ApiException;
 
     void deleteMessage(long channelId, long messageId)

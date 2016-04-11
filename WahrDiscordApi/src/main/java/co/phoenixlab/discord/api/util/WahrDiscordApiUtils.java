@@ -12,7 +12,7 @@
 
 package co.phoenixlab.discord.api.util;
 
-import co.phoenixlab.discord.api.entities.Channel;
+import co.phoenixlab.discord.api.entities.channel.Channel;
 import co.phoenixlab.discord.api.entities.GatewayPayload;
 import co.phoenixlab.discord.api.gsonadapters.ChannelDeserializer;
 import co.phoenixlab.discord.api.gsonadapters.WebsocketMessageDeserializer;

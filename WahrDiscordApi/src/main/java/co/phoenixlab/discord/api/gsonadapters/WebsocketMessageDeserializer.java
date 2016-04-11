@@ -13,6 +13,8 @@
 package co.phoenixlab.discord.api.gsonadapters;
 
 import co.phoenixlab.discord.api.entities.*;
+import co.phoenixlab.discord.api.entities.channel.Channel;
+import co.phoenixlab.discord.api.entities.channel.Message;
 import co.phoenixlab.discord.api.enums.WebSocketMessageType;
 import com.google.gson.*;
 import org.slf4j.Logger;
@@ -91,7 +93,7 @@ public class WebsocketMessageDeserializer implements JsonDeserializer<GatewayPay
                 break;
             case MESSAGE_CREATE:
             case MESSAGE_UPDATE:
-                clazz = ReceivedMessage.class;
+                clazz = Message.class;
                 break;
             case MESSAGE_DELETE:
                 clazz = DeletedMessage.class;

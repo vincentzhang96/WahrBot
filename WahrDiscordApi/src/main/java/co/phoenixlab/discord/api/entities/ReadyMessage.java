@@ -12,6 +12,7 @@
 
 package co.phoenixlab.discord.api.entities;
 
+import co.phoenixlab.discord.api.entities.channel.DmChannel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +28,7 @@ public class ReadyMessage {
     private Presence[] presences;
     private Guild[] guilds;
     private String sessionId;
-    private PrivateChannel[] privateChannels;
+    private DmChannel[] privateChannels;
     private SelfUser user;
     private int heartbeatInterval;
 
