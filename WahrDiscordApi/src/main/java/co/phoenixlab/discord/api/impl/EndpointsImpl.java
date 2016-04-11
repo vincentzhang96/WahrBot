@@ -15,6 +15,7 @@ package co.phoenixlab.discord.api.impl;
 import co.phoenixlab.discord.api.endpoints.*;
 import co.phoenixlab.discord.api.endpoints.async.*;
 import co.phoenixlab.discord.api.exceptions.InvalidTokenException;
+import co.phoenixlab.discord.api.exceptions.RateLimitExceededException;
 import com.google.common.net.HttpHeaders;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
@@ -29,6 +30,9 @@ import org.apache.http.entity.ContentType;
 public class EndpointsImpl implements Endpoints {
 
     public static final String BASE_URL = "https://discordapp.com/api";
+    public static final int HTTP_TOO_MANY_REQUESTS = 429;
+    public static final int HTTP_OK = 200;
+    public static final int HTTP_NOT_AUTHENTICATED = 401;
     @Inject
     private WahrDiscordApiImpl apiImpl;
     @Inject
@@ -156,7 +160,11 @@ public class EndpointsImpl implements Endpoints {
         addDefaultHeaders(req);
         HttpResponse<String> response = req.body(gson.toJson(body)).asString();
         int status = response.getStatus();
-        if (status != 200) {
+        if (status == HTTP_TOO_MANY_REQUESTS) {
+            long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
+            throw new RateLimitExceededException(retryIn);
+        }
+        if (status != HTTP_OK) {
             throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
         }
         if (type != Void.class) {
@@ -180,10 +188,14 @@ public class EndpointsImpl implements Endpoints {
         addAuthHeader(req);
         HttpResponse<String> response = req.body(gson.toJson(body)).asString();
         int status = response.getStatus();
-        if (status == 401) {
+        if (status == HTTP_NOT_AUTHENTICATED) {
             throw new InvalidTokenException(HttpMethod.POST, path, "Bad token");
         }
-        if (status != 200) {
+        if (status == HTTP_TOO_MANY_REQUESTS) {
+            long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
+            throw new RateLimitExceededException(retryIn);
+        }
+        if (status != HTTP_OK) {
             throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
         }
         if (type != Void.class) {
@@ -205,7 +217,11 @@ public class EndpointsImpl implements Endpoints {
         addDefaultHeaders(req);
         HttpResponse<String> response = req.asString();
         int status = response.getStatus();
-        if (status != 200) {
+        if (status == HTTP_TOO_MANY_REQUESTS) {
+            long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
+            throw new RateLimitExceededException(retryIn);
+        }
+        if (status != HTTP_OK) {
             throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
         }
         return gson.fromJson(response.getBody(), type);
@@ -225,10 +241,14 @@ public class EndpointsImpl implements Endpoints {
         addAuthHeader(req);
         HttpResponse<String> response = req.asString();
         int status = response.getStatus();
-        if (status == 401) {
+        if (status == HTTP_NOT_AUTHENTICATED) {
             throw new InvalidTokenException(HttpMethod.GET, path, "Bad token");
         }
-        if (status != 200) {
+        if (status == HTTP_TOO_MANY_REQUESTS) {
+            long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
+            throw new RateLimitExceededException(retryIn);
+        }
+        if (status != HTTP_OK) {
             throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
         }
         return gson.fromJson(response.getBody(), type);
