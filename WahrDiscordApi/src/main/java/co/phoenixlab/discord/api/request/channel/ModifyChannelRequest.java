@@ -23,7 +23,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public abstract class ModifyChannelRequest {
 
+    /**
+     * Channel name, 2-100 characters.
+     */
     private String name;
+    /**
+     * Position of the channel in the left side listing.
+     */
     private int position;
 
 }

@@ -23,6 +23,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ModifyVoiceChannelRequest extends ModifyChannelRequest {
 
+    /**
+     * Bitrate (in bits) of the voice channel; 8000 to 9600 (128000 for VIP).
+     */
     private int bitrate;
 
 }

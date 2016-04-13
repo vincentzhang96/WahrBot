@@ -21,6 +21,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ModifyTextChannelRequest extends ModifyChannelRequest {
 
+    /**
+     * Channel topic, 0-1024 characters.
+     */
     private String topic;
 
 }
