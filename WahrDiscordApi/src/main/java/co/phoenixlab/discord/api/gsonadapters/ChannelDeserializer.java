@@ -14,7 +14,7 @@ package co.phoenixlab.discord.api.gsonadapters;
 
 import co.phoenixlab.discord.api.entities.channel.Channel;
 import co.phoenixlab.discord.api.entities.channel.DmChannel;
-import co.phoenixlab.discord.api.entities.channel.PublicChannel;
+import co.phoenixlab.discord.api.entities.channel.GuildChannel;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;
@@ -34,7 +34,7 @@ public class ChannelDeserializer implements JsonDeserializer<Channel> {
         if (isPrivate) {
             return context.deserialize(obj, DmChannel.class);
         } else {
-            return context.deserialize(obj, PublicChannel.class);
+            return context.deserialize(obj, GuildChannel.class);
         }
     }
 }

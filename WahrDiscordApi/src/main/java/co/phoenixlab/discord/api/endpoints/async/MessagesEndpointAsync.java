@@ -15,7 +15,7 @@ package co.phoenixlab.discord.api.endpoints.async;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.entities.channel.Message;
 import co.phoenixlab.discord.api.request.EditMessageRequest;
-import co.phoenixlab.discord.api.request.PostMessageRequest;
+import co.phoenixlab.discord.api.request.channel.CreateMessageRequest;
 
 import java.util.concurrent.Future;
 
@@ -57,7 +57,7 @@ public interface MessagesEndpointAsync {
         return getLatestMessagesAsync(channelId, DEFAULT_LIMIT);
     }
 
-    Future<Message> sendMessageAsync(long channelId, PostMessageRequest request)
+    Future<Message> sendMessageAsync(long channelId, CreateMessageRequest request)
             throws ApiException;
 
     Future<Message> editMessageAsync(long channelId, long messageId, EditMessageRequest request)

@@ -22,6 +22,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public abstract class Channel implements Entity {
 
+    /**
+     * The ID of this channel. For {@link GuildChannel}
+     */
     private long id;
     private boolean isPrivate;
 

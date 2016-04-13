@@ -14,7 +14,7 @@ package co.phoenixlab.discord.api.endpoints.async;
 
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.entities.channel.DmChannel;
-import co.phoenixlab.discord.api.entities.channel.PublicChannel;
+import co.phoenixlab.discord.api.entities.channel.GuildChannel;
 import co.phoenixlab.discord.api.request.CreateChannelRequest;
 import co.phoenixlab.discord.api.request.CreatePrivateChannelRequest;
 import co.phoenixlab.discord.api.request.channel.ModifyChannelRequest;
@@ -23,19 +23,19 @@ import java.util.concurrent.Future;
 
 public interface ChannelsEndpointAsync {
 
-    Future<PublicChannel> createChannelAsync(long guildId, CreateChannelRequest request)
+    Future<GuildChannel> createChannelAsync(long guildId, CreateChannelRequest request)
             throws ApiException;
 
     Future<DmChannel> createPrivateChannelAsync(long myUserId, CreatePrivateChannelRequest request)
             throws ApiException;
 
-    Future<PublicChannel> editChannelAsync(long channelId, ModifyChannelRequest request)
+    Future<GuildChannel> editChannelAsync(long channelId, ModifyChannelRequest request)
             throws ApiException;
 
     Future<Void> deleteChannelAsync(long channelId)
             throws ApiException;
 
-    Future<PublicChannel[]> getGuildChannelsAsync(long guildId)
+    Future<GuildChannel[]> getGuildChannelsAsync(long guildId)
             throws ApiException;
 
     Future<Void> broadcastTypingAsync(long channelId)

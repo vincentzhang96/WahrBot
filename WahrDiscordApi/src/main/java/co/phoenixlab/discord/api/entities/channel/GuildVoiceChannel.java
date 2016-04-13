@@ -12,19 +12,18 @@
 
 package co.phoenixlab.discord.api.entities.channel;
 
+
 import co.phoenixlab.discord.api.entities.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TextChannel extends PublicChannel {
+public class GuildVoiceChannel extends GuildChannel {
 
-    private long lastMessageId;
-    private String topic;
+    private int bitrate;
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override

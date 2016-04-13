@@ -13,7 +13,7 @@
 package co.phoenixlab.discord.api.endpoints;
 
 import co.phoenixlab.discord.api.entities.channel.DmChannel;
-import co.phoenixlab.discord.api.entities.channel.PublicChannel;
+import co.phoenixlab.discord.api.entities.channel.GuildChannel;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.CreateChannelRequest;
 import co.phoenixlab.discord.api.request.CreatePrivateChannelRequest;
@@ -21,19 +21,19 @@ import co.phoenixlab.discord.api.request.channel.ModifyChannelRequest;
 
 public interface ChannelsEndpoint {
 
-    PublicChannel createChannel(long guildId, CreateChannelRequest request)
+    GuildChannel createChannel(long guildId, CreateChannelRequest request)
             throws ApiException;
 
     DmChannel createPrivateChannel(long myUserId, CreatePrivateChannelRequest request)
             throws ApiException;
 
-    PublicChannel editChannel(long channelId, ModifyChannelRequest request)
+    GuildChannel editChannel(long channelId, ModifyChannelRequest request)
             throws ApiException;
 
     void deleteChannel(long channelId)
             throws ApiException;
 
-    PublicChannel[] getGuildChannels(long guildId)
+    GuildChannel[] getGuildChannels(long guildId)
             throws ApiException;
 
     void broadcastTyping(long channelId)

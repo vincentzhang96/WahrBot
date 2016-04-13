@@ -12,7 +12,7 @@
 
 package co.phoenixlab.discord.api.entities;
 
-import co.phoenixlab.discord.api.entities.channel.PublicChannel;
+import co.phoenixlab.discord.api.entities.channel.GuildChannel;
 import co.phoenixlab.discord.api.enums.AfkTimeout;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,7 +45,7 @@ public class Guild implements Entity {
     private int verificationLevel;
     private boolean unavailable;
     private Presence[] presences;
-    private PublicChannel[] channels;
+    private GuildChannel[] channels;
     private Member[] members;
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

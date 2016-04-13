@@ -12,8 +12,8 @@
 
 package co.phoenixlab.discord.api.entities.channel;
 
-
-import co.phoenixlab.discord.api.entities.Entity;
+import co.phoenixlab.discord.api.entities.Permission;
+import co.phoenixlab.discord.api.enums.ChannelType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,18 +21,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VoiceChannel extends PublicChannel {
+public abstract class GuildChannel extends Channel {
 
-    private int bitrate;
+    private long guildId;
+    private Permission[] permissionOverwrites;
+    private int position;
+    private ChannelType type;
 
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    @Override
-    public boolean equals(Object o) {
-        return Entity.areEqual(this, o);
-    }
-
-    @Override
-    public int hashCode() {
-        return Entity.hash(this);
-    }
 }
