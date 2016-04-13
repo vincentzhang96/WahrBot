@@ -32,6 +32,7 @@ public class EndpointsImpl implements Endpoints {
     public static final String BASE_URL = "https://discordapp.com/api";
     public static final int HTTP_TOO_MANY_REQUESTS = 429;
     public static final int HTTP_OK = 200;
+    public static final int HTTP_EMPTY = 204;
     public static final int HTTP_NOT_AUTHENTICATED = 401;
     @Inject
     private WahrDiscordApiImpl apiImpl;
@@ -164,14 +165,17 @@ public class EndpointsImpl implements Endpoints {
             long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
             throw new RateLimitExceededException(retryIn);
         }
+        if (status == HTTP_EMPTY) {
+            if (Void.class.equals(type)) {
+                return null;
+            } else {
+                throw new UnirestException("Got HTTP 204: Expected a response body, got none");
+            }
+        }
         if (status != HTTP_OK) {
             throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
         }
-        if (type != Void.class) {
-            return gson.fromJson(response.getBody(), type);
-        } else {
-            return null;
-        }
+        return gson.fromJson(response.getBody(), type);
     }
 
     HttpResponse<String> defaultPost(String path, String body) throws UnirestException {
@@ -195,14 +199,17 @@ public class EndpointsImpl implements Endpoints {
             long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
             throw new RateLimitExceededException(retryIn);
         }
+        if (status == HTTP_EMPTY) {
+            if (Void.class.equals(type)) {
+                return null;
+            } else {
+                throw new UnirestException("Got HTTP 204: Expected a response body, got none");
+            }
+        }
         if (status != HTTP_OK) {
             throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
         }
-        if (type != Void.class) {
-            return gson.fromJson(response.getBody(), type);
-        } else {
-            return null;
-        }
+        return gson.fromJson(response.getBody(), type);
     }
 
     HttpResponse<String> defaultGetUnauth(String path) throws UnirestException {
@@ -220,6 +227,13 @@ public class EndpointsImpl implements Endpoints {
         if (status == HTTP_TOO_MANY_REQUESTS) {
             long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
             throw new RateLimitExceededException(retryIn);
+        }
+        if (status == HTTP_EMPTY) {
+            if (Void.class.equals(type)) {
+                return null;
+            } else {
+                throw new UnirestException("Got HTTP 204: Expected a response body, got none");
+            }
         }
         if (status != HTTP_OK) {
             throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
@@ -247,6 +261,13 @@ public class EndpointsImpl implements Endpoints {
         if (status == HTTP_TOO_MANY_REQUESTS) {
             long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
             throw new RateLimitExceededException(retryIn);
+        }
+        if (status == HTTP_EMPTY) {
+            if (Void.class.equals(type)) {
+                return null;
+            } else {
+                throw new UnirestException("Got HTTP 204: Expected a response body, got none");
+            }
         }
         if (status != HTTP_OK) {
             throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
