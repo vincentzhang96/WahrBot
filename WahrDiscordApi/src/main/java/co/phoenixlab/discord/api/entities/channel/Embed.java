@@ -21,11 +21,29 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Embed {
 
+    /**
+     * Title of embed.
+     */
     private String title;
+    /**
+     * Type of embed.
+     */
     private String type;
+    /**
+     * Description of embed.
+     */
     private String description;
+    /**
+     * URL of embed.
+     */
     private String url;
+    /**
+     * Thumbnail information.
+     */
     private EmbedThumbnail thumbnail;
+    /**
+     * Provider information.
+     */
     private EmbedProvider provider;
 
 }

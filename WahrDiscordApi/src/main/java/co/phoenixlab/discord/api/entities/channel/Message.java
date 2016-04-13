@@ -28,17 +28,53 @@ import java.time.Instant;
 @AllArgsConstructor
 public class Message implements Entity {
 
+    /**
+     * ID of the message.
+     */
     private long id;
+    /**
+     * ID of the channel the message was sent in.
+     */
     private long channelId;
+    /**
+     * The {@link User} who is the author of the message.
+     */
     private User author;
+    /**
+     * Contents of the message.
+     */
     private String content;
+    /**
+     * When this message was sent.
+     */
     private Instant timestamp;
+    /**
+     * When this message was edited (or null if never edited).
+     */
     private Instant editedTimestamp;
+    /**
+     * Whether this is a TTS message.
+     */
     private boolean tts;
+    /**
+     * Whether this message mentions everyone.
+     */
     private boolean mentionEveryone;
+    /**
+     * Any users specifically mentioned in the message.
+     */
     private User[] mentions;
+    /**
+     * Any attached files.
+     */
     private Attachment[] attachments;
+    /**
+     * Any embedded content.
+     */
     private Embed[] embeds;
+    /**
+     * Optional integer string used to validate if a message was sent.
+     */
     private String nonce;
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

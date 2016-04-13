@@ -9,12 +9,33 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Attachment implements Entity {
 
+    /**
+     * Attachment ID.
+     */
     private long id;
+    /**
+     * Name of the file attached.
+     */
     private String filename;
+    /**
+     * Size of file, in bytes.
+     */
     private int size;
+    /**
+     * Source URL of file.
+     */
     private String url;
+    /**
+     * A proxied URL of file.
+     */
     private String proxyUrl;
+    /**
+     * Height of file (if image, 0 otherwise).
+     */
     private int height;
+    /**
+     * Width of file (if image, 0 otherwise).
+     */
     private int width;
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

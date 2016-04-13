@@ -21,9 +21,21 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EmbedThumbnail {
 
+    /**
+     * Source URL of thumbnail.
+     */
     private String url;
+    /**
+     * A proxied URL of the thumbnail.
+     */
     private String proxyUrl;
+    /**
+     * Height of thumbnail.
+     */
     private int height;
+    /**
+     * Width of thumbnail.
+     */
     private int width;
 
 }

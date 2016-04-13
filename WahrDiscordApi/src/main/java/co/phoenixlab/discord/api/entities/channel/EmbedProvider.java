@@ -21,7 +21,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EmbedProvider {
 
+    /**
+     * Name of provider.
+     */
     private String name;
+    /**
+     * URL of provider.
+     */
     private String url;
 
 }
