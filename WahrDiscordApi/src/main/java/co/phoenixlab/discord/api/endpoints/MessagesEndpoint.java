@@ -15,7 +15,7 @@ package co.phoenixlab.discord.api.endpoints;
 import co.phoenixlab.discord.api.entities.channel.Message;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.EditMessageRequest;
-import co.phoenixlab.discord.api.request.PostMessageRequest;
+import co.phoenixlab.discord.api.request.channel.CreateMessageRequest;
 
 public interface MessagesEndpoint {
 
@@ -55,7 +55,7 @@ public interface MessagesEndpoint {
         return getLatestMessages(channelId, DEFAULT_LIMIT);
     }
 
-    Message sendMessage(long channelId, PostMessageRequest request)
+    Message sendMessage(long channelId, CreateMessageRequest request)
             throws ApiException;
 
     Message editMessage(long channelId, long messageId, EditMessageRequest request)
