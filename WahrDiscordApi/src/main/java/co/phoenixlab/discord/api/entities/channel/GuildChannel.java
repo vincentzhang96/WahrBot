@@ -23,9 +23,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public abstract class GuildChannel extends Channel {
 
+    /**
+     * The ID of the {@link co.phoenixlab.discord.api.entities.Guild} that this channel belongs to.
+     */
     private long guildId;
+    /**
+     * An array of {@link Permission} overwrites.
+     */
     private Permission[] permissionOverwrites;
+    /**
+     * The ordering position of the channel.
+     */
     private int position;
+    /**
+     * The type of channel. Will be {@code text} for {@link GuildTextChannel}s and {@code voice} for
+     * {@link GuildVoiceChannel}s.
+     */
     private ChannelType type;
 
 }

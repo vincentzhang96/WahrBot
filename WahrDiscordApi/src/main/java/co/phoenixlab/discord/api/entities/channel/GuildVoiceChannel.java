@@ -23,6 +23,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GuildVoiceChannel extends GuildChannel {
 
+    /**
+     * The bitrate (in bits) of the voice channel.
+     */
     private int bitrate;
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

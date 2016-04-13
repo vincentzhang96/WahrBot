@@ -15,8 +15,14 @@ package co.phoenixlab.discord.api.enums;
 import com.google.gson.annotations.SerializedName;
 
 public enum ChannelType {
+    /**
+     * A text channel
+     */
     @SerializedName("text")
     TEXT,
+    /**
+     * A voice channel
+     */
     @SerializedName("voice")
     VOICE
 

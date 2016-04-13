@@ -23,7 +23,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GuildTextChannel extends GuildChannel {
 
+    /**
+     * The ID of the last message sent in this channel.
+     */
     private long lastMessageId;
+    /**
+     * The channel topic (0-1024 chars).
+     */
     private String topic;
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

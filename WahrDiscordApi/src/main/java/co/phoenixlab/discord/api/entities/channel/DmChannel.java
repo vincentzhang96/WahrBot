@@ -23,7 +23,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DmChannel extends Channel {
 
+    /**
+     * The {@link User} of the DM recipient.
+     */
     private User recipient;
+    /**
+     * The ID of the last message sent in this DM.
+     */
     private long lastMessageId;
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
