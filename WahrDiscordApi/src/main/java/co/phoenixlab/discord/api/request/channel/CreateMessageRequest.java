@@ -17,14 +17,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Builder;
 
+import javax.validation.constraints.Size;
+
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateMessageRequest {
 
+    /**
+     * The message contents (up to 2000 characters).
+     */
+    @Size(min = 1, max = 2000)
     private String content;
+    /**
+     * A nonce that can be used for optimistic message sending.
+     */
     private String nonce;
+    /**
+     * If this is a TTS message.
+     */
     private boolean tts;
 
 }
