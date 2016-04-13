@@ -17,6 +17,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Size;
+
 @Builder
 @Getter
 @NoArgsConstructor
@@ -26,6 +28,7 @@ public class ModifyVoiceChannelRequest extends ModifyChannelRequest {
     /**
      * Bitrate (in bits) of the voice channel; 8000 to 9600 (128000 for VIP).
      */
+    @Size(min = 8000, max = 128000)
     private int bitrate;
 
 }

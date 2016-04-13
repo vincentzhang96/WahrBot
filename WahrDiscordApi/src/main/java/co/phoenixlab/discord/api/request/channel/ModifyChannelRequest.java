@@ -17,6 +17,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
+
 @Builder
 @Getter
 @NoArgsConstructor
@@ -26,10 +29,12 @@ public abstract class ModifyChannelRequest {
     /**
      * Channel name, 2-100 characters.
      */
+    @Size(min = 2, max = 100)
     private String name;
     /**
      * Position of the channel in the left side listing.
      */
+    @Min(0)
     private int position;
 
 }

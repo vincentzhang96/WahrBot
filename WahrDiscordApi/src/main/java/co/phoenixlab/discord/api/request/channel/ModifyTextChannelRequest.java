@@ -16,6 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Size;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,6 +26,7 @@ public class ModifyTextChannelRequest extends ModifyChannelRequest {
     /**
      * Channel topic, 0-1024 characters.
      */
+    @Size(min = 0, max = 1024)
     private String topic;
 
 }
