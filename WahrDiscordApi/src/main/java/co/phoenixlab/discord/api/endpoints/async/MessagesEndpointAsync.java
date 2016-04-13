@@ -14,7 +14,7 @@ package co.phoenixlab.discord.api.endpoints.async;
 
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.entities.channel.Message;
-import co.phoenixlab.discord.api.request.EditMessageRequest;
+import co.phoenixlab.discord.api.request.channel.EditMessageRequest;
 import co.phoenixlab.discord.api.request.channel.CreateMessageRequest;
 
 import java.util.concurrent.Future;

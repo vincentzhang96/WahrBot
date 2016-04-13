@@ -14,7 +14,7 @@ package co.phoenixlab.discord.api.endpoints;
 
 import co.phoenixlab.discord.api.entities.channel.Message;
 import co.phoenixlab.discord.api.exceptions.ApiException;
-import co.phoenixlab.discord.api.request.EditMessageRequest;
+import co.phoenixlab.discord.api.request.channel.EditMessageRequest;
 import co.phoenixlab.discord.api.request.channel.CreateMessageRequest;
 
 public interface MessagesEndpoint {
