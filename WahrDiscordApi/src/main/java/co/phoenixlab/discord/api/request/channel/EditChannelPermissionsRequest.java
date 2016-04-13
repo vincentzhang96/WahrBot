@@ -10,19 +10,21 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.endpoints.async;
+package co.phoenixlab.discord.api.request.channel;
 
-import co.phoenixlab.discord.api.exceptions.ApiException;
-import co.phoenixlab.discord.api.request.channel.EditChannelPermissionsRequest;
+import co.phoenixlab.discord.api.entities.DiscordPermissionSet;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.util.concurrent.Future;
+@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class EditChannelPermissionsRequest {
 
-public interface PermissionsEndpointAsync {
-
-    Future<Void> createOrEditPermissionAsync(long channelId, long overwriteId, EditChannelPermissionsRequest request)
-            throws ApiException;
-
-    Future<Void> deletePermissionAsync(long channelId, long overwriteId)
-            throws ApiException;
+    private DiscordPermissionSet allow;
+    private DiscordPermissionSet deny;
 
 }
