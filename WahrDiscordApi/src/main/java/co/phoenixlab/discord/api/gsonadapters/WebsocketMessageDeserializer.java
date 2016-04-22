@@ -123,7 +123,12 @@ public class WebsocketMessageDeserializer implements JsonDeserializer<GatewayPay
                 clazz = Map.class;
                 break;
         }
-        return ctx.deserialize(element, clazz);
+        try {
+            return ctx.deserialize(element, clazz);
+        } catch (JsonSyntaxException jse) {
+            LOGGER.warn("Failed to deserialize element \"{}\" of type {}", element.toString(), clazz.getName());
+            throw jse;
+        }
     }
 
 }

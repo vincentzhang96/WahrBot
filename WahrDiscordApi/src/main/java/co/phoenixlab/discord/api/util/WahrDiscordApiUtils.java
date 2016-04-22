@@ -14,12 +14,17 @@ package co.phoenixlab.discord.api.util;
 
 import co.phoenixlab.discord.api.entities.channel.Channel;
 import co.phoenixlab.discord.api.entities.GatewayPayload;
+import co.phoenixlab.discord.api.entities.channel.GuildChannel;
 import co.phoenixlab.discord.api.gsonadapters.ChannelDeserializer;
+import co.phoenixlab.discord.api.gsonadapters.GuildChannelDeserializer;
+import co.phoenixlab.discord.api.gsonadapters.InstantTypeAdapter;
 import co.phoenixlab.discord.api.gsonadapters.WebsocketMessageDeserializer;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.LongSerializationPolicy;
+
+import java.time.Instant;
 
 public class WahrDiscordApiUtils {
 
@@ -32,7 +37,9 @@ public class WahrDiscordApiUtils {
                 setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).
                 setLongSerializationPolicy(LongSerializationPolicy.STRING).
                 registerTypeAdapter(GatewayPayload.class, new WebsocketMessageDeserializer()).
+                registerTypeAdapter(Instant.class, new InstantTypeAdapter()).
                 registerTypeAdapter(Channel.class, new ChannelDeserializer()).
+                registerTypeAdapter(GuildChannel.class, new GuildChannelDeserializer()).
                 create();
     }
 
