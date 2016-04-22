@@ -15,12 +15,14 @@ package co.phoenixlab.discord.api.request;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class LogoutRequest {
 
+    @NotEmpty
     private String token;
 
 }
