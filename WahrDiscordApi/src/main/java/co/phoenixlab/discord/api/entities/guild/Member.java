@@ -13,7 +13,7 @@
 package co.phoenixlab.discord.api.entities.guild;
 
 import co.phoenixlab.discord.api.entities.Entity;
-import co.phoenixlab.discord.api.entities.User;
+import co.phoenixlab.discord.api.entities.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

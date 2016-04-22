@@ -12,7 +12,7 @@
 
 package co.phoenixlab.discord.api.request.channel;
 
-import co.phoenixlab.discord.api.entities.DiscordPermissionSet;
+import co.phoenixlab.discord.api.entities.guild.DiscordPermissionSet;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

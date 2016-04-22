@@ -10,25 +10,18 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.endpoints.async;
+package co.phoenixlab.discord.api.entities.user;
 
-import co.phoenixlab.discord.api.exceptions.ApiException;
-import co.phoenixlab.discord.api.entities.guild.Presence;
-import co.phoenixlab.discord.api.entities.user.SelfUser;
-import co.phoenixlab.discord.api.request.user.EditProfileRequest;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.awt.image.BufferedImage;
-import java.util.concurrent.Future;
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class SelfUser extends User {
 
-public interface UsersEndpointAsync {
-
-    Future<BufferedImage> getAvatarAsync(long userId, String avatar)
-            throws ApiException;
-
-    Future<SelfUser> editProfileAsync(EditProfileRequest request)
-            throws ApiException;
-
-    Future<Void> updatePresenceAsync(Presence request)
-            throws ApiException;
+    private boolean verified;
+    private String email;
 
 }

@@ -15,6 +15,7 @@ package co.phoenixlab.discord.api.entities;
 import co.phoenixlab.discord.api.entities.channel.DmChannel;
 import co.phoenixlab.discord.api.entities.guild.Guild;
 import co.phoenixlab.discord.api.entities.guild.Presence;
+import co.phoenixlab.discord.api.entities.user.SelfUser;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

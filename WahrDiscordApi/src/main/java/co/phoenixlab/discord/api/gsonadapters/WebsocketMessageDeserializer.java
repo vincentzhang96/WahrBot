@@ -17,6 +17,8 @@ import co.phoenixlab.discord.api.entities.channel.*;
 import co.phoenixlab.discord.api.entities.channel.message.DeletedMessage;
 import co.phoenixlab.discord.api.entities.channel.message.Message;
 import co.phoenixlab.discord.api.entities.guild.*;
+import co.phoenixlab.discord.api.entities.user.SelfUser;
+import co.phoenixlab.discord.api.entities.user.UserSettings;
 import co.phoenixlab.discord.api.enums.WebSocketMessageType;
 import com.google.gson.*;
 import org.slf4j.Logger;

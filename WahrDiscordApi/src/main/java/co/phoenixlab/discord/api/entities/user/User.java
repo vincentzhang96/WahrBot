@@ -10,23 +10,34 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.entities;
+package co.phoenixlab.discord.api.entities.user;
 
+import co.phoenixlab.discord.api.entities.Entity;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 @Builder
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-public class UserSettings {
+@AllArgsConstructor
+public class User implements Entity {
 
-    private boolean inlineAttachmentMedia;
-    private boolean inlineEmbedMedia;
-    private long[] mutedChannels;
-    private boolean renderEmbeds;
-    private String theme;
+    private long id;
+    private String username;
+    private short discriminator;
+    private String avatar;
+    private boolean bot;
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 }

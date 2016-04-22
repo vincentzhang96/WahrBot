@@ -10,18 +10,23 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.entities;
+package co.phoenixlab.discord.api.entities.user;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
-public class SelfUser extends User {
+@NoArgsConstructor
+public class UserSettings {
 
-    private boolean verified;
-    private String email;
+    private boolean inlineAttachmentMedia;
+    private boolean inlineEmbedMedia;
+    private long[] mutedChannels;
+    private boolean renderEmbeds;
+    private String theme;
 
 }

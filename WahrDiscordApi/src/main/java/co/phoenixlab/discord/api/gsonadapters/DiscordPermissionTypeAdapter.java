@@ -12,7 +12,7 @@
 
 package co.phoenixlab.discord.api.gsonadapters;
 
-import co.phoenixlab.discord.api.entities.DiscordPermissionSet;
+import co.phoenixlab.discord.api.entities.guild.DiscordPermissionSet;
 import co.phoenixlab.discord.api.enums.DiscordPermission;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;

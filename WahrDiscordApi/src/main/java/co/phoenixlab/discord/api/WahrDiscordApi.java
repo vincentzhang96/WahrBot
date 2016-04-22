@@ -13,7 +13,7 @@
 package co.phoenixlab.discord.api;
 
 import co.phoenixlab.discord.api.exceptions.ApiException;
-import co.phoenixlab.discord.api.entities.SelfUser;
+import co.phoenixlab.discord.api.entities.user.SelfUser;
 import co.phoenixlab.discord.api.entities.TokenResponse;
 import co.phoenixlab.discord.api.enums.ApiClientState;
 import co.phoenixlab.discord.api.exceptions.NotReadyException;

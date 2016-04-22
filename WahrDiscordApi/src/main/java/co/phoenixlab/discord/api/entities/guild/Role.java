@@ -12,7 +12,6 @@
 
 package co.phoenixlab.discord.api.entities.guild;
 
-import co.phoenixlab.discord.api.entities.DiscordPermissionSet;
 import co.phoenixlab.discord.api.entities.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
