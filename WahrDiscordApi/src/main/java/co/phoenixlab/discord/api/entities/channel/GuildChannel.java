@@ -12,7 +12,8 @@
 
 package co.phoenixlab.discord.api.entities.channel;
 
-import co.phoenixlab.discord.api.entities.Permission;
+import co.phoenixlab.discord.api.entities.guild.Permission;
+import co.phoenixlab.discord.api.entities.guild.Guild;
 import co.phoenixlab.discord.api.enums.ChannelType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,7 +25,7 @@ import lombok.NoArgsConstructor;
 public abstract class GuildChannel extends Channel {
 
     /**
-     * The ID of the {@link co.phoenixlab.discord.api.entities.Guild} that this channel belongs to.
+     * The ID of the {@link Guild} that this channel belongs to.
      */
     private long guildId;
     /**

@@ -15,8 +15,8 @@ package co.phoenixlab.discord.api.endpoints.async;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.entities.channel.DmChannel;
 import co.phoenixlab.discord.api.entities.channel.GuildChannel;
-import co.phoenixlab.discord.api.request.CreateChannelRequest;
-import co.phoenixlab.discord.api.request.CreatePrivateChannelRequest;
+import co.phoenixlab.discord.api.request.channel.CreateChannelRequest;
+import co.phoenixlab.discord.api.request.channel.CreatePrivateChannelRequest;
 import co.phoenixlab.discord.api.request.channel.ModifyChannelRequest;
 
 import java.util.concurrent.Future;

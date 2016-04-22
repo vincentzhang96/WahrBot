@@ -13,8 +13,10 @@
 package co.phoenixlab.discord.api.gsonadapters;
 
 import co.phoenixlab.discord.api.entities.*;
-import co.phoenixlab.discord.api.entities.channel.Channel;
-import co.phoenixlab.discord.api.entities.channel.Message;
+import co.phoenixlab.discord.api.entities.channel.*;
+import co.phoenixlab.discord.api.entities.channel.message.DeletedMessage;
+import co.phoenixlab.discord.api.entities.channel.message.Message;
+import co.phoenixlab.discord.api.entities.guild.*;
 import co.phoenixlab.discord.api.enums.WebSocketMessageType;
 import com.google.gson.*;
 import org.slf4j.Logger;

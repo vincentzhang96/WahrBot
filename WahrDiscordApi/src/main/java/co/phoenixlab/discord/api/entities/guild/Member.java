@@ -10,25 +10,42 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.endpoints.async;
+package co.phoenixlab.discord.api.entities.guild;
 
-import co.phoenixlab.discord.api.exceptions.ApiException;
-import co.phoenixlab.discord.api.entities.guild.BannedUser;
+import co.phoenixlab.discord.api.entities.Entity;
+import co.phoenixlab.discord.api.entities.User;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
-import java.util.concurrent.Future;
+import java.time.Instant;
 
-public interface BansEndpointAsync {
+@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Member implements Entity {
 
-    Future<BannedUser[]> getBansAsync(long guildId)
-            throws ApiException;
+    private User user;
+    private String[] roles;
+    private Instant joinedAt;
+    private boolean deaf;
+    private boolean mute;
 
-    Future<Void> addBanAsync(long guildId, long userId, int deleteMessageDays)
-            throws ApiException;
-
-    default Future<Void> addBanAsync(long guildId, long userId) {
-        return addBanAsync(guildId, userId, 0);
+    @Override
+    public long getId() {
+        return user.getId();
     }
 
-    Future<Void> removeBanAsync(long guildId, long userId);
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
 
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 }

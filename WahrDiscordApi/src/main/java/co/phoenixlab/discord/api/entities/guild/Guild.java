@@ -10,28 +10,56 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.entities;
+package co.phoenixlab.discord.api.entities.guild;
 
-import co.phoenixlab.discord.api.entities.channel.DmChannel;
-import co.phoenixlab.discord.api.entities.guild.Guild;
-import co.phoenixlab.discord.api.entities.guild.Presence;
+import co.phoenixlab.discord.api.entities.*;
+import co.phoenixlab.discord.api.entities.channel.GuildChannel;
+import co.phoenixlab.discord.api.enums.AfkTimeout;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Builder;
 
-@Builder
+import java.time.Instant;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReadyMessage {
+@Builder
+public class Guild implements Entity {
 
-    private int v;
+    public static long NO_AFK_CHANNEL_ID = -1;
+
+    private long id;
+    private String name;
+    private String icon;
+    private String splash;
+    private long ownerId;
+    private String region;
+    private long afkChannelId;
+    private AfkTimeout afkTimeout;
+    private boolean embedEnabled;
+    private long embedChannelId;
+    private int verificationLevel;
+    private Role[] roles;
+    private Emoji[] emojis;
+    private int memberCount;
+    private String[] features;
+    private Instant joinedAt;
+    private boolean large;
+    private boolean unavailable;
     private Presence[] presences;
-    private Guild[] guilds;
-    private String sessionId;
-    private DmChannel[] privateChannels;
-    private SelfUser user;
-    private int heartbeatInterval;
+    private GuildChannel[] channels;
+    private Member[] members;
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 }

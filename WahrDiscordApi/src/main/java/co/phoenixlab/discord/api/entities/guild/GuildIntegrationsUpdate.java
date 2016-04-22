@@ -10,25 +10,19 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.endpoints.async;
+package co.phoenixlab.discord.api.entities.guild;
 
-import co.phoenixlab.discord.api.exceptions.ApiException;
-import co.phoenixlab.discord.api.entities.guild.BannedUser;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.util.concurrent.Future;
+@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class GuildIntegrationsUpdate {
 
-public interface BansEndpointAsync {
-
-    Future<BannedUser[]> getBansAsync(long guildId)
-            throws ApiException;
-
-    Future<Void> addBanAsync(long guildId, long userId, int deleteMessageDays)
-            throws ApiException;
-
-    default Future<Void> addBanAsync(long guildId, long userId) {
-        return addBanAsync(guildId, userId, 0);
-    }
-
-    Future<Void> removeBanAsync(long guildId, long userId);
+    private String guildId;
 
 }

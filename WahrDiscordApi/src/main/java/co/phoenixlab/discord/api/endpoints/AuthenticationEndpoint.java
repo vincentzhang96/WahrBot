@@ -15,7 +15,7 @@ package co.phoenixlab.discord.api.endpoints;
 import co.phoenixlab.discord.api.entities.TokenResponse;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.EmailPasswordLoginRequest;
-import co.phoenixlab.discord.api.request.LogoutRequest;
+import co.phoenixlab.discord.api.request.user.LogoutRequest;
 
 public interface AuthenticationEndpoint {
 

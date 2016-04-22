@@ -13,8 +13,8 @@
 package co.phoenixlab.discord.api.endpoints.async;
 
 import co.phoenixlab.discord.api.exceptions.ApiException;
-import co.phoenixlab.discord.api.entities.Member;
-import co.phoenixlab.discord.api.request.EditMemberRequest;
+import co.phoenixlab.discord.api.entities.guild.Member;
+import co.phoenixlab.discord.api.request.guild.EditMemberRequest;
 
 import java.util.concurrent.Future;
 

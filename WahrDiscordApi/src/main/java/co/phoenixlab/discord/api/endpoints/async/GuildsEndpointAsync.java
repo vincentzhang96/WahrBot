@@ -13,9 +13,9 @@
 package co.phoenixlab.discord.api.endpoints.async;
 
 import co.phoenixlab.discord.api.exceptions.ApiException;
-import co.phoenixlab.discord.api.entities.Guild;
-import co.phoenixlab.discord.api.request.CreateGuildRequest;
-import co.phoenixlab.discord.api.request.EditGuildRequest;
+import co.phoenixlab.discord.api.entities.guild.Guild;
+import co.phoenixlab.discord.api.request.guild.CreateGuildRequest;
+import co.phoenixlab.discord.api.request.guild.EditGuildRequest;
 
 import java.util.concurrent.Future;
 

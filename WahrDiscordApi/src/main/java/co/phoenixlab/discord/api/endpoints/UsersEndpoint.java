@@ -12,10 +12,10 @@
 
 package co.phoenixlab.discord.api.endpoints;
 
-import co.phoenixlab.discord.api.entities.Presence;
+import co.phoenixlab.discord.api.entities.guild.Presence;
 import co.phoenixlab.discord.api.entities.SelfUser;
 import co.phoenixlab.discord.api.exceptions.ApiException;
-import co.phoenixlab.discord.api.request.EditProfileRequest;
+import co.phoenixlab.discord.api.request.user.EditProfileRequest;
 
 import java.awt.image.BufferedImage;
 

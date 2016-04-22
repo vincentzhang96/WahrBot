@@ -10,25 +10,43 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.endpoints.async;
+package co.phoenixlab.discord.api.entities.guild;
 
-import co.phoenixlab.discord.api.exceptions.ApiException;
-import co.phoenixlab.discord.api.entities.guild.BannedUser;
+import co.phoenixlab.discord.api.entities.DiscordPermissionSet;
+import co.phoenixlab.discord.api.entities.Entity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.util.concurrent.Future;
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Role implements Entity, Comparable<Role> {
 
-public interface BansEndpointAsync {
+    private long id;
+    private String name;
+    private int color;
+    private DiscordPermissionSet permissions;
+    private int position;
+    private boolean managed;
+    private boolean hoist;
 
-    Future<BannedUser[]> getBansAsync(long guildId)
-            throws ApiException;
 
-    Future<Void> addBanAsync(long guildId, long userId, int deleteMessageDays)
-            throws ApiException;
-
-    default Future<Void> addBanAsync(long guildId, long userId) {
-        return addBanAsync(guildId, userId, 0);
+    @Override
+    public int compareTo(Role o) {
+        return Integer.compare(position, o.position);
     }
 
-    Future<Void> removeBanAsync(long guildId, long userId);
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
 
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 }

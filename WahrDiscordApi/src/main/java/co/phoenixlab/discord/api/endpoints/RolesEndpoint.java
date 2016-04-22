@@ -12,9 +12,9 @@
 
 package co.phoenixlab.discord.api.endpoints;
 
-import co.phoenixlab.discord.api.entities.Role;
+import co.phoenixlab.discord.api.entities.guild.Role;
 import co.phoenixlab.discord.api.exceptions.ApiException;
-import co.phoenixlab.discord.api.request.RoleReorderRequestEntry;
+import co.phoenixlab.discord.api.request.guild.RoleReorderRequestEntry;
 
 public interface RolesEndpoint {
 

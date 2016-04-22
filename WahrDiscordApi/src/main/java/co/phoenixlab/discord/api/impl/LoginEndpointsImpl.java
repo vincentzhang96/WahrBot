@@ -20,7 +20,7 @@ import co.phoenixlab.discord.api.entities.TokenResponse;
 import co.phoenixlab.discord.api.entities.WebsocketEndpointResponse;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.EmailPasswordLoginRequest;
-import co.phoenixlab.discord.api.request.LogoutRequest;
+import co.phoenixlab.discord.api.request.user.LogoutRequest;
 import com.google.inject.Inject;
 
 import java.net.URI;
