@@ -23,6 +23,7 @@ import co.phoenixlab.discord.api.request.EmailPasswordLoginRequest;
 import co.phoenixlab.discord.api.request.LogoutRequest;
 import com.google.inject.Inject;
 
+import java.net.URI;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -69,12 +70,15 @@ public class LoginEndpointsImpl
     @Override
     public WebsocketEndpointResponse getGateway() throws ApiException {
         try {
-            WebsocketEndpointResponse ret = endpoints.
-                    defaultGet(GATEWAY_ENDPOINT, WebsocketEndpointResponse.class);
-            if (ret == null || ret.getUrl() == null) {
-                throw new ApiException(GET, GATEWAY_ENDPOINT, "Received invalid response");
-            }
-            return ret;
+//            WebsocketEndpointResponse ret = endpoints.
+//                    defaultGet(GATEWAY_ENDPOINT, WebsocketEndpointResponse.class);
+//            if (ret == null || ret.getUrl() == null) {
+//                throw new ApiException(GET, GATEWAY_ENDPOINT, "Received invalid response");
+//            }
+//            return ret;
+            return WebsocketEndpointResponse.builder().
+                    url(new URI("wss://gateway.discord.gg/")).
+                    build();
         } catch (ApiException apie) {
             //  rethrow
             throw apie;
