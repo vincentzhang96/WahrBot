@@ -16,6 +16,7 @@ import co.phoenixlab.discord.api.endpoints.*;
 import co.phoenixlab.discord.api.endpoints.async.*;
 import co.phoenixlab.discord.api.exceptions.InvalidTokenException;
 import co.phoenixlab.discord.api.exceptions.RateLimitExceededException;
+import com.codahale.metrics.Timer;
 import com.google.common.net.HttpHeaders;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
@@ -40,6 +41,8 @@ public class EndpointsImpl implements Endpoints {
     private LoginEndpointsImpl login;
     @Inject
     private Gson gson;
+    @Inject
+    private WahrDiscordApiImpl.Stats stats;
 
     @Override
     public AuthenticationEndpoint auth() {
@@ -151,127 +154,170 @@ public class EndpointsImpl implements Endpoints {
     }
 
     HttpResponse<String> defaultPostUnauth(String path, String body) throws UnirestException {
-        HttpRequestWithBody req = Unirest.post(BASE_URL + path);
-        addDefaultHeaders(req);
-        return req.body(body).asString();
+        try (Timer.Context ctx = stats.httpPostTime.time()) {
+            HttpRequestWithBody req = Unirest.post(BASE_URL + path);
+            addDefaultHeaders(req);
+            return logResponse(req.body(body).asString());
+        }
     }
 
     <T> T defaultPostUnauth(String path, Object body, Class<T> type) throws UnirestException {
-        HttpRequestWithBody req = Unirest.post(BASE_URL + path);
-        addDefaultHeaders(req);
-        HttpResponse<String> response = req.body(gson.toJson(body)).asString();
-        int status = response.getStatus();
-        if (status == HTTP_TOO_MANY_REQUESTS) {
-            long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
-            throw new RateLimitExceededException(retryIn);
-        }
-        if (status == HTTP_EMPTY) {
-            if (Void.class.equals(type)) {
-                return null;
-            } else {
-                throw new UnirestException("Got HTTP 204: Expected a response body, got none");
+        try (Timer.Context ctx = stats.httpPostTime.time()) {
+            HttpRequestWithBody req = Unirest.post(BASE_URL + path);
+            addDefaultHeaders(req);
+            HttpResponse<String> response = req.body(gson.toJson(body)).asString();
+            logResponse(response);
+            int status = response.getStatus();
+            if (status == HTTP_TOO_MANY_REQUESTS) {
+                long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
+                throw new RateLimitExceededException(retryIn);
             }
+            if (status == HTTP_EMPTY) {
+                if (Void.class.equals(type)) {
+                    return null;
+                } else {
+                    throw new UnirestException("Got HTTP 204: Expected a response body, got none");
+                }
+            }
+            if (status != HTTP_OK) {
+                throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
+            }
+            return gson.fromJson(response.getBody(), type);
         }
-        if (status != HTTP_OK) {
-            throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
-        }
-        return gson.fromJson(response.getBody(), type);
     }
 
     HttpResponse<String> defaultPost(String path, String body) throws UnirestException {
-        HttpRequestWithBody req = Unirest.post(BASE_URL + path);
-        addDefaultHeaders(req);
-        addAuthHeader(req);
-        return req.body(body).asString();
+        try (Timer.Context ctx = stats.httpPostTime.time()) {
+            HttpRequestWithBody req = Unirest.post(BASE_URL + path);
+            addDefaultHeaders(req);
+            addAuthHeader(req);
+            return logResponse(req.body(body).asString());
+        }
     }
 
     <T> T defaultPost(String path, Object body, Class<T> type)
             throws UnirestException, InvalidTokenException {
-        HttpRequestWithBody req = Unirest.post(BASE_URL + path);
-        addDefaultHeaders(req);
-        addAuthHeader(req);
-        HttpResponse<String> response = req.body(gson.toJson(body)).asString();
-        int status = response.getStatus();
-        if (status == HTTP_NOT_AUTHENTICATED) {
-            throw new InvalidTokenException(HttpMethod.POST, path, "Bad token");
-        }
-        if (status == HTTP_TOO_MANY_REQUESTS) {
-            long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
-            throw new RateLimitExceededException(retryIn);
-        }
-        if (status == HTTP_EMPTY) {
-            if (Void.class.equals(type)) {
-                return null;
-            } else {
-                throw new UnirestException("Got HTTP 204: Expected a response body, got none");
+        try (Timer.Context ctx = stats.httpPostTime.time()) {
+            HttpRequestWithBody req = Unirest.post(BASE_URL + path);
+            addDefaultHeaders(req);
+            addAuthHeader(req);
+            HttpResponse<String> response = req.body(gson.toJson(body)).asString();
+            logResponse(response);
+            int status = response.getStatus();
+            if (status == HTTP_NOT_AUTHENTICATED) {
+                throw new InvalidTokenException(HttpMethod.POST, path, "Bad token");
             }
+            if (status == HTTP_TOO_MANY_REQUESTS) {
+                long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
+                throw new RateLimitExceededException(retryIn);
+            }
+            if (status == HTTP_EMPTY) {
+                if (Void.class.equals(type)) {
+                    return null;
+                } else {
+                    throw new UnirestException("Got HTTP 204: Expected a response body, got none");
+                }
+            }
+            if (status != HTTP_OK) {
+                throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
+            }
+            return gson.fromJson(response.getBody(), type);
         }
-        if (status != HTTP_OK) {
-            throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
-        }
-        return gson.fromJson(response.getBody(), type);
     }
 
     HttpResponse<String> defaultGetUnauth(String path) throws UnirestException {
-        HttpRequest req = Unirest.get(BASE_URL + path);
-        addDefaultHeaders(req);
-        return req.asString();
+        try (Timer.Context ctx = stats.httpGetTime.time()) {
+            HttpRequest req = Unirest.get(BASE_URL + path);
+            addDefaultHeaders(req);
+            return logResponse(req.asString());
+        }
     }
 
     <T> T defaultGetUnauth(String path, Class<T> type)
             throws UnirestException, InvalidTokenException {
-        HttpRequest req = Unirest.get(BASE_URL + path);
-        addDefaultHeaders(req);
-        HttpResponse<String> response = req.asString();
-        int status = response.getStatus();
-        if (status == HTTP_TOO_MANY_REQUESTS) {
-            long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
-            throw new RateLimitExceededException(retryIn);
-        }
-        if (status == HTTP_EMPTY) {
-            if (Void.class.equals(type)) {
-                return null;
-            } else {
-                throw new UnirestException("Got HTTP 204: Expected a response body, got none");
+        try (Timer.Context ctx = stats.httpGetTime.time()) {
+            HttpRequest req = Unirest.get(BASE_URL + path);
+            addDefaultHeaders(req);
+            HttpResponse<String> response = req.asString();
+            logResponse(response);
+            int status = response.getStatus();
+            if (status == HTTP_TOO_MANY_REQUESTS) {
+                long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
+                throw new RateLimitExceededException(retryIn);
             }
+            if (status == HTTP_EMPTY) {
+                if (Void.class.equals(type)) {
+                    return null;
+                } else {
+                    throw new UnirestException("Got HTTP 204: Expected a response body, got none");
+                }
+            }
+            if (status != HTTP_OK) {
+                throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
+            }
+            return gson.fromJson(response.getBody(), type);
         }
-        if (status != HTTP_OK) {
-            throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
-        }
-        return gson.fromJson(response.getBody(), type);
     }
 
     HttpResponse<String> defaultGet(String path) throws UnirestException {
-        HttpRequest req = Unirest.get(BASE_URL + path);
-        addDefaultHeaders(req);
-        addAuthHeader(req);
-        return req.asString();
+        try (Timer.Context ctx = stats.httpGetTime.time()) {
+            HttpRequest req = Unirest.get(BASE_URL + path);
+            addDefaultHeaders(req);
+            addAuthHeader(req);
+            return logResponse(req.asString());
+        }
     }
 
     <T> T defaultGet(String path, Class<T> type)
             throws UnirestException, InvalidTokenException {
-        HttpRequest req = Unirest.get(BASE_URL + path);
-        addDefaultHeaders(req);
-        addAuthHeader(req);
-        HttpResponse<String> response = req.asString();
-        int status = response.getStatus();
-        if (status == HTTP_NOT_AUTHENTICATED) {
-            throw new InvalidTokenException(HttpMethod.GET, path, "Bad token");
-        }
-        if (status == HTTP_TOO_MANY_REQUESTS) {
-            long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
-            throw new RateLimitExceededException(retryIn);
-        }
-        if (status == HTTP_EMPTY) {
-            if (Void.class.equals(type)) {
-                return null;
-            } else {
-                throw new UnirestException("Got HTTP 204: Expected a response body, got none");
+        try (Timer.Context ctx = stats.httpGetTime.time()) {
+            HttpRequest req = Unirest.get(BASE_URL + path);
+            addDefaultHeaders(req);
+            addAuthHeader(req);
+            HttpResponse<String> response = req.asString();
+            logResponse(response);
+            int status = response.getStatus();
+            if (status == HTTP_NOT_AUTHENTICATED) {
+                throw new InvalidTokenException(HttpMethod.GET, path, "Bad token");
             }
+            if (status == HTTP_TOO_MANY_REQUESTS) {
+                long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
+                throw new RateLimitExceededException(retryIn);
+            }
+            if (status == HTTP_EMPTY) {
+                if (Void.class.equals(type)) {
+                    return null;
+                } else {
+                    throw new UnirestException("Got HTTP 204: Expected a response body, got none");
+                }
+            }
+            if (status != HTTP_OK) {
+                throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
+            }
+            return gson.fromJson(response.getBody(), type);
         }
-        if (status != HTTP_OK) {
-            throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
+    }
+
+    private <T> HttpResponse<T> logResponse(HttpResponse<T> response) {
+        int status = response.getStatus();
+        switch (status / 100) {
+            case 2:
+                stats.http2xxResp.mark();
+                break;
+            case 4:
+                stats.http4xxErrors.mark();
+                break;
+            case 5:
+                stats.http5xxErrors.mark();
+                break;
+            default:
+                stats.httpOtherResp.mark();
+                break;
         }
-        return gson.fromJson(response.getBody(), type);
+        return response;
+    }
+
+    private boolean inStatusRange(int range, int status) {
+        return status >= range && status < range + 100;
     }
 }
