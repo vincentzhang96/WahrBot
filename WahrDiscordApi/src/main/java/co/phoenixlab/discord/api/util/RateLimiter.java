@@ -74,18 +74,8 @@ public class RateLimiter {
                 for (int i = 0; i < charges.length; i++) {
                     long delta = now - charges[i];
                     if (delta >= periodMs) {
-                        lock.readLock().unlock();
-                        try {
-                            lock.writeLock().lock();
-                            //  recheck
-                            if (delta >= now - charges[i]) {
-                                charges[i] = now;
-                                return;
-                            }
-                            //  if not we go on to the next one
-                        } finally {
-                            lock.writeLock().unlock();
-                            lock.readLock().lock();
+                        if (tryAcquireCharge(now, i, delta)) {
+                            return;
                         }
                     }
                     if (delta < diff) {
@@ -101,6 +91,23 @@ public class RateLimiter {
             lock.readLock().unlock();
         }
         throw new RateLimitExceededException(label, diff);
+    }
+
+    private boolean tryAcquireCharge(long now, int i, long delta) {
+        lock.readLock().unlock();
+        try {
+            lock.writeLock().lock();
+            //  recheck
+            if (delta >= now - charges[i]) {
+                charges[i] = now;
+                return true;
+            }
+            //  if not we go on to the next one
+        } finally {
+            lock.writeLock().unlock();
+            lock.readLock().lock();
+        }
+        return false;
     }
 
     public int getRemainingCharges() {
