@@ -16,6 +16,7 @@ import co.phoenixlab.discord.api.entities.GatewayPayload;
 import co.phoenixlab.discord.api.exceptions.RateLimitExceededException;
 import co.phoenixlab.discord.api.request.ConnectRequest;
 import co.phoenixlab.discord.api.request.ConnectionProperties;
+import co.phoenixlab.discord.api.request.WSRequest;
 import co.phoenixlab.discord.api.util.RateLimiter;
 import co.phoenixlab.discord.api.util.WahrDiscordApiUtils;
 import com.codahale.metrics.Timer;
@@ -46,6 +47,7 @@ class WSClient extends WebSocketClient {
     private String referringDomain;
 
     private RateLimiter sendLimiter;
+    private volatile int lastSequenceId;
 
     public WSClient(URI serverURI, WahrDiscordApiImpl api) {
         super(serverURI);
@@ -60,6 +62,7 @@ class WSClient extends WebSocketClient {
         referrer = "";
         referringDomain = "";
         sendLimiter = new RateLimiter("gateway", 0, 0);
+        lastSequenceId = -1;
     }
 
     @Override
@@ -78,17 +81,23 @@ class WSClient extends WebSocketClient {
                         referringDomain(referringDomain).
                         build()).
                 build();
-        send(gson.toJson(GatewayPayload.identify(request)));
+        send(gson.toJson(WSRequest.identify(request)));
     }
 
     @Override
     public void onMessage(String message) {
         try(Timer.Context ctx = stats.webSocketMessageParsing.time()) {
             GatewayPayload msg = gson.fromJson(message, GatewayPayload.class);
+            if (msg.getSequenceNumber() > lastSequenceId) {
+                lastSequenceId = msg.getSequenceNumber();
+            } else {
+                WS_LOGGER.warn("Sequence ID went backwards! Had {}, got {}", lastSequenceId, msg.getSequenceNumber());
+            }
             if (msg.getErrorMessage() != null) {
                 onDiscordError(msg.getErrorMessage());
                 return;
             }
+            //  TODO handle
         } catch (Exception e) {
             stats.webSocketMessageErrors.mark();
             WS_LOGGER.warn("Exception while parsing message", e);
@@ -113,6 +122,17 @@ class WSClient extends WebSocketClient {
     public void onError(Exception ex) {
         stats.webSocketErrors.mark();
         WS_LOGGER.warn("Websocket exception", ex);
+    }
+
+    public void send(WSRequest request) throws NotYetConnectedException, RateLimitExceededException {
+        try {
+            sendLimiter.mark();
+            super.send(gson.toJson(request));
+        } catch (RateLimitExceededException e) {
+            stats.webSocketRateLimitHits.mark();
+            WS_LOGGER.warn("Rate limit exceeded for send(String), retry={}", e.getRetryIn());
+            throw e;
+        }
     }
 
     @Override

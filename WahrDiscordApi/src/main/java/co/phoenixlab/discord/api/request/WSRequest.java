@@ -12,6 +12,11 @@
 
 package co.phoenixlab.discord.api.request;
 
+import co.phoenixlab.discord.api.enums.GatewayOP;
+import co.phoenixlab.discord.api.request.channel.VoiceStateUpdateRequest;
+import co.phoenixlab.discord.api.request.guild.GuildMembersRequest;
+import co.phoenixlab.discord.api.request.guild.UpdateStatusRequest;
+import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,7 +28,40 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class WSRequest {
 
-    private int op;
-    private Object d;
+    @SerializedName("op")
+    private GatewayOP opCode;
+    @SerializedName("d")
+    private Object data;
 
+
+    public static WSRequest payload(GatewayOP op, Object request) {
+        return WSRequest.builder().
+                opCode(op).
+                data(request).
+                build();
+    }
+
+    public static WSRequest heartbeat(int lastSeqNum) {
+        return payload(GatewayOP.HEARTBEAT, lastSeqNum);
+    }
+
+    public static WSRequest identify(ConnectRequest request) {
+        return payload(GatewayOP.IDENTIFY, request);
+    }
+
+    public static WSRequest statusUpdate(UpdateStatusRequest request) {
+        return payload(GatewayOP.STATUS_UPDATE, request);
+    }
+
+    public static WSRequest voiceStateUpdate(VoiceStateUpdateRequest request) {
+        return payload(GatewayOP.VOICE_STATE_UPDATE, request);
+    }
+
+    public WSRequest resume(GatewayResumeRequest request) {
+        return payload(GatewayOP.RESUME, request);
+    }
+
+    public WSRequest requestGuildMembers(GuildMembersRequest request) {
+        return payload(GatewayOP.REQUEST_GUILD_MEMBERS, request);
+    }
 }

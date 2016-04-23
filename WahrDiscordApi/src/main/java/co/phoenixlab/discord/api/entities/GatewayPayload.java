@@ -14,10 +14,6 @@ package co.phoenixlab.discord.api.entities;
 
 import co.phoenixlab.discord.api.enums.GatewayOP;
 import co.phoenixlab.discord.api.enums.WebSocketMessageType;
-import co.phoenixlab.discord.api.request.*;
-import co.phoenixlab.discord.api.request.channel.VoiceStateUpdateRequest;
-import co.phoenixlab.discord.api.request.guild.GuildMembersRequest;
-import co.phoenixlab.discord.api.request.guild.UpdateStatusRequest;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,41 +36,5 @@ public class GatewayPayload {
     private WebSocketMessageType type;
     @SerializedName("d")
     private Object data;
-
-    public static GatewayPayload payload(GatewayOP op, Object request) {
-        return GatewayPayload.builder().
-                opCode(op).
-                data(request).
-                build();
-    }
-
-    public static GatewayPayload heartbeat(int lastSeqNum) {
-        return payload(GatewayOP.HEARTBEAT, lastSeqNum);
-    }
-
-    public static GatewayPayload identify(ConnectRequest request) {
-        return payload(GatewayOP.IDENTIFY, request);
-    }
-
-    public static GatewayPayload statusUpdate(UpdateStatusRequest request) {
-        return payload(GatewayOP.STATUS_UPDATE, request);
-    }
-
-    public static GatewayPayload voiceStateUpdate(VoiceStateUpdateRequest request) {
-        return payload(GatewayOP.VOICE_STATE_UPDATE, request);
-    }
-
-    public GatewayPayload resume(GatewayResumeRequest request) {
-        return payload(GatewayOP.RESUME, request);
-    }
-
-    public GatewayPayload requestGuildMembers(GuildMembersRequest request) {
-        return payload(GatewayOP.REQUEST_GUILD_MEMBERS, request);
-    }
-
-
-
-
-
 
 }
