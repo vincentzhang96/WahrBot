@@ -27,16 +27,16 @@ public class RateLimiter {
     @Getter
     private int maxCharges;
     @Getter
-    private int period;
+    private long periodMs;
     private long[] charges;
 
-    public RateLimiter(int period, int maxCharges) {
-        this("", period, maxCharges);
+    public RateLimiter(long periodMs, int maxCharges) {
+        this("", periodMs, maxCharges);
     }
 
-    public RateLimiter(String label, int period, int maxCharges) {
+    public RateLimiter(String label, long periodMs, int maxCharges) {
         this.label = label;
-        this.period = period;
+        this.periodMs = periodMs;
         this.maxCharges = maxCharges;
         this.charges = new long[maxCharges];
         this.lock = new ReentrantReadWriteLock();
@@ -60,7 +60,7 @@ public class RateLimiter {
                 diff = Long.MAX_VALUE;
                 for (int i = 0; i < charges.length; i++) {
                     long delta = now - charges[i];
-                    if (delta < period) {
+                    if (delta < periodMs) {
                         lock.readLock().unlock();
                         try {
                             lock.writeLock().lock();
@@ -113,7 +113,7 @@ public class RateLimiter {
     }
 
     private boolean isTimeOnCd(long time) {
-        return System.currentTimeMillis() - time < period;
+        return System.currentTimeMillis() - time < periodMs;
     }
 
     public void reset() {
