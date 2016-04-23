@@ -137,4 +137,10 @@ public class RateLimiter {
             lock.writeLock().unlock();
         }
     }
+
+    @Override
+    public String toString() {
+        return String.format("RateLimiter %s: period:%,dms chargeCount:%,d charges:%s",
+                label, periodMs, maxCharges, Arrays.toString(charges));
+    }
 }
