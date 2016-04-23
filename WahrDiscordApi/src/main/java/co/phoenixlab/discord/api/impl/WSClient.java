@@ -193,7 +193,6 @@ class WSClient {
 
     public void send(WSRequest request) throws NotYetConnectedException, RateLimitExceededException {
         try {
-            WS_LOGGER.info(sendLimiter.toString());
             sendLimiter.mark();
             delegate.send(gson.toJson(request));
         } catch (RateLimitExceededException e) {
