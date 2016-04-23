@@ -85,6 +85,7 @@ public class RateLimiter {
                             //  if not we go on to the next one
                         } finally {
                             lock.writeLock().unlock();
+                            lock.readLock().lock();
                         }
                     }
                     if (delta < diff) {
