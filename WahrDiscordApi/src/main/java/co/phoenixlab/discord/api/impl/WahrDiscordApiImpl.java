@@ -13,7 +13,7 @@
 package co.phoenixlab.discord.api.impl;
 
 import co.phoenixlab.discord.api.WahrDiscordApi;
-import co.phoenixlab.discord.api.entities.SelfUser;
+import co.phoenixlab.discord.api.entities.user.SelfUser;
 import co.phoenixlab.discord.api.entities.TokenResponse;
 import co.phoenixlab.discord.api.entities.WebsocketEndpointResponse;
 import co.phoenixlab.discord.api.enums.ApiClientState;
@@ -335,7 +335,6 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
             http4xxErrors = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "http", "response", "4XX"));
             http5xxErrors = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "http", "response", "5XX"));
             httpOtherResp = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "http", "response", "other"));
-
         }
 
     }
