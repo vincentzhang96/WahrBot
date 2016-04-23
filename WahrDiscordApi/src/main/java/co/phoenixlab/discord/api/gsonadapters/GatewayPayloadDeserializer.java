@@ -53,10 +53,15 @@ public class GatewayPayloadDeserializer implements JsonDeserializer<GatewayPaylo
                 throw new JsonParseException("Object is missing required field \"t\"");
             }
             String typeStr = typeElement.getAsString();
+            JsonElement seqElement = obj.get("s");
+            if (seqElement == null) {
+                throw new JsonParseException("Object is missing required field \"s\"");
+            }
             LOGGER.info("Received {}", typeStr);
             WebSocketMessageType type = WebSocketMessageType.fromString(typeStr);
             return GatewayPayload.builder().
                     opCode(op).
+                    sequenceNumber(seqElement.getAsInt()).
                     type(type).
                     data(deserializeBody(obj.get("d").getAsJsonObject(), typeStr, type, context)).
                     build();
