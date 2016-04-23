@@ -13,8 +13,10 @@
 package co.phoenixlab.discord.api.impl;
 
 import co.phoenixlab.discord.api.entities.GatewayPayload;
+import co.phoenixlab.discord.api.exceptions.RateLimitExceededException;
 import co.phoenixlab.discord.api.request.ConnectRequest;
 import co.phoenixlab.discord.api.request.ConnectionProperties;
+import co.phoenixlab.discord.api.util.RateLimiter;
 import co.phoenixlab.discord.api.util.WahrDiscordApiUtils;
 import com.codahale.metrics.Timer;
 import com.google.gson.Gson;
@@ -24,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.nio.channels.NotYetConnectedException;
 
 class WSClient extends WebSocketClient {
 
@@ -42,6 +45,8 @@ class WSClient extends WebSocketClient {
     private String referrer;
     private String referringDomain;
 
+    private RateLimiter sendLimiter;
+
     public WSClient(URI serverURI, WahrDiscordApiImpl api) {
         super(serverURI);
         stats = api.getStats();
@@ -54,6 +59,7 @@ class WSClient extends WebSocketClient {
         browser = "Java";
         referrer = "";
         referringDomain = "";
+        sendLimiter = new RateLimiter("gateway", 0, 0);
     }
 
     @Override
@@ -109,4 +115,27 @@ class WSClient extends WebSocketClient {
         WS_LOGGER.warn("Websocket exception", ex);
     }
 
+    @Override
+    public void send(String text) throws NotYetConnectedException {
+        try {
+            sendLimiter.mark();
+            super.send(text);
+        } catch (RateLimitExceededException e) {
+            stats.webSocketRateLimitHits.mark();
+            WS_LOGGER.warn("Rate limit exceeded for send(String), retry={}", e.getRetryIn());
+            throw e;
+        }
+    }
+
+    @Override
+    public void send(byte[] data) throws NotYetConnectedException {
+        try {
+            sendLimiter.mark();
+            super.send(data);
+        } catch (RateLimitExceededException e) {
+            stats.webSocketRateLimitHits.mark();
+            WS_LOGGER.warn("Rate limit exceeded for send(byte[]), retry={}", e.getRetryIn());
+            throw e;
+        }
+    }
 }
