@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-public class WebsocketMessageDeserializer implements JsonDeserializer<GatewayPayload> {
+public class GatewayPayloadDeserializer implements JsonDeserializer<GatewayPayload> {
 
-    private Logger LOGGER = LoggerFactory.getLogger(WebsocketMessageDeserializer.class);
+    private Logger LOGGER = LoggerFactory.getLogger(GatewayPayloadDeserializer.class);
 
     @Override
     public GatewayPayload deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
