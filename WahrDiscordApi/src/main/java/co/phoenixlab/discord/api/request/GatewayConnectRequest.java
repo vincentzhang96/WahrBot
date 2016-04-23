@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConnectRequest {
+public class GatewayConnectRequest {
 
     public static int OP_CODE = 2;
 

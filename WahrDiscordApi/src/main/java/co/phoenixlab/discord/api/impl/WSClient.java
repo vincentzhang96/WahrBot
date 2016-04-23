@@ -16,7 +16,7 @@ import co.phoenixlab.discord.api.entities.GatewayPayload;
 import co.phoenixlab.discord.api.enums.GatewayOP;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.exceptions.RateLimitExceededException;
-import co.phoenixlab.discord.api.request.ConnectRequest;
+import co.phoenixlab.discord.api.request.GatewayConnectRequest;
 import co.phoenixlab.discord.api.request.ConnectionProperties;
 import co.phoenixlab.discord.api.request.GatewayResumeRequest;
 import co.phoenixlab.discord.api.request.WSRequest;
@@ -80,7 +80,7 @@ class WSClient {
     }
 
     private void sendIdentify() {
-        ConnectRequest request = ConnectRequest.builder().
+        GatewayConnectRequest request = GatewayConnectRequest.builder().
                 token(api.getToken()).
                 v(webSocketProtocolVersion).
                 largeThreshold(largeThreshold).

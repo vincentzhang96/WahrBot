@@ -45,7 +45,7 @@ public class WSRequest {
         return payload(GatewayOP.HEARTBEAT, lastSeqNum);
     }
 
-    public static WSRequest identify(ConnectRequest request) {
+    public static WSRequest identify(GatewayConnectRequest request) {
         return payload(GatewayOP.IDENTIFY, request);
     }
 
