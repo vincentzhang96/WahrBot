@@ -51,6 +51,19 @@ public class RateLimiter {
         }
     }
 
+    public long tryMark() {
+        try {
+            //  Will never throw InterruptedException with false param
+            mark(false);
+            return 0L;
+        } catch (InterruptedException ignore) {
+            //  ignore
+            return 0L;
+        } catch (RateLimitExceededException e) {
+            return e.getRetryIn();
+        }
+    }
+
     public void mark(boolean waitFor) throws RateLimitExceededException, InterruptedException {
         long now = System.currentTimeMillis();
         long diff;
