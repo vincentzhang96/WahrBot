@@ -13,15 +13,17 @@
 package co.phoenixlab.discord.api.impl;
 
 import co.phoenixlab.discord.api.entities.GatewayPayload;
+import co.phoenixlab.discord.api.enums.GatewayOP;
+import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.exceptions.RateLimitExceededException;
 import co.phoenixlab.discord.api.request.ConnectRequest;
 import co.phoenixlab.discord.api.request.ConnectionProperties;
+import co.phoenixlab.discord.api.request.GatewayResumeRequest;
 import co.phoenixlab.discord.api.request.WSRequest;
 import co.phoenixlab.discord.api.util.RateLimiter;
 import co.phoenixlab.discord.api.util.WahrDiscordApiUtils;
 import com.codahale.metrics.Timer;
 import com.google.gson.Gson;
-import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +31,11 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.nio.channels.NotYetConnectedException;
 
-class WSClient extends WebSocketClient {
+class WSClient {
 
     private static final Logger WS_LOGGER = LoggerFactory.getLogger(WSClient.class);
+
+    private WebsocketDelegate delegate;
 
     private final WahrDiscordApiImpl api;
     private final WahrDiscordApiImpl.Stats stats;
@@ -50,7 +54,7 @@ class WSClient extends WebSocketClient {
     private volatile int lastSequenceId;
 
     public WSClient(URI serverURI, WahrDiscordApiImpl api) {
-        super(serverURI);
+        delegate = new WebsocketDelegate(serverURI, this);
         stats = api.getStats();
         this.api = api;
         gson = WahrDiscordApiUtils.createGson();
@@ -65,10 +69,17 @@ class WSClient extends WebSocketClient {
         lastSequenceId = -1;
     }
 
-    @Override
-    public void onOpen(ServerHandshake handshakedata) {
+    void onOpen(ServerHandshake handshakedata) {
         Thread.currentThread().setName("WebSocketClient");
         WS_LOGGER.info("WebSocket connection opened");
+        if (api.getSessionId() == null) {
+            sendIdentify();
+        } else {
+            sendResume();
+        }
+    }
+
+    private void sendIdentify() {
         ConnectRequest request = ConnectRequest.builder().
                 token(api.getToken()).
                 v(webSocketProtocolVersion).
@@ -81,11 +92,19 @@ class WSClient extends WebSocketClient {
                         referringDomain(referringDomain).
                         build()).
                 build();
-        send(gson.toJson(WSRequest.identify(request)));
+        send(WSRequest.identify(request));
     }
 
-    @Override
-    public void onMessage(String message) {
+    private void sendResume() {
+        GatewayResumeRequest resumeRequest = GatewayResumeRequest.builder().
+                seq(lastSequenceId).
+                token(api.getToken()).
+                sessionId(api.getSessionId()).
+                build();
+        send(WSRequest.resume(resumeRequest));
+    }
+
+    void onMessage(String message) {
         try(Timer.Context ctx = stats.webSocketMessageParsing.time()) {
             GatewayPayload msg = gson.fromJson(message, GatewayPayload.class);
             if (msg.getSequenceNumber() > lastSequenceId) {
@@ -97,11 +116,35 @@ class WSClient extends WebSocketClient {
                 onDiscordError(msg.getErrorMessage());
                 return;
             }
-            //  TODO handle
+            GatewayOP op = msg.getOpCode();
+            if (op == GatewayOP.DISPATCH) {
+                handleGatewayDispatch(msg);
+            } else if (op == GatewayOP.RECONNECT) {
+                handleGatewayReconnect();
+            } else if (op == GatewayOP.INVALID_SESSION) {
+                handleInvalidSession();
+            } else {
+                throw new ApiException(
+                        String.format("Unsupported received message type \"%s\", server should NOT be sending this!\n" +
+                                "Message body:\n%s",
+                        op.name(), message));
+            }
         } catch (Exception e) {
             stats.webSocketMessageErrors.mark();
             WS_LOGGER.warn("Exception while parsing message", e);
         }
+    }
+
+    private void handleGatewayDispatch(GatewayPayload payload) {
+
+    }
+
+    private void handleGatewayReconnect() {
+
+    }
+
+    private void handleInvalidSession() {
+
     }
 
     private void onDiscordError(String error) {
@@ -109,8 +152,7 @@ class WSClient extends WebSocketClient {
         WS_LOGGER.warn("Discord error: {}", error);
     }
 
-    @Override
-    public void onClose(int code, String reason, boolean remote) {
+    void onClose(int code, String reason, boolean remote) {
         if (remote) {
             WS_LOGGER.warn("Websocket closed by server. Code {}: \"{}\"", code, reason);
         } else {
@@ -118,8 +160,7 @@ class WSClient extends WebSocketClient {
         }
     }
 
-    @Override
-    public void onError(Exception ex) {
+    void onError(Exception ex) {
         stats.webSocketErrors.mark();
         WS_LOGGER.warn("Websocket exception", ex);
     }
@@ -127,34 +168,10 @@ class WSClient extends WebSocketClient {
     public void send(WSRequest request) throws NotYetConnectedException, RateLimitExceededException {
         try {
             sendLimiter.mark();
-            super.send(gson.toJson(request));
+            delegate.send(gson.toJson(request));
         } catch (RateLimitExceededException e) {
             stats.webSocketRateLimitHits.mark();
             WS_LOGGER.warn("Rate limit exceeded for send(String), retry={}", e.getRetryIn());
-            throw e;
-        }
-    }
-
-    @Override
-    public void send(String text) throws NotYetConnectedException {
-        try {
-            sendLimiter.mark();
-            super.send(text);
-        } catch (RateLimitExceededException e) {
-            stats.webSocketRateLimitHits.mark();
-            WS_LOGGER.warn("Rate limit exceeded for send(String), retry={}", e.getRetryIn());
-            throw e;
-        }
-    }
-
-    @Override
-    public void send(byte[] data) throws NotYetConnectedException {
-        try {
-            sendLimiter.mark();
-            super.send(data);
-        } catch (RateLimitExceededException e) {
-            stats.webSocketRateLimitHits.mark();
-            WS_LOGGER.warn("Rate limit exceeded for send(byte[]), retry={}", e.getRetryIn());
             throw e;
         }
     }
