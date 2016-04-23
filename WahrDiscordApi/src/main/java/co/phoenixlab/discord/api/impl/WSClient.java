@@ -16,14 +16,15 @@ import co.phoenixlab.discord.api.entities.GatewayPayload;
 import co.phoenixlab.discord.api.enums.GatewayOP;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.exceptions.RateLimitExceededException;
-import co.phoenixlab.discord.api.request.GatewayConnectRequest;
 import co.phoenixlab.discord.api.request.ConnectionProperties;
+import co.phoenixlab.discord.api.request.GatewayConnectRequest;
 import co.phoenixlab.discord.api.request.GatewayResumeRequest;
 import co.phoenixlab.discord.api.request.WSRequest;
 import co.phoenixlab.discord.api.util.RateLimiter;
 import co.phoenixlab.discord.api.util.WahrDiscordApiUtils;
 import com.codahale.metrics.Timer;
 import com.google.gson.Gson;
+import org.java_websocket.WebSocketFactory;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import java.nio.channels.NotYetConnectedException;
 class WSClient {
 
     private static final Logger WS_LOGGER = LoggerFactory.getLogger(WSClient.class);
+    private final URI serverURI;
 
     private WebsocketDelegate delegate;
 
@@ -52,9 +54,10 @@ class WSClient {
 
     private RateLimiter sendLimiter;
     private volatile int lastSequenceId;
+    private WebSocketFactory factory;
 
     public WSClient(URI serverURI, WahrDiscordApiImpl api) {
-        delegate = new WebsocketDelegate(serverURI, this);
+        this.serverURI = serverURI;
         stats = api.getStats();
         this.api = api;
         gson = WahrDiscordApiUtils.createGson();
@@ -67,6 +70,14 @@ class WSClient {
         referringDomain = "";
         sendLimiter = new RateLimiter("gateway", 0, 0);
         lastSequenceId = -1;
+    }
+
+    public boolean connectBlocking() throws InterruptedException {
+        if (delegate != null) {
+            delegate.close();
+        }
+        delegate = new WebsocketDelegate(serverURI, this);
+        return delegate.connectBlocking();
     }
 
     void onOpen(ServerHandshake handshakedata) {
@@ -174,5 +185,9 @@ class WSClient {
             WS_LOGGER.warn("Rate limit exceeded for send(String), retry={}", e.getRetryIn());
             throw e;
         }
+    }
+
+    public void setWebSocketFactory(WebSocketFactory factory) {
+        this.factory = factory;
     }
 }
