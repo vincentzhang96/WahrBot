@@ -16,6 +16,7 @@ import co.phoenixlab.discord.api.entities.guild.Guild;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.guild.CreateGuildRequest;
 import co.phoenixlab.discord.api.request.guild.EditGuildRequest;
+import co.phoenixlab.discord.api.request.guild.GuildMembersRequest;
 
 public interface GuildsEndpoint {
 
@@ -33,5 +34,9 @@ public interface GuildsEndpoint {
 
     Guild[] getGuilds()
             throws ApiException;
+
+    void requestMembers(GuildMembersRequest request)
+            throws ApiException;
+
 
 }
