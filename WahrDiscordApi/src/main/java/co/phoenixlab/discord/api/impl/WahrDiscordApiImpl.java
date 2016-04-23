@@ -13,6 +13,7 @@
 package co.phoenixlab.discord.api.impl;
 
 import co.phoenixlab.discord.api.WahrDiscordApi;
+import co.phoenixlab.discord.api.entities.ReadyMessage;
 import co.phoenixlab.discord.api.entities.user.SelfUser;
 import co.phoenixlab.discord.api.entities.TokenResponse;
 import co.phoenixlab.discord.api.entities.WebsocketEndpointResponse;
@@ -209,6 +210,14 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
 
     }
 
+    void handleReadyMessage(ReadyMessage message) {
+        sessionId = message.getSessionId();
+        API_LOGGER.debug("Using sessionId {}", sessionId);
+        //  TODO rest
+
+        stateMachine.fire(LOAD_OK);
+    }
+
     private void handleEventBusException(Throwable throwable, SubscriberExceptionContext context) {
         stats.eventBusExceptions.mark();
         API_LOGGER.warn("Exception while handling event when calling {}.\nEventData: {}",
@@ -253,6 +262,10 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         if (!isReady()) {
             throw new NotReadyException();
         }
+        return sessionId;
+    }
+
+    String getSessionIdUnchecked() {
         return sessionId;
     }
 

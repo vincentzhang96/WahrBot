@@ -13,7 +13,9 @@
 package co.phoenixlab.discord.api.impl;
 
 import co.phoenixlab.discord.api.entities.GatewayPayload;
+import co.phoenixlab.discord.api.entities.ReadyMessage;
 import co.phoenixlab.discord.api.enums.GatewayOP;
+import co.phoenixlab.discord.api.enums.WebSocketMessageType;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.exceptions.RateLimitExceededException;
 import co.phoenixlab.discord.api.request.ConnectionProperties;
@@ -24,13 +26,14 @@ import co.phoenixlab.discord.api.util.RateLimiter;
 import co.phoenixlab.discord.api.util.WahrDiscordApiUtils;
 import com.codahale.metrics.Timer;
 import com.google.gson.Gson;
-import org.java_websocket.WebSocketFactory;
+import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.nio.channels.NotYetConnectedException;
+import java.util.concurrent.TimeUnit;
 
 class WSClient {
 
@@ -54,7 +57,7 @@ class WSClient {
 
     private RateLimiter sendLimiter;
     private volatile int lastSequenceId;
-    private WebSocketFactory factory;
+    private WebSocketClient.WebSocketClientFactory factory;
 
     public WSClient(URI serverURI, WahrDiscordApiImpl api) {
         this.serverURI = serverURI;
@@ -68,7 +71,7 @@ class WSClient {
         browser = "Java";
         referrer = "";
         referringDomain = "";
-        sendLimiter = new RateLimiter("gateway", 0, 0);
+        sendLimiter = new RateLimiter("gateway", TimeUnit.SECONDS.toMillis(60), 120);
         lastSequenceId = -1;
     }
 
@@ -77,13 +80,14 @@ class WSClient {
             delegate.close();
         }
         delegate = new WebsocketDelegate(serverURI, this);
+        delegate.setWebSocketFactory(factory);
         return delegate.connectBlocking();
     }
 
     void onOpen(ServerHandshake handshakedata) {
         Thread.currentThread().setName("WebSocketClient");
         WS_LOGGER.info("WebSocket connection opened");
-        if (api.getSessionId() == null) {
+        if (api.getSessionIdUnchecked() == null) {
             sendIdentify();
         } else {
             sendResume();
@@ -118,17 +122,17 @@ class WSClient {
     void onMessage(String message) {
         try(Timer.Context ctx = stats.webSocketMessageParsing.time()) {
             GatewayPayload msg = gson.fromJson(message, GatewayPayload.class);
-            if (msg.getSequenceNumber() > lastSequenceId) {
-                lastSequenceId = msg.getSequenceNumber();
-            } else {
-                WS_LOGGER.warn("Sequence ID went backwards! Had {}, got {}", lastSequenceId, msg.getSequenceNumber());
-            }
             if (msg.getErrorMessage() != null) {
                 onDiscordError(msg.getErrorMessage());
                 return;
             }
             GatewayOP op = msg.getOpCode();
             if (op == GatewayOP.DISPATCH) {
+                if (msg.getSequenceNumber() > lastSequenceId) {
+                    lastSequenceId = msg.getSequenceNumber();
+                } else {
+                    WS_LOGGER.warn("Sequence ID went backwards! Had {}, got {}", lastSequenceId, msg.getSequenceNumber());
+                }
                 handleGatewayDispatch(msg);
             } else if (op == GatewayOP.RECONNECT) {
                 handleGatewayReconnect();
@@ -147,7 +151,18 @@ class WSClient {
     }
 
     private void handleGatewayDispatch(GatewayPayload payload) {
+        WebSocketMessageType type = payload.getType();
+        switch (type) {
+            case READY:
+                handleReadyMessage((ReadyMessage) payload.getData());
+                break;
+            //  TODO
+        }
+    }
 
+    private void handleReadyMessage(ReadyMessage readyMessage) {
+        //  delegated to api impl
+        api.handleReadyMessage(readyMessage);
     }
 
     private void handleGatewayReconnect() {
@@ -178,6 +193,7 @@ class WSClient {
 
     public void send(WSRequest request) throws NotYetConnectedException, RateLimitExceededException {
         try {
+            WS_LOGGER.info(sendLimiter.toString());
             sendLimiter.mark();
             delegate.send(gson.toJson(request));
         } catch (RateLimitExceededException e) {
@@ -187,7 +203,7 @@ class WSClient {
         }
     }
 
-    public void setWebSocketFactory(WebSocketFactory factory) {
+    public void setWebSocketFactory(WebSocketClient.WebSocketClientFactory factory) {
         this.factory = factory;
     }
 }
