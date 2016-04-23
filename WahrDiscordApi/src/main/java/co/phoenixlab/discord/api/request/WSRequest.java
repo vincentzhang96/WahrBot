@@ -57,11 +57,11 @@ public class WSRequest {
         return payload(GatewayOP.VOICE_STATE_UPDATE, request);
     }
 
-    public WSRequest resume(GatewayResumeRequest request) {
+    public static WSRequest resume(GatewayResumeRequest request) {
         return payload(GatewayOP.RESUME, request);
     }
 
-    public WSRequest requestGuildMembers(GuildMembersRequest request) {
+    public static WSRequest requestGuildMembers(GuildMembersRequest request) {
         return payload(GatewayOP.REQUEST_GUILD_MEMBERS, request);
     }
 }
