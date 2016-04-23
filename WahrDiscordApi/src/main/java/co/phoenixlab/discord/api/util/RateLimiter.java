@@ -73,12 +73,12 @@ public class RateLimiter {
                 diff = Long.MAX_VALUE;
                 for (int i = 0; i < charges.length; i++) {
                     long delta = now - charges[i];
-                    if (delta < periodMs) {
+                    if (delta >= periodMs) {
                         lock.readLock().unlock();
                         try {
                             lock.writeLock().lock();
                             //  recheck
-                            if (delta < now - charges[i]) {
+                            if (delta >= now - charges[i]) {
                                 charges[i] = now;
                                 return;
                             }
