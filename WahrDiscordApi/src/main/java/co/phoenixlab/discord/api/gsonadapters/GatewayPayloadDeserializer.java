@@ -19,6 +19,7 @@ import co.phoenixlab.discord.api.entities.channel.message.Message;
 import co.phoenixlab.discord.api.entities.guild.*;
 import co.phoenixlab.discord.api.entities.user.SelfUser;
 import co.phoenixlab.discord.api.entities.user.UserSettings;
+import co.phoenixlab.discord.api.enums.GatewayOP;
 import co.phoenixlab.discord.api.enums.WebSocketMessageType;
 import com.google.gson.*;
 import org.slf4j.Logger;
@@ -41,17 +42,29 @@ public class GatewayPayloadDeserializer implements JsonDeserializer<GatewayPaylo
                     errorMessage(errorElement.getAsString()).
                     build();
         }
-        JsonElement typeElement = obj.get("t");
-        if (typeElement == null) {
-            throw new JsonParseException("Object is missing required field \"t\"");
+        JsonElement opElement = obj.get("op");
+        if (opElement == null) {
+            throw new JsonParseException("Object is missing required field \"op\"");
         }
-        String typeStr = typeElement.getAsString();
-        LOGGER.info("Received {}", typeStr);
-        WebSocketMessageType type = WebSocketMessageType.fromString(typeStr);
-        return GatewayPayload.builder().
-                type(type).
-                data(deserializeBody(obj.get("d").getAsJsonObject(), typeStr, type, context)).
-                build();
+        GatewayOP op = GatewayOP.fromInt(opElement.getAsInt());
+        if (op == GatewayOP.DISPATCH) {
+            JsonElement typeElement = obj.get("t");
+            if (typeElement == null) {
+                throw new JsonParseException("Object is missing required field \"t\"");
+            }
+            String typeStr = typeElement.getAsString();
+            LOGGER.info("Received {}", typeStr);
+            WebSocketMessageType type = WebSocketMessageType.fromString(typeStr);
+            return GatewayPayload.builder().
+                    opCode(op).
+                    type(type).
+                    data(deserializeBody(obj.get("d").getAsJsonObject(), typeStr, type, context)).
+                    build();
+        } else {
+            return GatewayPayload.builder().
+                    opCode(op).
+                    build();
+        }
     }
 
     private Object deserializeBody(JsonObject element, String typestr,
