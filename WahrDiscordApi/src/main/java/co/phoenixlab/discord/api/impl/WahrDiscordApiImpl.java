@@ -305,6 +305,10 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         return stateMachine.getState();
     }
 
+    WSClient getWebSocketClient() {
+        return webSocketClient;
+    }
+
     @Subscribe
     @AllowConcurrentEvents
     public void countEvent(Object object) {
