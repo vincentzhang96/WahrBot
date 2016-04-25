@@ -327,6 +327,7 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         final Meter webSocketMessageErrors;
         final Timer webSocketMessageDispatching;
         final Meter webSocketRateLimitHits;
+        final Meter webSocketOutboundMessages;
         final Timer httpPostTime;
         final Timer httpGetTime;
         final Meter http2xxResp;
@@ -344,6 +345,7 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
             webSocketMessageParsing = metrics.timer(name(WSClient.class, clientId, "messages", "parsing"));
             webSocketMessageDispatching = metrics.timer(name(WSClient.class, clientId, "messages", "dispatching"));
             webSocketRateLimitHits = metrics.meter(name(WSClient.class, clientId, "ratelimit", "overruns"));
+            webSocketOutboundMessages = metrics.meter(name(WSClient.class, clientId, "messages", "outbound"));
             httpPostTime = metrics.timer(name(WahrDiscordApiImpl.class, clientId, "http", "post"));
             httpGetTime = metrics.timer(name(WahrDiscordApiImpl.class, clientId, "http", "get"));
             http2xxResp = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "http", "response", "2XX"));
