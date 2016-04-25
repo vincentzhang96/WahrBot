@@ -45,6 +45,7 @@ public class LoginEndpointsImpl
 
     @Override
     public TokenResponse logIn(EmailPasswordLoginRequest request) throws ApiException {
+        endpoints.validate(request);
         try {
             return endpoints.defaultPostUnauth(LOGIN_ENDPOINT, request, TokenResponse.class);
         } catch (ApiException apie) {
@@ -57,6 +58,7 @@ public class LoginEndpointsImpl
 
     @Override
     public void logOut(LogoutRequest request) throws ApiException {
+        endpoints.validate(request);
         try {
             endpoints.defaultPostUnauth(LOGOUT_ENDPOINT, request, Void.class);
         } catch (ApiException apie) {

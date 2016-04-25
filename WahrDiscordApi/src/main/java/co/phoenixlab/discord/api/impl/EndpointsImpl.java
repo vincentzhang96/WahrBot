@@ -14,6 +14,7 @@ package co.phoenixlab.discord.api.impl;
 
 import co.phoenixlab.discord.api.endpoints.*;
 import co.phoenixlab.discord.api.endpoints.async.*;
+import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.exceptions.InvalidTokenException;
 import co.phoenixlab.discord.api.exceptions.RateLimitExceededException;
 import com.codahale.metrics.Timer;
@@ -27,6 +28,12 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.apache.http.entity.ContentType;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import java.util.Set;
 
 public class EndpointsImpl implements Endpoints {
 
@@ -43,6 +50,13 @@ public class EndpointsImpl implements Endpoints {
     private Gson gson;
     @Inject
     private WahrDiscordApiImpl.Stats stats;
+
+    private Validator validator;
+
+    public EndpointsImpl() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
 
     @Override
     public AuthenticationEndpoint auth() {
@@ -225,6 +239,46 @@ public class EndpointsImpl implements Endpoints {
         }
     }
 
+    HttpResponse<String> defaultPatch(String path, String body) throws UnirestException {
+        try (Timer.Context ctx = stats.httpPostTime.time()) {
+            HttpRequestWithBody req = Unirest.patch(BASE_URL + path);
+            addDefaultHeaders(req);
+            addAuthHeader(req);
+            return logResponse(req.body(body).asString());
+        }
+    }
+
+    <T> T defaultPatch(String path, Object body, Class<T> type)
+            throws UnirestException, InvalidTokenException {
+        try (Timer.Context ctx = stats.httpPostTime.time()) {
+            HttpRequestWithBody req = Unirest.patch(BASE_URL + path);
+            addDefaultHeaders(req);
+            addAuthHeader(req);
+            HttpResponse<String> response = req.body(gson.toJson(body)).asString();
+            logResponse(response);
+            int status = response.getStatus();
+            if (status == HTTP_NOT_AUTHENTICATED) {
+                throw new InvalidTokenException(HttpMethod.POST, path, "Bad token");
+            }
+            if (status == HTTP_TOO_MANY_REQUESTS) {
+                long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
+                throw new RateLimitExceededException(retryIn);
+            }
+            if (status == HTTP_EMPTY) {
+                if (Void.class.equals(type)) {
+                    return null;
+                } else {
+                    throw new UnirestException("Got HTTP 204: Expected a response body, got none");
+                }
+            }
+            if (status != HTTP_OK) {
+                throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
+            }
+            return gson.fromJson(response.getBody(), type);
+        }
+    }
+
+
     HttpResponse<String> defaultGetUnauth(String path) throws UnirestException {
         try (Timer.Context ctx = stats.httpGetTime.time()) {
             HttpRequest req = Unirest.get(BASE_URL + path);
@@ -319,5 +373,20 @@ public class EndpointsImpl implements Endpoints {
 
     private boolean inStatusRange(int range, int status) {
         return status >= range && status < range + 100;
+    }
+
+    void validate(Object o) throws ApiException {
+        Set<ConstraintViolation<Object>> validate = validator.validate(o);
+        if (!validate.isEmpty()) {
+            StringBuilder builder = new StringBuilder();
+            for (ConstraintViolation<Object> violation : validate) {
+                builder.append(String.format("Field invalid: %s",
+                        violation.getMessage()));
+            }
+        }
+    }
+
+    String snowflakeToString(long snowflake) {
+        return Long.toUnsignedString(snowflake);
     }
 }
