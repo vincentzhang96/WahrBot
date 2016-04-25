@@ -12,6 +12,7 @@
 
 package co.phoenixlab.discord.api.endpoints.async;
 
+import co.phoenixlab.discord.api.entities.channel.Channel;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.entities.channel.DmChannel;
 import co.phoenixlab.discord.api.entities.channel.GuildChannel;
@@ -39,6 +40,9 @@ public interface ChannelsEndpointAsync {
             throws ApiException;
 
     Future<Void> broadcastTypingAsync(long channelId)
+            throws ApiException;
+
+    Future<Channel> getChannelAsync(long channelId)
             throws ApiException;
 
 }

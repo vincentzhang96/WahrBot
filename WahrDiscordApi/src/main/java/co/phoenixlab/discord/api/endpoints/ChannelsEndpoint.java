@@ -12,6 +12,7 @@
 
 package co.phoenixlab.discord.api.endpoints;
 
+import co.phoenixlab.discord.api.entities.channel.Channel;
 import co.phoenixlab.discord.api.entities.channel.DmChannel;
 import co.phoenixlab.discord.api.entities.channel.GuildChannel;
 import co.phoenixlab.discord.api.exceptions.ApiException;
@@ -37,6 +38,9 @@ public interface ChannelsEndpoint {
             throws ApiException;
 
     void broadcastTyping(long channelId)
+            throws ApiException;
+
+    Channel getChannel(long channelId)
             throws ApiException;
 
 }
