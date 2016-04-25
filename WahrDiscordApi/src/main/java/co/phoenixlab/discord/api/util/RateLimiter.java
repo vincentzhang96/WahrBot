@@ -19,21 +19,53 @@ import java.util.Arrays;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * A RateLimiter throttles access to a resource, acting as a guard to prevent overutilization of some resource via
+ * the {@link #mark(boolean)}, {@link #mark()}, and {@link #tryMark()} methods.
+ */
 public class RateLimiter {
 
+    /**
+     * Name of this RateLimiter.
+     */
     @Getter
     private final String label;
+    /**
+     * ReadWrite lock for charge concurrency.
+     */
     private final ReadWriteLock lock;
+    /**
+     * The maximum number of charges that can be on cooldown at the same time.
+     */
     @Getter
     private int maxCharges;
+    /**
+     * Charge cooldown time.
+     */
     @Getter
     private long periodMs;
+    /**
+     * Charge timestamps.
+     */
     private long[] charges;
 
+    /**
+     * Constructs a new RateLimiter with no label and the given period time and maximum number of charges.
+     *
+     * @param periodMs   Cooldown time (in milliseconds) for each charge.
+     * @param maxCharges Maximum number of charges that can be on cooldown at the same time.
+     */
     public RateLimiter(long periodMs, int maxCharges) {
         this("", periodMs, maxCharges);
     }
 
+    /**
+     * Constructs a new RateLimiter with a given label and the given period time and maximum number of charges.
+     *
+     * @param label      The RateLimiter's label, for display/debug purposes.
+     * @param periodMs   Cooldown time (in milliseconds) for each charge.
+     * @param maxCharges Maximum number of charges that can be on cooldown at the same time.
+     */
     public RateLimiter(String label, long periodMs, int maxCharges) {
         this.label = label;
         this.periodMs = periodMs;
@@ -42,6 +74,14 @@ public class RateLimiter {
         this.lock = new ReentrantReadWriteLock();
     }
 
+    /**
+     * Consumes an available charge. If no charges are available then this method will immediately throw an exception
+     * with the number of milliseconds to wait before retrying. This method is equivalent to calling
+     * {@link #mark(boolean)} with {@code false}, but does not throw {@link InterruptedException}.
+     *
+     * @throws RateLimitExceededException If there are no charges available; that is, the rate limit has been
+     *                                    exceeded.
+     */
     public void mark() throws RateLimitExceededException {
         try {
             //  Will never throw InterruptedException with false param
@@ -51,6 +91,12 @@ public class RateLimiter {
         }
     }
 
+    /**
+     * Attempts to consume an available charge. If a charge was successfully consumed, then zero is returned.
+     * Otherwise, the number of milliseconds to wait before retrying is returned and no charges are consumed.
+     *
+     * @return 0 if a charge was available and consumed, or a positive number of milliseconds to wait before retrying.
+     */
     public long tryMark() {
         try {
             //  Will never throw InterruptedException with false param
@@ -64,6 +110,17 @@ public class RateLimiter {
         }
     }
 
+    /**
+     * Attempts to consume an available charge, optionally waiting for one. If no charges are available and
+     * {@code waitFor} is false, then a {@link RateLimitExceededException} is thrown with the number of milliseconds
+     * until the next charge is available.
+     *
+     * @param waitFor Whether or not to wait for an available charge.
+     * @throws RateLimitExceededException If {@code waitFor} is false and no charges are available; that is, the
+     *                                    rate limit has been exceeded.
+     * @throws InterruptedException       If the current Thread has been interrupted while waiting for a charge and
+     *                                    {@code waitFor} is true.
+     */
     public void mark(boolean waitFor) throws RateLimitExceededException, InterruptedException {
         long now = System.currentTimeMillis();
         long diff;
@@ -110,6 +167,11 @@ public class RateLimiter {
         return false;
     }
 
+    /**
+     * Get the number of charges currently available.
+     *
+     * @return The number of charges currently available.
+     */
     public int getRemainingCharges() {
         int count = 0;
         try {
@@ -125,6 +187,11 @@ public class RateLimiter {
         return maxCharges - count;
     }
 
+    /**
+     * Whether or not there are any charges available.
+     *
+     * @return If there's any available charges.
+     */
     public boolean hasCharges() {
         return getRemainingCharges() > 0;
     }
@@ -137,6 +204,9 @@ public class RateLimiter {
         return System.currentTimeMillis() - time < periodMs;
     }
 
+    /**
+     * Resets this RateLimiter by making all charges available.
+     */
     public void reset() {
         try {
             lock.writeLock().lock();
