@@ -15,6 +15,7 @@ package co.phoenixlab.discord.api.impl;
 import co.phoenixlab.discord.api.endpoints.*;
 import co.phoenixlab.discord.api.endpoints.async.*;
 import co.phoenixlab.discord.api.exceptions.ApiException;
+import co.phoenixlab.discord.api.exceptions.InvalidApiRequestException;
 import co.phoenixlab.discord.api.exceptions.InvalidTokenException;
 import co.phoenixlab.discord.api.exceptions.RateLimitExceededException;
 import com.codahale.metrics.Timer;
@@ -34,6 +35,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.util.Set;
+import java.util.StringJoiner;
 
 public class EndpointsImpl implements Endpoints {
 
@@ -378,12 +380,25 @@ public class EndpointsImpl implements Endpoints {
     void validate(Object o) throws ApiException {
         Set<ConstraintViolation<Object>> validate = validator.validate(o);
         if (!validate.isEmpty()) {
-            StringBuilder builder = new StringBuilder();
-            for (ConstraintViolation<Object> violation : validate) {
-                builder.append(String.format("Field invalid: %s",
-                        violation.getMessage()));
-            }
+            throw new InvalidApiRequestException(getViolations(validate));
         }
+    }
+
+    void validate(HttpMethod method, String endpoint, Object o) throws ApiException {
+        Set<ConstraintViolation<Object>> validate = validator.validate(o);
+        if (!validate.isEmpty()) {
+            throw new InvalidApiRequestException(method, endpoint, getViolations(validate));
+        }
+    }
+
+    private String getViolations(Set<ConstraintViolation<Object>> validate) {
+        StringJoiner joiner = new StringJoiner(", ");
+        for (ConstraintViolation<Object> violation : validate) {
+            joiner.add(String.format("Field %s invalid: %s",
+                    violation.getPropertyPath(),
+                    violation.getMessage()));
+        }
+        return joiner.toString();
     }
 
     String snowflakeToString(long snowflake) {
