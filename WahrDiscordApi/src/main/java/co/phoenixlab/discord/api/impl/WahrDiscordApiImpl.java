@@ -336,8 +336,8 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         final Meter httpOtherResp;
 
         Stats() {
-            eventBusExceptions = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "events", "errors", "uncaught"));
-            eventBusEvents = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "events"));
+            eventBusExceptions = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "bus", "events", "errors", "uncaught"));
+            eventBusEvents = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "bus", "events"));
             connectAttemptCount = metrics.counter(name(WahrDiscordApi.class, clientId, "connection", "attempts"));
             connectFails = metrics.meter(name(WahrDiscordApi.class, clientId, "connection", "failures"));
             webSocketErrors = metrics.meter(name(WSClient.class, clientId, "errors", "general"));

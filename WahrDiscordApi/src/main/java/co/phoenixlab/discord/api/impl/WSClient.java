@@ -33,13 +33,17 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.nio.channels.NotYetConnectedException;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 class WSClient {
 
     private static final Logger WS_LOGGER = LoggerFactory.getLogger(WSClient.class);
     private final URI serverURI;
 
+    private Lock delegateLock;
     private WebsocketDelegate delegate;
 
     private final WahrDiscordApiImpl api;
@@ -58,6 +62,7 @@ class WSClient {
     private RateLimiter sendLimiter;
     private volatile int lastSequenceId;
     private WebSocketClient.WebSocketClientFactory factory;
+    private ScheduledFuture<?> heartbeat;
 
     public WSClient(URI serverURI, WahrDiscordApiImpl api) {
         this.serverURI = serverURI;
@@ -73,15 +78,21 @@ class WSClient {
         referringDomain = "";
         sendLimiter = new RateLimiter("gateway", TimeUnit.SECONDS.toMillis(60), 120);
         lastSequenceId = -1;
+        delegateLock = new ReentrantLock();
     }
 
     public boolean connectBlocking() throws InterruptedException {
-        if (delegate != null) {
-            delegate.close();
+        try {
+            delegateLock.lock();
+            if (delegate != null) {
+                delegate.close();
+            }
+            delegate = new WebsocketDelegate(serverURI, this);
+            delegate.setWebSocketFactory(factory);
+            return delegate.connectBlocking();
+        } finally {
+            delegateLock.unlock();
         }
-        delegate = new WebsocketDelegate(serverURI, this);
-        delegate.setWebSocketFactory(factory);
-        return delegate.connectBlocking();
     }
 
     void onOpen(ServerHandshake handshakedata) {
@@ -161,6 +172,12 @@ class WSClient {
     }
 
     private void handleReadyMessage(ReadyMessage readyMessage) {
+        //  Set up heartbeat
+        killHeart();
+        heartbeat = api.getExecutorService().scheduleAtFixedRate(this::heartbeat, 0,
+                readyMessage.getHeartbeatInterval(), TimeUnit.MILLISECONDS);
+        WS_LOGGER.debug("Beating heart every {} ms", readyMessage.getHeartbeatInterval());
+
         //  delegated to api impl
         api.handleReadyMessage(readyMessage);
     }
@@ -171,6 +188,23 @@ class WSClient {
 
     private void handleInvalidSession() {
 
+    }
+
+    private void heartbeat() {
+        while(true) {
+            try {
+                send(WSRequest.heartbeat(lastSequenceId));
+                return;
+            } catch (RateLimitExceededException ignore) {
+                //  keep trying - heartbeats are critical
+            }
+        }
+    }
+
+    private void killHeart() {
+        if (heartbeat != null) {
+            heartbeat.cancel(true);
+        }
     }
 
     private void onDiscordError(String error) {
@@ -184,21 +218,29 @@ class WSClient {
         } else {
             WS_LOGGER.info("Websocket closed by client. Code {}: \"{}\"", code, reason);
         }
+        killHeart();
     }
 
     void onError(Exception ex) {
         stats.webSocketErrors.mark();
         WS_LOGGER.warn("Websocket exception", ex);
+        killHeart();
     }
 
     public void send(WSRequest request) throws NotYetConnectedException, RateLimitExceededException {
         try {
+            delegateLock.lock();
             sendLimiter.mark();
             delegate.send(gson.toJson(request));
+            stats.webSocketOutboundMessages.mark();
         } catch (RateLimitExceededException e) {
             stats.webSocketRateLimitHits.mark();
-            WS_LOGGER.warn("Rate limit exceeded for send(String), retry={}", e.getRetryIn());
+            WS_LOGGER.warn("Rate limit exceeded for send(String), request={} retry={}",
+                    request.getOpCode(),
+                    e.getRetryIn());
             throw e;
+        } finally {
+            delegateLock.unlock();
         }
     }
 
