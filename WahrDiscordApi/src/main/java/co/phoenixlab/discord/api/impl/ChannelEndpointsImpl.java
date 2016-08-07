@@ -45,7 +45,7 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
     }
 
     @Override
-    public DmChannel createPrivateChannel(long myUserId, CreatePrivateChannelRequest request) throws ApiException {
+    public DmChannel createPrivateChannel(CreatePrivateChannelRequest request) throws ApiException {
         return null;
     }
 
@@ -91,12 +91,12 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
 
     @Override
     public Future<GuildChannel> createChannelAsync(long guildId, CreateChannelRequest request) throws ApiException {
-        return null;
+        return executorService.submit(() -> createChannel(guildId, request));
     }
 
     @Override
-    public Future<DmChannel> createPrivateChannelAsync(long myUserId, CreatePrivateChannelRequest request) throws ApiException {
-        return null;
+    public Future<DmChannel> createPrivateChannelAsync(CreatePrivateChannelRequest request) throws ApiException {
+        return executorService.submit(() -> createPrivateChannel(request));
     }
 
     @Override

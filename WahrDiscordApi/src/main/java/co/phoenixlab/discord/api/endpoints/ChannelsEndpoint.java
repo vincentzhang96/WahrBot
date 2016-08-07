@@ -25,7 +25,7 @@ public interface ChannelsEndpoint {
     GuildChannel createChannel(long guildId, CreateChannelRequest request)
             throws ApiException;
 
-    DmChannel createPrivateChannel(long myUserId, CreatePrivateChannelRequest request)
+    DmChannel createPrivateChannel(CreatePrivateChannelRequest request)
             throws ApiException;
 
     GuildChannel editChannel(long channelId, ModifyChannelRequest request)

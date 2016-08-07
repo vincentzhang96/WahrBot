@@ -27,7 +27,7 @@ public interface ChannelsEndpointAsync {
     Future<GuildChannel> createChannelAsync(long guildId, CreateChannelRequest request)
             throws ApiException;
 
-    Future<DmChannel> createPrivateChannelAsync(long myUserId, CreatePrivateChannelRequest request)
+    Future<DmChannel> createPrivateChannelAsync(CreatePrivateChannelRequest request)
             throws ApiException;
 
     Future<GuildChannel> editChannelAsync(long channelId, ModifyChannelRequest request)
