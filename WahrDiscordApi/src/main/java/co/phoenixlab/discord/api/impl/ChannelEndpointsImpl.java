@@ -27,10 +27,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static com.mashape.unirest.http.HttpMethod.GET;
+import static com.mashape.unirest.http.HttpMethod.POST;
 
 public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointAsync {
 
     private static final String CHANNEL_ENDPOINT_BASE = "/channels/";
+    private static final String GUILD_CHANNEL_PATH = "/guilds/{guild.id}/channels";
+    private static final String GUILD_CHANNEL_ENDPOINT = "/guilds/%s/channels";
 
     @Inject
     private ScheduledExecutorService executorService;
@@ -41,7 +44,15 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
 
     @Override
     public GuildChannel createChannel(long guildId, CreateChannelRequest request) throws ApiException {
-        return null;
+        endpoints.validate(POST, GUILD_CHANNEL_ENDPOINT, request);
+        try {
+            return endpoints.defaultPost(guildChannelPath(guildId), request, GuildChannel.class);
+        } catch (ApiException apie) {
+            //  rethrow
+            throw apie;
+        } catch (Exception e) {
+            throw new ApiException(POST, GUILD_CHANNEL_ENDPOINT, e);
+        }
     }
 
     @Override
@@ -53,7 +64,7 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
     public GuildChannel editChannel(long channelId, ModifyChannelRequest request) throws ApiException {
         endpoints.validate(GET, CHANNEL_ENDPOINT_BASE, request);
         try {
-            return endpoints.defaultPatch(channel(channelId), request, GuildChannel.class);
+            return endpoints.defaultPatch(channelPath(channelId), request, GuildChannel.class);
         } catch (ApiException apie) {
             //  rethrow
             throw apie;
@@ -80,7 +91,7 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
     @Override
     public Channel getChannel(long channelId) throws ApiException {
         try {
-            return endpoints.defaultGet(channel(channelId), Channel.class);
+            return endpoints.defaultGet(channelPath(channelId), Channel.class);
         } catch (ApiException apie) {
             //  rethrow
             throw apie;
@@ -101,30 +112,34 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
 
     @Override
     public Future<GuildChannel> editChannelAsync(long channelId, ModifyChannelRequest request) throws ApiException {
-        return null;
+        return executorService.submit(() -> editChannel(channelId, request));
     }
 
     @Override
     public Future<Void> deleteChannelAsync(long channelId) throws ApiException {
-        return null;
+        return executorService.submit(() -> deleteChannel(channelId), null);
     }
 
     @Override
     public Future<GuildChannel[]> getGuildChannelsAsync(long guildId) throws ApiException {
-        return null;
+        return executorService.submit(() -> getGuildChannels(guildId));
     }
 
     @Override
     public Future<Void> broadcastTypingAsync(long channelId) throws ApiException {
-        return null;
+        return executorService.submit(() -> broadcastTyping(channelId), null);
     }
 
     @Override
     public Future<Channel> getChannelAsync(long channelId) throws ApiException {
-        return null;
+        return executorService.submit(() -> getChannel(channelId));
     }
 
-    private String channel(long id) {
+    private String channelPath(long id) {
         return CHANNEL_ENDPOINT_BASE + endpoints.snowflakeToString(id);
+    }
+
+    private String guildChannelPath(long id) {
+        return String.format(GUILD_CHANNEL_ENDPOINT, endpoints.snowflakeToString(id));
     }
 }
