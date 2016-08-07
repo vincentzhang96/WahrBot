@@ -37,6 +37,7 @@ import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.gson.Gson;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import lombok.Getter;
 import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
@@ -50,8 +51,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.locks.LockSupport;
-import java.util.concurrent.locks.ReadWriteLock;
 
 import static co.phoenixlab.discord.api.enums.ApiClientState.*;
 import static co.phoenixlab.discord.api.enums.ApiClientTrigger.*;
@@ -61,7 +60,8 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
 
     private static final Logger API_LOGGER = LoggerFactory.getLogger(WahrDiscordApiImpl.class);
 
-    private final String clientId;
+    @Getter
+    private final String instanceId;
     @Getter
     private final MetricRegistry metrics;
     private final Injector injector;
@@ -81,21 +81,21 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
 
     private final StateMachine<ApiClientState, ApiClientTrigger> stateMachine;
 
-    public WahrDiscordApiImpl(String userAgent, String clientId) {
-        this(clientId, userAgent, null);
+    public WahrDiscordApiImpl(String userAgent, String instanceId) {
+        this(instanceId, userAgent, null);
     }
 
-    public WahrDiscordApiImpl(String clientId, String userAgent, String token) {
-        this.clientId = clientId;
+    public WahrDiscordApiImpl(String instanceId, String userAgent, String token) {
+        this.instanceId = instanceId;
         this.userAgent = userAgent;
         this.metrics = new MetricRegistry();
-        this.stats = new Stats();
         this.token = token;
         this.executorService = Executors.newScheduledThreadPool(2);
         this.stateMachine = buildStateMachine();
         this.eventBus = new AsyncEventBus(executorService, this::handleEventBusException);
-        injector = Guice.createInjector(this::configureInjector);
-        endpoints = injector.getInstance(EndpointsImpl.class);
+        this.injector = Guice.createInjector(this::configureInjector);
+        this.stats = injector.getInstance(Stats.class);
+        this.endpoints = injector.getInstance(EndpointsImpl.class);
         this.eventBus.register(this);
     }
 
@@ -143,7 +143,8 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
                 toProvider(WahrDiscordApiUtils::createGson);
         binder.bind(Stats.class).
                 toProvider(this::getStats);
-
+        binder.bind(MetricRegistry.class).
+                toProvider(this::getMetrics);
     }
 
     private void onDisconnected() {
@@ -321,7 +322,7 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         return stats;
     }
 
-    class Stats {
+    static class Stats {
         final Meter eventBusExceptions;
         final Meter eventBusEvents;
 
@@ -343,25 +344,28 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         final Meter http5xxErrors;
         final Meter httpOtherResp;
 
-        Stats() {
-            eventBusExceptions = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "bus", "events", "errors", "uncaught"));
-            eventBusEvents = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "bus", "events"));
-            connectAttemptCount = metrics.counter(name(WahrDiscordApi.class, clientId, "connection", "attempts"));
-            connectFails = metrics.meter(name(WahrDiscordApi.class, clientId, "connection", "failures"));
-            webSocketErrors = metrics.meter(name(WSClient.class, clientId, "errors", "general"));
-            webSocketMessageErrors = metrics.meter(name(WSClient.class, clientId, "errors", "messages"));
-            webSocketMessageParsing = metrics.timer(name(WSClient.class, clientId, "messages", "parsing"));
-            webSocketMessageDispatching = metrics.timer(name(WSClient.class, clientId, "messages", "dispatching"));
-            webSocketRateLimitHits = metrics.meter(name(WSClient.class, clientId, "ratelimit", "overruns"));
-            webSocketOutboundMessages = metrics.meter(name(WSClient.class, clientId, "messages", "outbound"));
-            httpPostTime = metrics.timer(name(WahrDiscordApiImpl.class, clientId, "http", "post"));
-            httpPatchTime = metrics.timer(name(WahrDiscordApiImpl.class, clientId, "http", "patch"));
-            httpGetTime = metrics.timer(name(WahrDiscordApiImpl.class, clientId, "http", "get"));
-            httpDeleteTime = metrics.timer(name(WahrDiscordApiImpl.class, clientId, "http", "delete"));
-            http2xxResp = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "http", "response", "2XX"));
-            http4xxErrors = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "http", "response", "4XX"));
-            http5xxErrors = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "http", "response", "5XX"));
-            httpOtherResp = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "http", "response", "other"));
+        @Inject
+        Stats(MetricRegistry metrics, WahrDiscordApi apiClient) {
+            String instanceId = apiClient.getInstanceId();
+            eventBusExceptions = metrics.meter(name(WahrDiscordApiImpl.class, instanceId,
+                    "bus", "events", "errors", "uncaught"));
+            eventBusEvents = metrics.meter(name(WahrDiscordApiImpl.class, instanceId, "bus", "events"));
+            connectAttemptCount = metrics.counter(name(WahrDiscordApi.class, instanceId, "connection", "attempts"));
+            connectFails = metrics.meter(name(WahrDiscordApi.class, instanceId, "connection", "failures"));
+            webSocketErrors = metrics.meter(name(WSClient.class, instanceId, "errors", "general"));
+            webSocketMessageErrors = metrics.meter(name(WSClient.class, instanceId, "errors", "messages"));
+            webSocketMessageParsing = metrics.timer(name(WSClient.class, instanceId, "messages", "parsing"));
+            webSocketMessageDispatching = metrics.timer(name(WSClient.class, instanceId, "messages", "dispatching"));
+            webSocketRateLimitHits = metrics.meter(name(WSClient.class, instanceId, "ratelimit", "overruns"));
+            webSocketOutboundMessages = metrics.meter(name(WSClient.class, instanceId, "messages", "outbound"));
+            httpPostTime = metrics.timer(name(WahrDiscordApiImpl.class, instanceId, "http", "post"));
+            httpPatchTime = metrics.timer(name(WahrDiscordApiImpl.class, instanceId, "http", "patch"));
+            httpGetTime = metrics.timer(name(WahrDiscordApiImpl.class, instanceId, "http", "get"));
+            httpDeleteTime = metrics.timer(name(WahrDiscordApiImpl.class, instanceId, "http", "delete"));
+            http2xxResp = metrics.meter(name(WahrDiscordApiImpl.class, instanceId, "http", "response", "2XX"));
+            http4xxErrors = metrics.meter(name(WahrDiscordApiImpl.class, instanceId, "http", "response", "4XX"));
+            http5xxErrors = metrics.meter(name(WahrDiscordApiImpl.class, instanceId, "http", "response", "5XX"));
+            httpOtherResp = metrics.meter(name(WahrDiscordApiImpl.class, instanceId, "http", "response", "other"));
         }
 
     }

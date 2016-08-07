@@ -37,6 +37,8 @@ public interface WahrDiscordApi {
     Future<TokenResponse> getAndSetTokenAsync(String email, String password)
             throws ApiException;
 
+    String getInstanceId();
+
     String getToken();
 
     String getSessionId()
