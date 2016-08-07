@@ -99,7 +99,7 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
     @Override
     public GuildChannel[] getGuildChannels(long guildId) throws ApiException {
         try {
-            endpoints.defaultGet(channelFormatPath(guildId, GUILD_CHANNEL_ENDPOINT_FMT), GuildChannel[].class);
+            return endpoints.defaultGet(channelFormatPath(guildId, GUILD_CHANNEL_ENDPOINT_FMT), GuildChannel[].class);
         } catch (ApiException apie) {
             //  rethrow
             throw apie;
