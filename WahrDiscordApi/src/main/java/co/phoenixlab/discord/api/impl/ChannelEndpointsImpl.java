@@ -33,8 +33,11 @@ import static com.mashape.unirest.http.HttpMethod.POST;
 public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointAsync {
 
     private static final String CHANNEL_ENDPOINT_BASE = "/channels/";
-    private static final String GUILD_CHANNEL_PATH = "/guilds/{guild.id}/channels";
-    private static final String GUILD_CHANNEL_ENDPOINT = "/guilds/%s/channels";
+    private static final String GUILD_CHANNEL_ENDPOINT = "/guilds/{guild.id}/channels";
+    private static final String GUILD_CHANNEL_ENDPOINT_FMT = "/guilds/%s/channels";
+    private static final String PRIVATE_CHANNEL_ENDPOINT = "/users/@me/channels";
+    private static final String TYPING_ENDPOINT = "/channels/{channel.id}/";
+    private static final String TYPING_ENDPOINT_FMT = "/channels/%s/typing";
 
     @Inject
     private ScheduledExecutorService executorService;
@@ -45,9 +48,9 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
 
     @Override
     public GuildChannel createChannel(long guildId, CreateChannelRequest request) throws ApiException {
-        endpoints.validate(POST, GUILD_CHANNEL_PATH, request);
+        endpoints.validate(POST, GUILD_CHANNEL_ENDPOINT, request);
         try {
-            return endpoints.defaultPost(guildChannelPath(guildId), request, GuildChannel.class);
+            return endpoints.defaultPost(channelFormatPath(guildId, GUILD_CHANNEL_ENDPOINT_FMT), request, GuildChannel.class);
         } catch (ApiException apie) {
             //  rethrow
             throw apie;
@@ -58,7 +61,15 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
 
     @Override
     public DmChannel createPrivateChannel(CreatePrivateChannelRequest request) throws ApiException {
-        return null;
+        endpoints.validate(POST, PRIVATE_CHANNEL_ENDPOINT, request);
+        try {
+            return endpoints.defaultPost(PRIVATE_CHANNEL_ENDPOINT, request, DmChannel.class);
+        } catch (ApiException apie) {
+            //  rethrow
+            throw apie;
+        } catch (Exception e) {
+            throw new ApiException(POST, PRIVATE_CHANNEL_ENDPOINT, e);
+        }
     }
 
     @Override
@@ -86,7 +97,14 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
 
     @Override
     public void broadcastTyping(long channelId) throws ApiException {
-
+        try {
+            endpoints.defaultPost(channelFormatPath(channelId, TYPING_ENDPOINT_FMT), null, Void.class);
+        } catch (ApiException apie) {
+            //  rethrow
+            throw apie;
+        } catch (Exception e) {
+            throw new ApiException(POST, TYPING_ENDPOINT, e);
+        }
     }
 
     @Override
@@ -140,7 +158,7 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
         return CHANNEL_ENDPOINT_BASE + endpoints.snowflakeToString(id);
     }
 
-    private String guildChannelPath(long id) {
-        return String.format(GUILD_CHANNEL_ENDPOINT, endpoints.snowflakeToString(id));
+    private String channelFormatPath(long id, String format) {
+        return String.format(format, endpoints.snowflakeToString(id));
     }
 }
