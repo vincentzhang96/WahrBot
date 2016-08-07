@@ -354,6 +354,43 @@ public class EndpointsImpl implements Endpoints {
         }
     }
 
+    HttpResponse<String> defaultDelete(String path) throws UnirestException {
+        HttpRequest req = Unirest.delete(path);
+        addDefaultHeaders(req);
+        addAuthHeader(req);
+        return logResponse(req.asString());
+    }
+
+    <T> T defaultDelete(String path, Class<T> type)
+        throws UnirestException, InvalidTokenException {
+        try (Timer.Context ctx = stats.httpGetTime.time()) {
+            HttpRequest req = Unirest.delete(BASE_URL + path);
+            addDefaultHeaders(req);
+            addAuthHeader(req);
+            HttpResponse<String> response = req.asString();
+            logResponse(response);
+            int status = response.getStatus();
+            if (status == HTTP_NOT_AUTHENTICATED) {
+                throw new InvalidTokenException(HttpMethod.DELETE, path, "Bad token");
+            }
+            if (status == HTTP_TOO_MANY_REQUESTS) {
+                long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
+                throw new RateLimitExceededException(retryIn);
+            }
+            if (status == HTTP_EMPTY) {
+                if (Void.class.equals(type)) {
+                    return null;
+                } else {
+                    throw new UnirestException("Got HTTP 204: Expected a response body, got none");
+                }
+            }
+            if (status != HTTP_OK) {
+                throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
+            }
+            return gson.fromJson(response.getBody(), type);
+        }
+    }
+
     private <T> HttpResponse<T> logResponse(HttpResponse<T> response) {
         int status = response.getStatus();
         switch (status / 100) {

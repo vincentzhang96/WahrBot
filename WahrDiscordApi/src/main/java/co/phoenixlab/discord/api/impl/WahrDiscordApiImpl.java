@@ -50,6 +50,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.locks.LockSupport;
+import java.util.concurrent.locks.ReadWriteLock;
 
 import static co.phoenixlab.discord.api.enums.ApiClientState.*;
 import static co.phoenixlab.discord.api.enums.ApiClientTrigger.*;
@@ -335,6 +337,7 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         final Timer httpPostTime;
         final Timer httpPatchTime;
         final Timer httpGetTime;
+        final Timer httpDeleteTime;
         final Meter http2xxResp;
         final Meter http4xxErrors;
         final Meter http5xxErrors;
@@ -354,6 +357,7 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
             httpPostTime = metrics.timer(name(WahrDiscordApiImpl.class, clientId, "http", "post"));
             httpPatchTime = metrics.timer(name(WahrDiscordApiImpl.class, clientId, "http", "patch"));
             httpGetTime = metrics.timer(name(WahrDiscordApiImpl.class, clientId, "http", "get"));
+            httpDeleteTime = metrics.timer(name(WahrDiscordApiImpl.class, clientId, "http", "delete"));
             http2xxResp = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "http", "response", "2XX"));
             http4xxErrors = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "http", "response", "4XX"));
             http5xxErrors = metrics.meter(name(WahrDiscordApiImpl.class, clientId, "http", "response", "5XX"));
