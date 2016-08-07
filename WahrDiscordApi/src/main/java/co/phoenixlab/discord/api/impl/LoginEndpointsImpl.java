@@ -72,12 +72,6 @@ public class LoginEndpointsImpl
     @Override
     public WebsocketEndpointResponse getGateway() throws ApiException {
         try {
-//            WebsocketEndpointResponse ret = endpoints.
-//                    defaultGet(GATEWAY_ENDPOINT, WebsocketEndpointResponse.class);
-//            if (ret == null || ret.getUrl() == null) {
-//                throw new ApiException(GET, GATEWAY_ENDPOINT, "Received invalid response");
-//            }
-//            return ret;
             return WebsocketEndpointResponse.builder().
                     url(new URI("wss://gateway.discord.gg/")).
                     build();
