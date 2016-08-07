@@ -45,7 +45,7 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
 
     @Override
     public GuildChannel createChannel(long guildId, CreateChannelRequest request) throws ApiException {
-        endpoints.validate(POST, GUILD_CHANNEL_ENDPOINT, request);
+        endpoints.validate(POST, GUILD_CHANNEL_PATH, request);
         try {
             return endpoints.defaultPost(guildChannelPath(guildId), request, GuildChannel.class);
         } catch (ApiException apie) {
