@@ -30,6 +30,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.StateMachineConfig;
+import com.github.oxo42.stateless4j.triggers.TriggerWithParameters1;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.Subscribe;
@@ -80,6 +81,8 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
     private final ScheduledExecutorService executorService;
 
     private final StateMachine<ApiClientState, ApiClientTrigger> stateMachine;
+
+    private Timer.Context readyContext;
 
     public WahrDiscordApiImpl(String userAgent, String instanceId) {
         this(instanceId, userAgent, null);
@@ -149,36 +152,41 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
 
     private void onDisconnected() {
         API_LOGGER.info("Disconnected");
+        if (readyContext != null) {
+            readyContext.stop();
+            readyContext = null;
+        }
     }
 
     private void onConnecting() {
         API_LOGGER.info("Attempting to connect using token \"{}\"", token);
-        try {
-            stats.connectAttemptCount.inc();
-            WebsocketEndpointResponse response = endpoints.gateway().getGateway();
-            initWSClient(response.getUrl());
-        } catch (InvalidTokenException ite) {
-            API_LOGGER.warn("Unable to get websocket gateway.", ite);
-            stats.connectFails.mark();
-            stateMachine.fire(CONNECT_FAIL);
-            return;
-        } catch (ApiException e) {
-            API_LOGGER.warn("Unable to get websocket gateway. Is Discord's API down?", e);
-            stats.connectFails.mark();
-            stateMachine.fire(CONNECT_FAIL);
-            return;
-        }
-        try {
-            if (!webSocketClient.connectBlocking()) {
-                API_LOGGER.warn("Failed to connect to websocket gateway.");
+        try (Timer.Context ctx = stats.connectAttempts.time()) {
+            try {
+                WebsocketEndpointResponse response = endpoints.gateway().getGateway();
+                initWSClient(response.getUrl());
+            } catch (InvalidTokenException ite) {
+                API_LOGGER.warn("Unable to get websocket gateway.", ite);
+                stats.connectFails.mark();
+                stateMachine.fire(CONNECT_FAIL);
+                return;
+            } catch (ApiException e) {
+                API_LOGGER.warn("Unable to get websocket gateway. Is Discord's API down?", e);
                 stats.connectFails.mark();
                 stateMachine.fire(CONNECT_FAIL);
                 return;
             }
-        } catch (InterruptedException e) {
-            API_LOGGER.warn("Connection was interrupted, canceling");
-            stateMachine.fire(CONNECT_FAIL);
-            return;
+            try {
+                if (!webSocketClient.connectBlocking()) {
+                    API_LOGGER.warn("Failed to connect to websocket gateway.");
+                    stats.connectFails.mark();
+                    stateMachine.fire(CONNECT_FAIL);
+                    return;
+                }
+            } catch (InterruptedException e) {
+                API_LOGGER.warn("Connection was interrupted, canceling");
+                stateMachine.fire(CONNECT_FAIL);
+                return;
+            }
         }
         stateMachine.fire(CONNECT_OK);
     }
@@ -199,18 +207,20 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
 
     private void onConnected() {
         API_LOGGER.info("Connected to websocket gateway");
-
+        readyContext = stats.timeToReady.time();
         stateMachine.fire(LOAD);
     }
 
     private void onLoading() {
         API_LOGGER.info("Waiting for READY");
-
     }
 
     private void onReady() {
         API_LOGGER.info("Websocket connection is ready");
-
+        if (readyContext != null) {
+            readyContext.stop();
+            readyContext = null;
+        }
     }
 
     void handleReadyMessage(ReadyMessage message) {
@@ -326,8 +336,9 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         final Meter eventBusExceptions;
         final Meter eventBusEvents;
 
-        final Counter connectAttemptCount;
+        final Timer connectAttempts;
         final Meter connectFails;
+        final Timer timeToReady;
 
         final Meter webSocketErrors;
         final Timer webSocketMessageParsing;
@@ -350,8 +361,9 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
             eventBusExceptions = metrics.meter(name(WahrDiscordApiImpl.class, instanceId,
                     "bus", "events", "errors", "uncaught"));
             eventBusEvents = metrics.meter(name(WahrDiscordApiImpl.class, instanceId, "bus", "events"));
-            connectAttemptCount = metrics.counter(name(WahrDiscordApi.class, instanceId, "connection", "attempts"));
+            connectAttempts = metrics.timer(name(WahrDiscordApi.class, instanceId, "connection", "attempts"));
             connectFails = metrics.meter(name(WahrDiscordApi.class, instanceId, "connection", "failures"));
+            timeToReady = metrics.timer(name(WahrDiscordApi.class, instanceId, "connection", "timetoready"));
             webSocketErrors = metrics.meter(name(WSClient.class, instanceId, "errors", "general"));
             webSocketMessageErrors = metrics.meter(name(WSClient.class, instanceId, "errors", "messages"));
             webSocketMessageParsing = metrics.timer(name(WSClient.class, instanceId, "messages", "parsing"));
