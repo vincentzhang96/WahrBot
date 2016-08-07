@@ -22,13 +22,12 @@ import co.phoenixlab.discord.api.request.channel.CreateChannelRequest;
 import co.phoenixlab.discord.api.request.channel.CreatePrivateChannelRequest;
 import co.phoenixlab.discord.api.request.channel.ModifyChannelRequest;
 import com.google.inject.Inject;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static com.mashape.unirest.http.HttpMethod.GET;
-import static com.mashape.unirest.http.HttpMethod.PATCH;
-import static com.mashape.unirest.http.HttpMethod.POST;
+import static com.mashape.unirest.http.HttpMethod.*;
 
 public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointAsync {
 
@@ -87,12 +86,26 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
 
     @Override
     public void deleteChannel(long channelId) throws ApiException {
-
+        try {
+            endpoints.defaultDelete(channelPath(channelId), Void.class);
+        } catch (ApiException apie) {
+            //  rethrow
+            throw apie;
+        } catch (Exception e) {
+            throw new ApiException(DELETE, CHANNEL_ENDPOINT_BASE, e);
+        }
     }
 
     @Override
     public GuildChannel[] getGuildChannels(long guildId) throws ApiException {
-        return new GuildChannel[0];
+        try {
+            endpoints.defaultGet(channelFormatPath(guildId, GUILD_CHANNEL_ENDPOINT_FMT), GuildChannel[].class);
+        } catch (ApiException apie) {
+            //  rethrow
+            throw apie;
+        } catch (Exception e) {
+            throw new ApiException(GET, GUILD_CHANNEL_ENDPOINT, e);
+        }
     }
 
     @Override
