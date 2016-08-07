@@ -27,6 +27,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static com.mashape.unirest.http.HttpMethod.GET;
+import static com.mashape.unirest.http.HttpMethod.PATCH;
 import static com.mashape.unirest.http.HttpMethod.POST;
 
 public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointAsync {
@@ -62,14 +63,14 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
 
     @Override
     public GuildChannel editChannel(long channelId, ModifyChannelRequest request) throws ApiException {
-        endpoints.validate(GET, CHANNEL_ENDPOINT_BASE, request);
+        endpoints.validate(PATCH, CHANNEL_ENDPOINT_BASE, request);
         try {
             return endpoints.defaultPatch(channelPath(channelId), request, GuildChannel.class);
         } catch (ApiException apie) {
             //  rethrow
             throw apie;
         } catch (Exception e) {
-            throw new ApiException(GET, CHANNEL_ENDPOINT_BASE, e);
+            throw new ApiException(PATCH, CHANNEL_ENDPOINT_BASE, e);
         }
     }
 
