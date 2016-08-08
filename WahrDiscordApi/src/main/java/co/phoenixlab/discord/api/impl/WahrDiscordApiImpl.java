@@ -358,26 +358,26 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         @Inject
         Stats(MetricRegistry metrics, WahrDiscordApi apiClient) {
             String instanceId = apiClient.getInstanceId();
-            eventBusExceptions = metrics.meter(name(WahrDiscordApiImpl.class, instanceId,
-                    "bus", "events", "errors", "uncaught"));
-            eventBusEvents = metrics.meter(name(WahrDiscordApiImpl.class, instanceId, "bus", "events"));
-            connectAttempts = metrics.timer(name(WahrDiscordApi.class, instanceId, "connection", "attempts"));
-            connectFails = metrics.meter(name(WahrDiscordApi.class, instanceId, "connection", "failures"));
-            timeToReady = metrics.timer(name(WahrDiscordApi.class, instanceId, "connection", "timetoready"));
-            webSocketErrors = metrics.meter(name(WSClient.class, instanceId, "errors", "general"));
-            webSocketMessageErrors = metrics.meter(name(WSClient.class, instanceId, "errors", "messages"));
-            webSocketMessageParsing = metrics.timer(name(WSClient.class, instanceId, "messages", "parsing"));
-            webSocketMessageDispatching = metrics.timer(name(WSClient.class, instanceId, "messages", "dispatching"));
-            webSocketRateLimitHits = metrics.meter(name(WSClient.class, instanceId, "ratelimit", "overruns"));
-            webSocketOutboundMessages = metrics.meter(name(WSClient.class, instanceId, "messages", "outbound"));
-            httpPostTime = metrics.timer(name(WahrDiscordApiImpl.class, instanceId, "http", "post"));
-            httpPatchTime = metrics.timer(name(WahrDiscordApiImpl.class, instanceId, "http", "patch"));
-            httpGetTime = metrics.timer(name(WahrDiscordApiImpl.class, instanceId, "http", "get"));
-            httpDeleteTime = metrics.timer(name(WahrDiscordApiImpl.class, instanceId, "http", "delete"));
-            http2xxResp = metrics.meter(name(WahrDiscordApiImpl.class, instanceId, "http", "response", "2XX"));
-            http4xxErrors = metrics.meter(name(WahrDiscordApiImpl.class, instanceId, "http", "response", "4XX"));
-            http5xxErrors = metrics.meter(name(WahrDiscordApiImpl.class, instanceId, "http", "response", "5XX"));
-            httpOtherResp = metrics.meter(name(WahrDiscordApiImpl.class, instanceId, "http", "response", "other"));
+            eventBusExceptions = metrics.meter(name(WahrDiscordApiImpl.class,
+                    "bus", "events", "errors", "uncaught", instanceId));
+            eventBusEvents = metrics.meter(name(WahrDiscordApiImpl.class, "bus", "events", instanceId));
+            connectAttempts = metrics.timer(name(WahrDiscordApi.class, "connection", "attempts", instanceId));
+            connectFails = metrics.meter(name(WahrDiscordApi.class, "connection", "failures", instanceId));
+            timeToReady = metrics.timer(name(WahrDiscordApi.class, "connection", "timetoready", instanceId));
+            webSocketErrors = metrics.meter(name(WSClient.class, "errors", "general", instanceId));
+            webSocketMessageErrors = metrics.meter(name(WSClient.class, "errors", "messages", instanceId));
+            webSocketMessageParsing = metrics.timer(name(WSClient.class, "messages", "parsing", instanceId));
+            webSocketMessageDispatching = metrics.timer(name(WSClient.class, "messages", "dispatching", instanceId));
+            webSocketRateLimitHits = metrics.meter(name(WSClient.class, "ratelimit", "overruns", instanceId));
+            webSocketOutboundMessages = metrics.meter(name(WSClient.class, "messages", "outbound", instanceId));
+            httpPostTime = metrics.timer(name(WahrDiscordApiImpl.class, "http", "post", instanceId));
+            httpPatchTime = metrics.timer(name(WahrDiscordApiImpl.class, "http", "patch", instanceId));
+            httpGetTime = metrics.timer(name(WahrDiscordApiImpl.class, "http", "get", instanceId));
+            httpDeleteTime = metrics.timer(name(WahrDiscordApiImpl.class, "http", "delete", instanceId));
+            http2xxResp = metrics.meter(name(WahrDiscordApiImpl.class, "http", "response", "2XX", instanceId));
+            http4xxErrors = metrics.meter(name(WahrDiscordApiImpl.class, "http", "response", "4XX", instanceId));
+            http5xxErrors = metrics.meter(name(WahrDiscordApiImpl.class, "http", "response", "5XX", instanceId));
+            httpOtherResp = metrics.meter(name(WahrDiscordApiImpl.class, "http", "response", "other", instanceId));
         }
 
     }
