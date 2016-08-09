@@ -39,23 +39,70 @@ import java.util.StringJoiner;
 
 public class EndpointsImpl implements Endpoints {
 
+    /**
+     * The base URL for the Discord API
+     */
     public static final String BASE_URL = "https://discordapp.com/api";
+
+    /**
+     * HTTP status code for throttling/rate limiting
+     */
     public static final int HTTP_TOO_MANY_REQUESTS = 429;
+
+    /**
+     * HTTP status code for OK
+     */
     public static final int HTTP_OK = 200;
+
+    /**
+     * HTTP status code for OK - No Content
+     */
     public static final int HTTP_EMPTY = 204;
+
+    /**
+     * HTTP status code for unauthenticated
+     */
     public static final int HTTP_NOT_AUTHENTICATED = 401;
+
+    /**
+     * The HTTP header "Retry-After"
+     */
+    public static final String HTTP_RETRY_AFTER_HEADER = "Retry-After";
+
+    /**
+     * API client implementation
+     */
     @Inject
     private WahrDiscordApiImpl apiImpl;
+
+    /**
+     * Login endpoints implementation
+     */
     @Inject
     private LoginEndpointsImpl login;
+
+    /**
+     * GSON instance to use by endpoint implementations
+     */
     @Inject
     private Gson gson;
+
+    /**
+     * Discord API implementation metrics
+     */
     @Inject
     private WahrDiscordApiImpl.Stats stats;
 
+    /**
+     * Validator instances for validating request parameters
+     */
     private Validator validator;
 
+    /**
+     * Constructs a new endpoints implementation
+     */
     public EndpointsImpl() {
+        //  Create the validator we're using to validate request parameters - default settings are fine
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
@@ -160,35 +207,83 @@ public class EndpointsImpl implements Endpoints {
         return null;
     }
 
+    /**
+     * Adds the default headers to the in-construction HttpRequest, specifically the user-agent and content-type (JSON)
+     * @param request The in-construction HttpRequeset
+     */
     private void addDefaultHeaders(HttpRequest request) {
         request.header(HttpHeaders.USER_AGENT, apiImpl.getUserAgent());
         request.header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
     }
 
+    /**
+     * Adds the authorization header to the in-construction HttpRequest
+     * @param request The in-construction HttpRequest
+     */
     private void addAuthHeader(HttpRequest request) {
         request.header(HttpHeaders.AUTHORIZATION, apiImpl.getToken());
     }
 
+    /**
+     * Performs a basic POST request without authentication, taking a string body and returning a string result.
+     * @param path The URL path relative to the API {@link #BASE_URL}
+     * @param body The body to send in the request, or null for no body
+     * @return An HttpResponse that resolves to a string value
+     * @throws UnirestException If there was an HTTP exception
+     */
     HttpResponse<String> defaultPostUnauth(String path, String body) throws UnirestException {
         try (Timer.Context ctx = stats.httpPostTime.time()) {
             HttpRequestWithBody req = Unirest.post(BASE_URL + path);
             addDefaultHeaders(req);
-            return logResponse(req.body(body).asString());
+            //  Skip adding the auth headers
+            //  Log the response for metrics (passthrough)
+            //  Only add body if present
+            if (body != null) {
+                return logResponse(req.body(body).asString());
+            } else {
+                return logResponse(req.asString());
+            }
         }
     }
 
+    /**
+     * Performs a POST request without authentication, taking an Object body (serialized to JSON) and returning a typed
+     * result (deserialized from JSON). For endpoints that respond with 204 No Content, the return class should be
+     * {@code Void.class}. For making POST requests without a body, pass in {@code null} as the body.
+     * @param path The URL path relative to the API {@link #BASE_URL}
+     * @param body The body to send in the request, or null for no body
+     * @param type The class to deserialize the result to, or {@code Void.class} for endpoints that are expected to
+     *             return HTTP 204 No Content
+     * @param <T> Type parameter for the return value type
+     * @return The deserialized response object, or {@code null} if the return type is Void
+     * @throws UnirestException If there was an HTTP exception
+     */
     <T> T defaultPostUnauth(String path, Object body, Class<T> type) throws UnirestException {
         try (Timer.Context ctx = stats.httpPostTime.time()) {
+            //  Construct the request
             HttpRequestWithBody req = Unirest.post(BASE_URL + path);
             addDefaultHeaders(req);
-            HttpResponse<String> response = req.body(gson.toJson(body)).asString();
+            //  Skip adding the auth header since it's an unauthenticated call
+            //  Only serialize if we have a body to send
+            HttpResponse<String> response;
+            if (body != null) {
+                response = req.body(gson.toJson(body)).
+                        asString();
+            } else {
+                response = req.asString();
+            }
+            //  Log for metrics
             logResponse(response);
+            //  Check for error conditions
             int status = response.getStatus();
             if (status == HTTP_TOO_MANY_REQUESTS) {
-                long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
+                //  We hit the rate limit, throw an exception to let the caller know
+                long retryIn = Long.parseLong(response.getHeaders().getFirst(HTTP_RETRY_AFTER_HEADER));
                 throw new RateLimitExceededException(retryIn);
             }
             if (status == HTTP_EMPTY) {
+                //  We expect the response to be empty if we expected Void back
+                //  Otherwise, this is an unexpected situation
                 if (Void.class.equals(type)) {
                     return null;
                 } else {
@@ -196,12 +291,20 @@ public class EndpointsImpl implements Endpoints {
                 }
             }
             if (status != HTTP_OK) {
+                //  Other errors
                 throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
             }
             return gson.fromJson(response.getBody(), type);
         }
     }
 
+    /**
+     * Performs a basic POST request, taking a string body and returning a string result.
+     * @param path The URL path relative to the API {@link #BASE_URL}
+     * @param body The body to send in the request, or null for no body
+     * @return An HttpResponse that resolves to a string value
+     * @throws UnirestException If there was an HTTP exception
+     */
     HttpResponse<String> defaultPost(String path, String body) throws UnirestException {
         try (Timer.Context ctx = stats.httpPostTime.time()) {
             HttpRequestWithBody req = Unirest.post(BASE_URL + path);
@@ -211,6 +314,18 @@ public class EndpointsImpl implements Endpoints {
         }
     }
 
+    /**
+     * Performs a POST request, taking an Object body (serialized to JSON) and returning a typed
+     * result (deserialized from JSON). For endpoints that respond with 204 No Content, the return class should be
+     * {@code Void.class}. For making POST requests without a body, pass in {@code null} as the body.
+     * @param path The URL path relative to the API {@link #BASE_URL}
+     * @param body The body to send in the request, or null for no body
+     * @param type The class to deserialize the result to, or {@code Void.class} for endpoints that are expected to
+     *             return HTTP 204 No Content
+     * @param <T> Type parameter for the return value type
+     * @return The deserialized response object, or {@code null} if the return type is Void
+     * @throws UnirestException If there was an HTTP exception
+     */
     <T> T defaultPost(String path, Object body, Class<T> type)
             throws UnirestException, InvalidTokenException {
         try (Timer.Context ctx = stats.httpPostTime.time()) {
@@ -224,7 +339,7 @@ public class EndpointsImpl implements Endpoints {
                 throw new InvalidTokenException(HttpMethod.POST, path, "Bad token");
             }
             if (status == HTTP_TOO_MANY_REQUESTS) {
-                long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
+                long retryIn = Long.parseLong(response.getHeaders().getFirst(HTTP_RETRY_AFTER_HEADER));
                 throw new RateLimitExceededException(retryIn);
             }
             if (status == HTTP_EMPTY) {
@@ -263,7 +378,7 @@ public class EndpointsImpl implements Endpoints {
                 throw new InvalidTokenException(HttpMethod.POST, path, "Bad token");
             }
             if (status == HTTP_TOO_MANY_REQUESTS) {
-                long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
+                long retryIn = Long.parseLong(response.getHeaders().getFirst(HTTP_RETRY_AFTER_HEADER));
                 throw new RateLimitExceededException(retryIn);
             }
             if (status == HTTP_EMPTY) {
@@ -298,7 +413,7 @@ public class EndpointsImpl implements Endpoints {
             logResponse(response);
             int status = response.getStatus();
             if (status == HTTP_TOO_MANY_REQUESTS) {
-                long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
+                long retryIn = Long.parseLong(response.getHeaders().getFirst(HTTP_RETRY_AFTER_HEADER));
                 throw new RateLimitExceededException(retryIn);
             }
             if (status == HTTP_EMPTY) {
@@ -337,7 +452,7 @@ public class EndpointsImpl implements Endpoints {
                 throw new InvalidTokenException(HttpMethod.GET, path, "Bad token");
             }
             if (status == HTTP_TOO_MANY_REQUESTS) {
-                long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
+                long retryIn = Long.parseLong(response.getHeaders().getFirst(HTTP_RETRY_AFTER_HEADER));
                 throw new RateLimitExceededException(retryIn);
             }
             if (status == HTTP_EMPTY) {
@@ -374,7 +489,7 @@ public class EndpointsImpl implements Endpoints {
                 throw new InvalidTokenException(HttpMethod.DELETE, path, "Bad token");
             }
             if (status == HTTP_TOO_MANY_REQUESTS) {
-                long retryIn = Long.parseLong(response.getHeaders().getFirst("Retry-After"));
+                long retryIn = Long.parseLong(response.getHeaders().getFirst(HTTP_RETRY_AFTER_HEADER));
                 throw new RateLimitExceededException(retryIn);
             }
             if (status == HTTP_EMPTY) {
