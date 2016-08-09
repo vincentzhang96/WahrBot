@@ -310,7 +310,13 @@ public class EndpointsImpl implements Endpoints {
             HttpRequestWithBody req = Unirest.post(BASE_URL + path);
             addDefaultHeaders(req);
             addAuthHeader(req);
-            return logResponse(req.body(body).asString());
+            //  Log the response for metrics (passthrough)
+            //  Only add body if present
+            if (body != null) {
+                return logResponse(req.body(body).asString());
+            } else {
+                return logResponse(req.asString());
+            }
         }
     }
 
@@ -332,17 +338,30 @@ public class EndpointsImpl implements Endpoints {
             HttpRequestWithBody req = Unirest.post(BASE_URL + path);
             addDefaultHeaders(req);
             addAuthHeader(req);
-            HttpResponse<String> response = req.body(gson.toJson(body)).asString();
+            //  Only serialize if we have a body to send
+            HttpResponse<String> response;
+            if (body != null) {
+                response = req.body(gson.toJson(body)).
+                        asString();
+            } else {
+                response = req.asString();
+            }
+            //  Log for metrics
             logResponse(response);
+            //  Check for error conditions
             int status = response.getStatus();
             if (status == HTTP_NOT_AUTHENTICATED) {
+                //  Authentication failed
                 throw new InvalidTokenException(HttpMethod.POST, path, "Bad token");
             }
             if (status == HTTP_TOO_MANY_REQUESTS) {
+                //  We hit the rate limit, throw an exception to let the caller know
                 long retryIn = Long.parseLong(response.getHeaders().getFirst(HTTP_RETRY_AFTER_HEADER));
                 throw new RateLimitExceededException(retryIn);
             }
             if (status == HTTP_EMPTY) {
+                //  We expect the response to be empty if we expected Void back
+                //  Otherwise, this is an unexpected situation
                 if (Void.class.equals(type)) {
                     return null;
                 } else {
@@ -350,38 +369,77 @@ public class EndpointsImpl implements Endpoints {
                 }
             }
             if (status != HTTP_OK) {
+                //  Other errors
                 throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
             }
             return gson.fromJson(response.getBody(), type);
         }
     }
 
+    /**
+     * Performs a basic PATCH request, taking a string body and returning a string result.
+     * @param path The URL path relative to the API {@link #BASE_URL}
+     * @param body The body to send in the request, or null for no body
+     * @return An HttpResponse that resolves to a string value
+     * @throws UnirestException If there was an HTTP exception
+     */
     HttpResponse<String> defaultPatch(String path, String body) throws UnirestException {
         try (Timer.Context ctx = stats.httpPostTime.time()) {
             HttpRequestWithBody req = Unirest.patch(BASE_URL + path);
             addDefaultHeaders(req);
             addAuthHeader(req);
-            return logResponse(req.body(body).asString());
+            //  Log the response for metrics (passthrough)
+            //  Only add body if present
+            if (body != null) {
+                return logResponse(req.body(body).asString());
+            } else {
+                return logResponse(req.asString());
+            }
         }
     }
 
+    /**
+     * Performs a PATCH request, taking an Object body (serialized to JSON) and returning a typed
+     * result (deserialized from JSON). For endpoints that respond with 204 No Content, the return class should be
+     * {@code Void.class}. For making PATCH requests without a body, pass in {@code null} as the body.
+     * @param path The URL path relative to the API {@link #BASE_URL}
+     * @param body The body to send in the request, or null for no body
+     * @param type The class to deserialize the result to, or {@code Void.class} for endpoints that are expected to
+     *             return HTTP 204 No Content
+     * @param <T> Type parameter for the return value type
+     * @return The deserialized response object, or {@code null} if the return type is Void
+     * @throws UnirestException If there was an HTTP exception
+     */
     <T> T defaultPatch(String path, Object body, Class<T> type)
             throws UnirestException, InvalidTokenException {
         try (Timer.Context ctx = stats.httpPostTime.time()) {
             HttpRequestWithBody req = Unirest.patch(BASE_URL + path);
             addDefaultHeaders(req);
             addAuthHeader(req);
-            HttpResponse<String> response = req.body(gson.toJson(body)).asString();
+            //  Only serialize if we have a body to send
+            HttpResponse<String> response;
+            if (body != null) {
+                response = req.body(gson.toJson(body)).
+                        asString();
+            } else {
+                response = req.asString();
+            }
+            //  Log for metrics
             logResponse(response);
+            //  Check for error conditions
             int status = response.getStatus();
             if (status == HTTP_NOT_AUTHENTICATED) {
+                //  Authentication failed
                 throw new InvalidTokenException(HttpMethod.POST, path, "Bad token");
             }
             if (status == HTTP_TOO_MANY_REQUESTS) {
+                //  We hit the rate limit, throw an exception to let the caller know
                 long retryIn = Long.parseLong(response.getHeaders().getFirst(HTTP_RETRY_AFTER_HEADER));
                 throw new RateLimitExceededException(retryIn);
             }
             if (status == HTTP_EMPTY) {
+                //  We expect the response to be empty if we expected Void back
+                //  Otherwise, this is an unexpected situation
                 if (Void.class.equals(type)) {
                     return null;
                 } else {
@@ -389,13 +447,19 @@ public class EndpointsImpl implements Endpoints {
                 }
             }
             if (status != HTTP_OK) {
+                //  Other errors
                 throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
             }
             return gson.fromJson(response.getBody(), type);
         }
     }
 
-
+    /**
+     * Performs a basic GET request without authentication, returning a string result.
+     * @param path The URL path relative to the API {@link #BASE_URL}
+     * @return An HttpResponse that resolves to a string value
+     * @throws UnirestException If there was an HTTP exception
+     */
     HttpResponse<String> defaultGetUnauth(String path) throws UnirestException {
         try (Timer.Context ctx = stats.httpGetTime.time()) {
             HttpRequest req = Unirest.get(BASE_URL + path);
@@ -404,6 +468,16 @@ public class EndpointsImpl implements Endpoints {
         }
     }
 
+    /**
+     * Performs a GET request without authentication, returning a typed result (deserialized from JSON). For endpoints
+     * that respond with 204 No Content, the return class should be {@code Void.class}.
+     * @param path The URL path relative to the API {@link #BASE_URL}
+     * @param type The class to deserialize the result to, or {@code Void.class} for endpoints that are expected to
+     *             return HTTP 204 No Content
+     * @param <T> Type parameter for the return value type
+     * @return The deserialized response object, or {@code null} if the return type is Void
+     * @throws UnirestException If there was an HTTP exception
+     */
     <T> T defaultGetUnauth(String path, Class<T> type)
             throws UnirestException, InvalidTokenException {
         try (Timer.Context ctx = stats.httpGetTime.time()) {
@@ -430,6 +504,12 @@ public class EndpointsImpl implements Endpoints {
         }
     }
 
+    /**
+     * Performs a basic GET request, returning a string result.
+     * @param path The URL path relative to the API {@link #BASE_URL}
+     * @return An HttpResponse that resolves to a string value
+     * @throws UnirestException If there was an HTTP exception
+     */
     HttpResponse<String> defaultGet(String path) throws UnirestException {
         try (Timer.Context ctx = stats.httpGetTime.time()) {
             HttpRequest req = Unirest.get(BASE_URL + path);
@@ -439,6 +519,16 @@ public class EndpointsImpl implements Endpoints {
         }
     }
 
+    /**
+     * Performs a GET request, returning a typed result (deserialized from JSON). For endpoints
+     * that respond with 204 No Content, the return class should be {@code Void.class}.
+     * @param path The URL path relative to the API {@link #BASE_URL}
+     * @param type The class to deserialize the result to, or {@code Void.class} for endpoints that are expected to
+     *             return HTTP 204 No Content
+     * @param <T> Type parameter for the return value type
+     * @return The deserialized response object, or {@code null} if the return type is Void
+     * @throws UnirestException If there was an HTTP exception
+     */
     <T> T defaultGet(String path, Class<T> type)
             throws UnirestException, InvalidTokenException {
         try (Timer.Context ctx = stats.httpGetTime.time()) {
@@ -446,16 +536,22 @@ public class EndpointsImpl implements Endpoints {
             addDefaultHeaders(req);
             addAuthHeader(req);
             HttpResponse<String> response = req.asString();
+            //  Log for metrics
             logResponse(response);
+            //  Check for error conditions
             int status = response.getStatus();
             if (status == HTTP_NOT_AUTHENTICATED) {
-                throw new InvalidTokenException(HttpMethod.GET, path, "Bad token");
+                //  Authentication failed
+                throw new InvalidTokenException(HttpMethod.POST, path, "Bad token");
             }
             if (status == HTTP_TOO_MANY_REQUESTS) {
+                //  We hit the rate limit, throw an exception to let the caller know
                 long retryIn = Long.parseLong(response.getHeaders().getFirst(HTTP_RETRY_AFTER_HEADER));
                 throw new RateLimitExceededException(retryIn);
             }
             if (status == HTTP_EMPTY) {
+                //  We expect the response to be empty if we expected Void back
+                //  Otherwise, this is an unexpected situation
                 if (Void.class.equals(type)) {
                     return null;
                 } else {
@@ -463,12 +559,19 @@ public class EndpointsImpl implements Endpoints {
                 }
             }
             if (status != HTTP_OK) {
+                //  Other errors
                 throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
             }
             return gson.fromJson(response.getBody(), type);
         }
     }
 
+    /**
+     * Performs a basic DELETE request, returning a string result.
+     * @param path The URL path relative to the API {@link #BASE_URL}
+     * @return An HttpResponse that resolves to a string value
+     * @throws UnirestException If there was an HTTP exception
+     */
     HttpResponse<String> defaultDelete(String path) throws UnirestException {
         HttpRequest req = Unirest.delete(path);
         addDefaultHeaders(req);
@@ -476,6 +579,16 @@ public class EndpointsImpl implements Endpoints {
         return logResponse(req.asString());
     }
 
+    /**
+     * Performs a DELETE request, returning a typed result (deserialized from JSON). For endpoints
+     * that respond with 204 No Content, the return class should be {@code Void.class}.
+     * @param path The URL path relative to the API {@link #BASE_URL}
+     * @param type The class to deserialize the result to, or {@code Void.class} for endpoints that are expected to
+     *             return HTTP 204 No Content
+     * @param <T> Type parameter for the return value type
+     * @return The deserialized response object, or {@code null} if the return type is Void
+     * @throws UnirestException If there was an HTTP exception
+     */
     <T> T defaultDelete(String path, Class<T> type)
         throws UnirestException, InvalidTokenException {
         try (Timer.Context ctx = stats.httpGetTime.time()) {
@@ -483,16 +596,22 @@ public class EndpointsImpl implements Endpoints {
             addDefaultHeaders(req);
             addAuthHeader(req);
             HttpResponse<String> response = req.asString();
+            //  Log for metrics
             logResponse(response);
+            //  Check for error conditions
             int status = response.getStatus();
             if (status == HTTP_NOT_AUTHENTICATED) {
-                throw new InvalidTokenException(HttpMethod.DELETE, path, "Bad token");
+                //  Authentication failed
+                throw new InvalidTokenException(HttpMethod.POST, path, "Bad token");
             }
             if (status == HTTP_TOO_MANY_REQUESTS) {
+                //  We hit the rate limit, throw an exception to let the caller know
                 long retryIn = Long.parseLong(response.getHeaders().getFirst(HTTP_RETRY_AFTER_HEADER));
                 throw new RateLimitExceededException(retryIn);
             }
             if (status == HTTP_EMPTY) {
+                //  We expect the response to be empty if we expected Void back
+                //  Otherwise, this is an unexpected situation
                 if (Void.class.equals(type)) {
                     return null;
                 } else {
@@ -500,12 +619,19 @@ public class EndpointsImpl implements Endpoints {
                 }
             }
             if (status != HTTP_OK) {
+                //  Other errors
                 throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
             }
             return gson.fromJson(response.getBody(), type);
         }
     }
 
+    /**
+     * Logs an HTTP response status code for metrics
+     * @param response The HTTP request response
+     * @param <T> The result type of the HTTP request response (ignored)
+     * @return the given HTTP request response (pass-through)
+     */
     private <T> HttpResponse<T> logResponse(HttpResponse<T> response) {
         int status = response.getStatus();
         switch (status / 100) {
@@ -525,10 +651,21 @@ public class EndpointsImpl implements Endpoints {
         return response;
     }
 
+    /**
+     * Checks whether or not a given status is within an HTTP status code range
+     * @param range The HTTP status range, such as 200 for all 2XX statuses
+     * @param status The HTTP status to test
+     * @return true if status is a member of the given HTTP status range, false otherwise
+     */
     private boolean inStatusRange(int range, int status) {
         return status >= range && status < range + 100;
     }
 
+    /**
+     * Performs validation on the given object according to its validation rules, throwing an exception if it fails
+     * @param o The object to validate, annotated with validation constraints
+     * @throws ApiException If the validation fails
+     */
     void validate(Object o) throws ApiException {
         Set<ConstraintViolation<Object>> validate = validator.validate(o);
         if (!validate.isEmpty()) {
@@ -536,6 +673,14 @@ public class EndpointsImpl implements Endpoints {
         }
     }
 
+    /**
+     * Performs validation on the given object according to its validation rules, throwing an exception containing
+     * the HTTP method and endpoint if it fails
+     * @param method The HTTP method being invoked
+     * @param endpoint The endpoint being invoked
+     * @param o The object to validate, annotated with validation constraints
+     * @throws ApiException If the validation fails
+     */
     void validate(HttpMethod method, String endpoint, Object o) throws ApiException {
         Set<ConstraintViolation<Object>> validate = validator.validate(o);
         if (!validate.isEmpty()) {
@@ -543,6 +688,11 @@ public class EndpointsImpl implements Endpoints {
         }
     }
 
+    /**
+     * Gets a string containing a list of validation violations, if any
+     * @param validate The object to validate
+     * @return A string containing a list of violations, or emtpy string if there are none
+     */
     private String getViolations(Set<ConstraintViolation<Object>> validate) {
         StringJoiner joiner = new StringJoiner(", ");
         for (ConstraintViolation<Object> violation : validate) {
@@ -553,6 +703,11 @@ public class EndpointsImpl implements Endpoints {
         return joiner.toString();
     }
 
+    /**
+     * Converts a snowflake int64 into the proper string representation for Discord (unsigned decimal)
+     * @param snowflake The snowflake ID to convert
+     * @return The snowflake in string format
+     */
     String snowflakeToString(long snowflake) {
         return Long.toUnsignedString(snowflake);
     }
