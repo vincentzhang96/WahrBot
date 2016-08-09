@@ -14,6 +14,7 @@ package co.phoenixlab.discord.api.endpoints;
 
 import co.phoenixlab.discord.api.entities.channel.message.Message;
 import co.phoenixlab.discord.api.exceptions.ApiException;
+import co.phoenixlab.discord.api.request.channel.message.BulkMessageDeleteRequest;
 import co.phoenixlab.discord.api.request.channel.message.EditMessageRequest;
 import co.phoenixlab.discord.api.request.channel.message.CreateMessageRequest;
 
@@ -65,5 +66,8 @@ public interface MessagesEndpoint {
             throws ApiException;
 
     void ackMessage(long channelId, long messageId)
+            throws ApiException;
+
+    void bulkDeleteMessages(long channelId, BulkMessageDeleteRequest request)
             throws ApiException;
 }
