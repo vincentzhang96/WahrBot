@@ -20,42 +20,58 @@ import co.phoenixlab.discord.api.request.channel.message.CreateMessageRequest;
 
 import java.util.concurrent.Future;
 
-import static co.phoenixlab.discord.api.endpoints.MessagesEndpoint.DEFAULT_LIMIT;
-import static co.phoenixlab.discord.api.endpoints.MessagesEndpoint.IGNORE;
+import static co.phoenixlab.discord.api.endpoints.MessagesEndpoint.LIMIT_DEFAULT;
+import static co.phoenixlab.discord.api.endpoints.MessagesEndpoint.MESSAGE_ID_IGNORE_PARAM;
 
 public interface MessagesEndpointAsync {
 
-    Future<Message[]> getMessagesAsync(long channelId, long beforeMessageId, long afterMessageId, int limit)
+    Future<Message[]> getMessagesAsync(long channelId, long beforeMessageId, long afterMessageId,
+                                       long aroundMessageId, int limit)
             throws ApiException;
+
+    default Future<Message[]> getMessagesAsync(long channelId, long beforeMessageId, long afterMessageId, int limit)
+            throws ApiException {
+        return getMessagesAsync(channelId, beforeMessageId, afterMessageId, MESSAGE_ID_IGNORE_PARAM, limit);
+    }
 
     default Future<Message[]> getMessagesBeforeAsync(long channelId, long beforeMessageId, int limit)
             throws ApiException {
-        return getMessagesAsync(channelId, beforeMessageId, IGNORE, limit);
+        return getMessagesAsync(channelId, beforeMessageId, MESSAGE_ID_IGNORE_PARAM, limit);
     }
 
     default Future<Message[]> getMessagesBeforeAsync(long channelId, long beforeMessageId)
             throws ApiException {
-        return getMessagesBeforeAsync(channelId, beforeMessageId, DEFAULT_LIMIT);
+        return getMessagesBeforeAsync(channelId, beforeMessageId, LIMIT_DEFAULT);
     }
 
     default Future<Message[]> getMessagesAfterAsync(long channelId, long afterMessageId, int limit)
             throws ApiException {
-        return getMessagesAsync(channelId, IGNORE, afterMessageId, limit);
+        return getMessagesAsync(channelId, MESSAGE_ID_IGNORE_PARAM, afterMessageId, limit);
     }
 
     default Future<Message[]> getMessagesAfterAsync(long channelId, long afterMessageId)
             throws ApiException {
-        return getMessagesAfterAsync(channelId, afterMessageId, DEFAULT_LIMIT);
+        return getMessagesAfterAsync(channelId, afterMessageId, LIMIT_DEFAULT);
     }
 
     default Future<Message[]> getLatestMessagesAsync(long channelId, int limit)
             throws ApiException {
-        return getMessagesAsync(channelId, IGNORE, IGNORE, limit);
+        return getMessagesAsync(channelId, MESSAGE_ID_IGNORE_PARAM, MESSAGE_ID_IGNORE_PARAM, limit);
     }
 
     default Future<Message[]> getLatestMessagesAsync(long channelId)
             throws ApiException {
-        return getLatestMessagesAsync(channelId, DEFAULT_LIMIT);
+        return getLatestMessagesAsync(channelId, LIMIT_DEFAULT);
+    }
+
+    default Future<Message[]> getMessagesAroundAsync(long channelId, long aroundMessageId, int limit)
+            throws ApiException {
+        return getMessagesAsync(channelId, MESSAGE_ID_IGNORE_PARAM, MESSAGE_ID_IGNORE_PARAM, aroundMessageId, limit);
+    }
+
+    default Future<Message[]> getMessagesAroundAsync(long channelId, long aroundMessageId)
+            throws ApiException {
+        return getMessagesAroundAsync(channelId, aroundMessageId, LIMIT_DEFAULT);
     }
 
     Future<Message> sendMessageAsync(long channelId, CreateMessageRequest request)
