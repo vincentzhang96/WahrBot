@@ -14,9 +14,9 @@ package co.phoenixlab.discord.api.impl;
 
 import co.phoenixlab.discord.api.WahrDiscordApi;
 import co.phoenixlab.discord.api.entities.ReadyMessage;
-import co.phoenixlab.discord.api.entities.user.SelfUser;
 import co.phoenixlab.discord.api.entities.TokenResponse;
 import co.phoenixlab.discord.api.entities.WebsocketEndpointResponse;
+import co.phoenixlab.discord.api.entities.user.SelfUser;
 import co.phoenixlab.discord.api.enums.ApiClientState;
 import co.phoenixlab.discord.api.enums.ApiClientTrigger;
 import co.phoenixlab.discord.api.exceptions.ApiException;
@@ -24,13 +24,11 @@ import co.phoenixlab.discord.api.exceptions.InvalidTokenException;
 import co.phoenixlab.discord.api.exceptions.NotReadyException;
 import co.phoenixlab.discord.api.request.EmailPasswordLoginRequest;
 import co.phoenixlab.discord.api.util.WahrDiscordApiUtils;
-import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.StateMachineConfig;
-import com.github.oxo42.stateless4j.triggers.TriggerWithParameters1;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.Subscribe;
@@ -275,6 +273,9 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         if (!isReady()) {
             throw new NotReadyException();
         }
+        if (sessionId == null) {
+            throw new IllegalStateException("SessionId shouldn't be null if the client is ready");
+        }
         return sessionId;
     }
 
@@ -286,6 +287,9 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
     public SelfUser getSelf() throws NotReadyException {
         if (!isReady()) {
             throw new NotReadyException();
+        }
+        if (self == null) {
+            throw new IllegalStateException("Self shouldn't be null if the client is ready");
         }
         return self;
     }
