@@ -36,7 +36,6 @@ import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.gson.Gson;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
 import lombok.Getter;
 import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
@@ -94,8 +93,8 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         this.executorService = Executors.newScheduledThreadPool(2);
         this.stateMachine = buildStateMachine();
         this.eventBus = new AsyncEventBus(executorService, this::handleEventBusException);
+        this.stats = new Stats(metrics, this);
         this.injector = Guice.createInjector(this::configureInjector);
-        this.stats = injector.getInstance(Stats.class);
         this.endpoints = injector.getInstance(EndpointsImpl.class);
         this.eventBus.register(this);
     }
@@ -363,7 +362,6 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         final Meter http5xxErrors;
         final Meter httpOtherResp;
 
-        @Inject
         Stats(MetricRegistry metrics, WahrDiscordApi apiClient) {
             String instanceId = apiClient.getInstanceId();
             eventBusExceptions = metrics.meter(name(WahrDiscordApiImpl.class,
