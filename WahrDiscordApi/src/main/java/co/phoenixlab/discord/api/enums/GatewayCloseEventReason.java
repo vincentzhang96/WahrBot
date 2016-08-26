@@ -12,36 +12,45 @@
 
 package co.phoenixlab.discord.api.enums;
 
-import co.phoenixlab.discord.api.gsonadapters.GatewayOPTypeAdapter;
-import com.google.gson.annotations.JsonAdapter;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
-@JsonAdapter(GatewayOPTypeAdapter.class)
-public enum GatewayOP {
+import java.util.Optional;
 
-    DISPATCH,
-    HEARTBEAT,
-    IDENTIFY,
-    STATUS_UPDATE,
-    VOICE_STATE_UPDATE,
-    VOICE_SERVER_PING,
-    RESUME,
-    RECONNECT,
-    REQUEST_GUILD_MEMBERS,
-    INVALID_SESSION,
-    HELLO,
-    HEARTBEAT_ACK,
-    UNKNOWN;
+public enum GatewayCloseEventReason {
+    UNKNOWN_ERROR(4000),
+    UNKNOWN_OPCODE(4001),
+    DECODE_ERROR(4002),
+    NOT_AUTHENTICATED(4003),
+    AUTHENTICATION_FAILED(4004),
+    ALREADY_AUTHENTICATED(4005),
+    INVALID_SEQUENCE_NUMBER(4007),
+    RATE_LIMITED(4008),
+    SESSION_TIMEOUT(4009),
+    INVALID_SHARD(4010),
+    UNKNOWN_CODE(-1);
 
-    public static GatewayOP fromInt(int i) {
-        GatewayOP[] values = values();
-        if (i >= 0 && i < values.length) {
-            return values[i];
-        }
-        return UNKNOWN;
+    private int code;
+
+    GatewayCloseEventReason(int code) {
+        this.code = code;
     }
 
-    public int toInt() {
-        return ordinal();
+    private static final TIntObjectHashMap<GatewayCloseEventReason> cache;
+
+    static {
+        cache = new TIntObjectHashMap<>();
+        for (GatewayCloseEventReason gatewayCloseEventReason : values()) {
+            cache.put(gatewayCloseEventReason.code, gatewayCloseEventReason);
+        }
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public static GatewayCloseEventReason fromCode(int code) {
+        return Optional.ofNullable(cache.get(code)).
+            orElse(UNKNOWN_CODE);
     }
 
 }

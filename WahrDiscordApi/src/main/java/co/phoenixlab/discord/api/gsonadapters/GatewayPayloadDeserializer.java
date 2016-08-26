@@ -47,25 +47,36 @@ public class GatewayPayloadDeserializer implements JsonDeserializer<GatewayPaylo
             throw new JsonParseException("Object is missing required field \"op\"");
         }
         GatewayOP op = GatewayOP.fromInt(opElement.getAsInt());
-        if (op == GatewayOP.DISPATCH) {
-            JsonElement typeElement = obj.get("t");
-            if (typeElement == null) {
-                throw new JsonParseException("Object is missing required field \"t\"");
-            }
-            String typeStr = typeElement.getAsString();
-            JsonElement seqElement = obj.get("s");
-            if (seqElement == null) {
-                throw new JsonParseException("Object is missing required field \"s\"");
-            }
-            WebSocketMessageType type = WebSocketMessageType.fromString(typeStr);
-            return GatewayPayload.builder().
+        switch (op) {
+            case DISPATCH:
+                JsonElement typeElement = obj.get("t");
+                if (typeElement == null) {
+                    throw new JsonParseException("Object is missing required field \"t\"");
+                }
+                String typeStr = typeElement.getAsString();
+                JsonElement seqElement = obj.get("s");
+                if (seqElement == null) {
+                    throw new JsonParseException("Object is missing required field \"s\"");
+                }
+                WebSocketMessageType type = WebSocketMessageType.fromString(typeStr);
+                return GatewayPayload.builder().
                     opCode(op).
                     sequenceNumber(seqElement.getAsInt()).
                     type(type).
                     data(deserializeBody(obj.get("d").getAsJsonObject(), typeStr, type, context)).
                     build();
-        } else {
-            return GatewayPayload.builder().
+            case HELLO:
+                JsonElement helloElement = obj.get("d");
+                if (helloElement == null) {
+                    throw new JsonParseException("Object is missing required field \"d\"");
+                }
+                GatewayHello hello = context.deserialize(helloElement, GatewayHello.class);
+                return GatewayPayload.builder().
+                    opCode(op)
+                    .data(hello)
+                    .build();
+            default:
+                return GatewayPayload.builder().
                     opCode(op).
                     build();
         }

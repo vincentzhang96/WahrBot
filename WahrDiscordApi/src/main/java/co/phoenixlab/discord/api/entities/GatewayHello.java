@@ -10,38 +10,23 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.enums;
+package co.phoenixlab.discord.api.entities;
 
-import co.phoenixlab.discord.api.gsonadapters.GatewayOPTypeAdapter;
-import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.annotations.SerializedName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@JsonAdapter(GatewayOPTypeAdapter.class)
-public enum GatewayOP {
+@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class GatewayHello {
 
-    DISPATCH,
-    HEARTBEAT,
-    IDENTIFY,
-    STATUS_UPDATE,
-    VOICE_STATE_UPDATE,
-    VOICE_SERVER_PING,
-    RESUME,
-    RECONNECT,
-    REQUEST_GUILD_MEMBERS,
-    INVALID_SESSION,
-    HELLO,
-    HEARTBEAT_ACK,
-    UNKNOWN;
-
-    public static GatewayOP fromInt(int i) {
-        GatewayOP[] values = values();
-        if (i >= 0 && i < values.length) {
-            return values[i];
-        }
-        return UNKNOWN;
-    }
-
-    public int toInt() {
-        return ordinal();
-    }
+    @SerializedName("heartbeat_interval")
+    private long heartbeatIntervalMs;
+    @SerializedName("_trace")
+    private String[] serverTrace;
 
 }

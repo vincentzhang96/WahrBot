@@ -12,8 +12,10 @@
 
 package co.phoenixlab.discord.api.impl;
 
+import co.phoenixlab.discord.api.entities.GatewayHello;
 import co.phoenixlab.discord.api.entities.GatewayPayload;
 import co.phoenixlab.discord.api.entities.ReadyMessage;
+import co.phoenixlab.discord.api.enums.GatewayCloseEventReason;
 import co.phoenixlab.discord.api.enums.GatewayOP;
 import co.phoenixlab.discord.api.enums.WebSocketMessageType;
 import co.phoenixlab.discord.api.exceptions.ApiException;
@@ -69,7 +71,7 @@ class WSClient {
         stats = api.getStats();
         this.api = api;
         gson = WahrDiscordApiUtils.createGson();
-        webSocketProtocolVersion = 4;
+        webSocketProtocolVersion = 5;
         largeThreshold = 250;
         compress = false;
         operatingSystem = System.getProperty("os.name");
@@ -138,26 +140,49 @@ class WSClient {
                 return;
             }
             GatewayOP op = msg.getOpCode();
-            if (op == GatewayOP.DISPATCH) {
-                if (msg.getSequenceNumber() > lastSequenceId) {
-                    lastSequenceId = msg.getSequenceNumber();
-                } else {
-                    WS_LOGGER.warn("Sequence ID went backwards! Had {}, got {}", lastSequenceId, msg.getSequenceNumber());
-                }
-                handleGatewayDispatch(msg);
-            } else if (op == GatewayOP.RECONNECT) {
-                handleGatewayReconnect();
-            } else if (op == GatewayOP.INVALID_SESSION) {
-                handleInvalidSession();
-            } else {
-                throw new ApiException(
+            switch (op) {
+                case DISPATCH:
+                    checkAndUpdateSequenceNumber(msg);
+                    handleGatewayDispatch(msg);
+                    break;
+                case HELLO:
+                    handleHello((GatewayHello) msg.getData());
+                    break;
+                case HEARTBEAT_ACK:
+                    //  Do nothing
+                    break;
+                case RECONNECT:
+                    handleGatewayReconnect();
+                    break;
+                case INVALID_SESSION:
+                    handleInvalidSession();
+                    break;
+                default:
+                    throw new ApiException(
                         String.format("Unsupported received message type \"%s\", server should NOT be sending this!\n" +
                                 "Message body:\n%s",
-                        op.name(), message));
+                            op.name(), message));
             }
         } catch (Exception e) {
             stats.webSocketMessageErrors.mark();
             WS_LOGGER.warn("Exception while parsing message", e);
+        }
+    }
+
+    private void handleHello(GatewayHello hello) {
+        //  Set up heartbeat
+        killHeart();
+        heartbeat = api.getExecutorService().scheduleAtFixedRate(this::heartbeat, 0,
+            hello.getHeartbeatIntervalMs(), TimeUnit.MILLISECONDS);
+        WS_LOGGER.debug("Beating heart every {} ms", hello.getHeartbeatIntervalMs());
+    }
+
+    private void checkAndUpdateSequenceNumber(GatewayPayload msg) {
+        if (msg.getSequenceNumber() > lastSequenceId) {
+            lastSequenceId = msg.getSequenceNumber();
+        } else {
+            WS_LOGGER.warn("Sequence ID went backwards! Had {}, got {}",
+                lastSequenceId, msg.getSequenceNumber());
         }
     }
 
@@ -172,11 +197,6 @@ class WSClient {
     }
 
     private void handleReadyMessage(ReadyMessage readyMessage) {
-        //  Set up heartbeat
-        killHeart();
-        heartbeat = api.getExecutorService().scheduleAtFixedRate(this::heartbeat, 0,
-                readyMessage.getHeartbeatInterval(), TimeUnit.MILLISECONDS);
-        WS_LOGGER.debug("Beating heart every {} ms", readyMessage.getHeartbeatInterval());
 
         //  delegated to api impl
         api.handleReadyMessage(readyMessage);
@@ -214,7 +234,8 @@ class WSClient {
 
     void onClose(int code, String reason, boolean remote) {
         if (remote) {
-            WS_LOGGER.warn("Websocket closed by server. Code {}: \"{}\"", code, reason);
+            GatewayCloseEventReason closeReason = GatewayCloseEventReason.fromCode(code);
+            WS_LOGGER.warn("Websocket closed by server. Code {}: \"{}\"", code, closeReason.name());
         } else {
             WS_LOGGER.info("Websocket closed by client. Code {}: \"{}\"", code, reason);
         }
@@ -225,6 +246,7 @@ class WSClient {
         stats.webSocketErrors.mark();
         WS_LOGGER.warn("Websocket exception", ex);
         killHeart();
+
     }
 
     public void send(WSRequest request) throws NotYetConnectedException, RateLimitExceededException {
