@@ -224,7 +224,10 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
     void handleReadyMessage(ReadyMessage message) {
         sessionId = message.getSessionId();
         API_LOGGER.debug("Using sessionId {}", sessionId);
-        //  TODO rest
+        self = message.getUser();
+        API_LOGGER.info("Connected as \"{}\"#{}:{}",
+            self.getUsername(), self.getDiscriminator(), self.getBase64EncodedId());
+
 
         stateMachine.fire(LOAD_OK);
     }
@@ -241,6 +244,7 @@ public class WahrDiscordApiImpl implements WahrDiscordApi {
         if (!isReady()) {
             throw new NotReadyException();
         }
+        assert endpoints != null;
         return endpoints;
     }
 
