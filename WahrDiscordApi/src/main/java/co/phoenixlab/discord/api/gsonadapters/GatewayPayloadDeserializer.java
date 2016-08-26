@@ -86,6 +86,9 @@ public class GatewayPayloadDeserializer implements JsonDeserializer<GatewayPaylo
                                    WebSocketMessageType type, JsonDeserializationContext ctx) {
         Class<?> clazz;
         switch (type) {
+            case RESUMED:
+                clazz = GatewayResumed.class;
+                break;
             case CHANNEL_CREATE:
             case CHANNEL_DELETE:
             case CHANNEL_UPDATE:
@@ -96,10 +99,11 @@ public class GatewayPayloadDeserializer implements JsonDeserializer<GatewayPaylo
                 clazz = BanMessage.class;
                 break;
             case GUILD_CREATE:
+            case GUILD_UPDATE:
             case GUILD_DELETE:
                 clazz = Guild.class;
                 break;
-            case GUILD_EMOJIS_UPDATE:
+            case GUILD_EMOJI_UPDATE:
                 clazz = GuildEmojisUpdate.class;
                 break;
             case GUILD_INTEGRATIONS_UPDATE:
@@ -143,7 +147,8 @@ public class GatewayPayloadDeserializer implements JsonDeserializer<GatewayPaylo
                 clazz = SelfUser.class;
                 break;
             case VOICE_SERVER_UPDATE:
-
+                clazz = VoiceServerUpdate.class;
+                break;
             case VOICE_STATE_UPDATE:
                 clazz = VoiceState.class;
                 break;
