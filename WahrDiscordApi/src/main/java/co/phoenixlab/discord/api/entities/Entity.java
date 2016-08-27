@@ -13,9 +13,8 @@
 package co.phoenixlab.discord.api.entities;
 
 
-import com.google.common.primitives.Longs;
+import co.phoenixlab.discord.api.util.SnowflakeUtils;
 
-import java.util.Base64;
 import java.util.Objects;
 
 /**
@@ -30,15 +29,11 @@ public interface Entity {
     }
 
     static String encodeId(long l) {
-        return "$" + Base64.getUrlEncoder().encodeToString(Longs.toByteArray(l));
+        return SnowflakeUtils.encodeSnowflake(l);
     }
 
     static long decodeId(String id) throws IllegalArgumentException {
-        if (!id.startsWith("$")) {
-            throw new IllegalArgumentException("Not a valid encoded ID token: " + id);
-        }
-        id = id.substring(1);
-        return Longs.fromByteArray(Base64.getUrlDecoder().decode(id));
+        return SnowflakeUtils.decodeSnowflake(id);
     }
 
     /**
