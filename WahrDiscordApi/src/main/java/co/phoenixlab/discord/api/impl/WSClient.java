@@ -170,11 +170,15 @@ class WSClient {
     }
 
     private void handleHello(GatewayHello hello) {
+        startHeartbeat(hello.getHeartbeatIntervalMs());
+    }
+
+    private void startHeartbeat(long interval) {
         //  Set up heartbeat
         killHeart();
         heartbeat = api.getExecutorService().scheduleAtFixedRate(this::heartbeat, 0,
-            hello.getHeartbeatIntervalMs(), TimeUnit.MILLISECONDS);
-        WS_LOGGER.debug("Beating heart every {} ms", hello.getHeartbeatIntervalMs());
+            interval, TimeUnit.MILLISECONDS);
+        WS_LOGGER.info("Beating heart every {} ms", interval);
     }
 
     private void checkAndUpdateSequenceNumber(GatewayPayload msg) {
@@ -197,7 +201,10 @@ class WSClient {
     }
 
     private void handleReadyMessage(ReadyMessage readyMessage) {
-
+        int heartbeatInterval = readyMessage.getHeartbeatInterval();
+        if (heartbeatInterval > 0) {
+            startHeartbeat(heartbeatInterval);
+        }
         //  delegated to api impl
         api.handleReadyMessage(readyMessage);
     }
