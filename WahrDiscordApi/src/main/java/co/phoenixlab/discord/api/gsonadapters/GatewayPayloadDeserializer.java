@@ -36,19 +36,23 @@ public class GatewayPayloadDeserializer implements JsonDeserializer<GatewayPaylo
     public GatewayPayload deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
         JsonObject obj = json.getAsJsonObject();
+        //  Check for error
         JsonElement errorElement = obj.get("message");
         if (errorElement != null) {
             return GatewayPayload.builder().
                     errorMessage(errorElement.getAsString()).
                     build();
         }
+        //  Grab the opcode so we know what to do
         JsonElement opElement = obj.get("op");
         if (opElement == null) {
             throw new JsonParseException("Object is missing required field \"op\"");
         }
         GatewayOP op = GatewayOP.fromInt(opElement.getAsInt());
+        //  Decode based on opcode
         switch (op) {
             case DISPATCH:
+                //  Event dispatch, decode the type and sequence so we can decode
                 JsonElement typeElement = obj.get("t");
                 if (typeElement == null) {
                     throw new JsonParseException("Object is missing required field \"t\"");
@@ -58,24 +62,30 @@ public class GatewayPayloadDeserializer implements JsonDeserializer<GatewayPaylo
                 if (seqElement == null) {
                     throw new JsonParseException("Object is missing required field \"s\"");
                 }
+                //  Figure out the type
                 WebSocketMessageType type = WebSocketMessageType.fromString(typeStr);
+                //  Decode the body based on the type
+                Object body = deserializeBody(obj.get("d").getAsJsonObject(), typeStr, type, context);
                 return GatewayPayload.builder().
                     opCode(op).
                     sequenceNumber(seqElement.getAsInt()).
                     type(type).
-                    data(deserializeBody(obj.get("d").getAsJsonObject(), typeStr, type, context)).
+                    data(body).
                     build();
             case HELLO:
+                //  Websocket HELLO
                 JsonElement helloElement = obj.get("d");
                 if (helloElement == null) {
                     throw new JsonParseException("Object is missing required field \"d\"");
                 }
+                //  Decode
                 GatewayHello hello = context.deserialize(helloElement, GatewayHello.class);
                 return GatewayPayload.builder().
-                    opCode(op)
-                    .data(hello)
-                    .build();
+                    opCode(op).
+                    data(hello).
+                    build();
             default:
+                //  Other opcodes don't have data associated with them
                 return GatewayPayload.builder().
                     opCode(op).
                     build();
