@@ -10,7 +10,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.entities.channel.message;
+package co.phoenixlab.discord.api.entities.channel.message.embed;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,31 +19,23 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Embed {
+public class EmbedThumbnail {
 
     /**
-     * Title of embed.
-     */
-    private String title;
-    /**
-     * Type of embed.
-     */
-    private String type;
-    /**
-     * Description of embed.
-     */
-    private String description;
-    /**
-     * URL of embed.
+     * Source URL of thumbnail.
      */
     private String url;
     /**
-     * Thumbnail information.
+     * A proxied URL of the thumbnail.
      */
-    private EmbedThumbnail thumbnail;
+    private String proxyUrl;
     /**
-     * Provider information.
+     * Height of thumbnail.
      */
-    private EmbedProvider provider;
+    private int height;
+    /**
+     * Width of thumbnail.
+     */
+    private int width;
 
 }

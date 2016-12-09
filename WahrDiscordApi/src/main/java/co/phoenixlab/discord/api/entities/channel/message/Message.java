@@ -13,6 +13,7 @@
 package co.phoenixlab.discord.api.entities.channel.message;
 
 import co.phoenixlab.discord.api.entities.Entity;
+import co.phoenixlab.discord.api.entities.channel.message.embed.Embed;
 import co.phoenixlab.discord.api.entities.user.BasicUser;
 import co.phoenixlab.discord.api.entities.user.HumanUser;
 import lombok.AllArgsConstructor;
