@@ -37,6 +37,9 @@ import javax.validation.ValidatorFactory;
 import java.util.Set;
 import java.util.StringJoiner;
 
+import static com.mashape.unirest.http.HttpMethod.GET;
+import static com.mashape.unirest.http.HttpMethod.POST;
+
 public class EndpointsImpl implements Endpoints {
 
     /**
@@ -710,5 +713,53 @@ public class EndpointsImpl implements Endpoints {
      */
     String snowflakeToString(long snowflake) {
         return Long.toUnsignedString(snowflake);
+    }
+
+    <T> T performPost(String path, Object body, Class<T> clazz, String endpoint)
+        throws ApiException {
+        try {
+            return defaultPost(path, body, clazz);
+        } catch (ApiException apie) {
+            //  rethrow
+            throw apie;
+        } catch (Exception e) {
+            throw new ApiException(POST, endpoint, e);
+        }
+    }
+
+    <T> T performGet(String path, Class<T> clazz, String endpoint)
+        throws ApiException {
+        try {
+            return defaultGet(path, clazz);
+        } catch (ApiException apie) {
+            //  rethrow
+            throw apie;
+        } catch (Exception e) {
+            throw new ApiException(GET, endpoint, e);
+        }
+    }
+
+    <T> T performPatch(String path, Object body, Class<T> clazz, String endpoint)
+        throws ApiException {
+        try {
+            return defaultPatch(path, body, clazz);
+        } catch (ApiException apie) {
+            //  rethrow
+            throw apie;
+        } catch (Exception e) {
+            throw new ApiException(POST, endpoint, e);
+        }
+    }
+
+    <T> T performDelete(String path, Class<T> clazz, String endpoint)
+        throws ApiException {
+        try {
+            return defaultDelete(path, clazz);
+        } catch (ApiException apie) {
+            //  rethrow
+            throw apie;
+        } catch (Exception e) {
+            throw new ApiException(POST, endpoint, e);
+        }
     }
 }

@@ -74,6 +74,9 @@ public interface MessagesEndpoint {
         return getMessagesAround(channelId, aroundMessageId, LIMIT_DEFAULT);
     }
 
+    Message getMessage(long channelId, long messageId)
+            throws ApiException;
+
     Message sendMessage(long channelId, CreateMessageRequest request)
             throws ApiException;
 

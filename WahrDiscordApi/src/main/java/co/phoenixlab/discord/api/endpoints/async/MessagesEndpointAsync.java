@@ -74,6 +74,9 @@ public interface MessagesEndpointAsync {
         return getMessagesAroundAsync(channelId, aroundMessageId, LIMIT_DEFAULT);
     }
 
+    Future<Message> getMessageAsync(long channelId, long messageId)
+            throws ApiException;
+
     Future<Message> sendMessageAsync(long channelId, CreateMessageRequest request)
             throws ApiException;
 

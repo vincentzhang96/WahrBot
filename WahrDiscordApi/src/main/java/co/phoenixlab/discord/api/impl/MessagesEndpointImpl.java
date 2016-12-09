@@ -5,6 +5,7 @@ import co.phoenixlab.discord.api.endpoints.async.MessagesEndpointAsync;
 import co.phoenixlab.discord.api.entities.channel.message.Message;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.exceptions.InvalidApiRequestException;
+import co.phoenixlab.discord.api.exceptions.RequestRequiresBotStatusException;
 import co.phoenixlab.discord.api.request.channel.message.BulkMessageDeleteRequest;
 import co.phoenixlab.discord.api.request.channel.message.CreateMessageRequest;
 import co.phoenixlab.discord.api.request.channel.message.EditMessageRequest;
@@ -73,9 +74,20 @@ public class MessagesEndpointImpl implements MessagesEndpoint, MessagesEndpointA
         if (limit != LIMIT_DEFAULT) {
             joiner.add(String.format("limit=%d", limit));
         }
-        return performGet(messageFormatPath(channelId, MESSAGES_ENDPOINT_FMT) + joiner.toString(),
+        return endpoints.performGet(messageFormatPath(channelId, MESSAGES_ENDPOINT_FMT) + joiner.toString(),
                 Message[].class,
                 MESSAGES_ENDPOINT);
+    }
+
+    @Override
+    public Message getMessage(long channelId, long messageId)
+            throws ApiException {
+        if (!api.getSelf().isBot()) {
+            throw new RequestRequiresBotStatusException(GET, SPECIFIC_MESSAGE_ENDPOINT);
+        }
+        return endpoints.performGet(messageFormatPath(channelId, messageId, SPECIFIC_MESSAGE_ENDPOINT_FMT),
+            Message.class,
+            SPECIFIC_MESSAGE_ENDPOINT);
     }
 
     @Override
@@ -85,7 +97,7 @@ public class MessagesEndpointImpl implements MessagesEndpoint, MessagesEndpointA
             throw new InvalidApiRequestException(POST, MESSAGES_ENDPOINT,
                 String.format("Embed must have type set to \"rich\", is set to \"%s\".", request.getEmbed().getType()));
         }
-        return performPost(messageFormatPath(channelId, MESSAGES_ENDPOINT_FMT),
+        return endpoints.performPost(messageFormatPath(channelId, MESSAGES_ENDPOINT_FMT),
                 request,
                 Message.class,
                 MESSAGES_ENDPOINT);
@@ -94,7 +106,7 @@ public class MessagesEndpointImpl implements MessagesEndpoint, MessagesEndpointA
     @Override
     public Message editMessage(long channelId, long messageId, EditMessageRequest request)
             throws ApiException {
-        return performPatch(messageFormatPath(channelId, messageId, SPECIFIC_MESSAGE_ENDPOINT_FMT),
+        return endpoints.performPatch(messageFormatPath(channelId, messageId, SPECIFIC_MESSAGE_ENDPOINT_FMT),
                 request,
                 Message.class,
                 SPECIFIC_MESSAGE_ENDPOINT);
@@ -103,7 +115,7 @@ public class MessagesEndpointImpl implements MessagesEndpoint, MessagesEndpointA
     @Override
     public void deleteMessage(long channelId, long messageId)
             throws ApiException {
-        performDelete(messageFormatPath(channelId, messageId, SPECIFIC_MESSAGE_ENDPOINT_FMT),
+        endpoints.performDelete(messageFormatPath(channelId, messageId, SPECIFIC_MESSAGE_ENDPOINT_FMT),
                 Void.class,
                 SPECIFIC_MESSAGE_ENDPOINT);
     }
@@ -120,58 +132,10 @@ public class MessagesEndpointImpl implements MessagesEndpoint, MessagesEndpointA
         if (api.getSelf().isBot()) {
             throw new InvalidApiRequestException(POST, MESSAGE_ACK_ENDPOINT, "Cannot ack as a bot");
         }
-        performPost(messageFormatPath(channelId, messageId, MESSAGE_ACK_ENDPOINT_FMT),
+        endpoints.performPost(messageFormatPath(channelId, messageId, MESSAGE_ACK_ENDPOINT_FMT),
                 null,
                 Void.class,
                 MESSAGE_ACK_ENDPOINT);
-    }
-
-    private <T> T performPost(String path, Object body, Class<T> clazz, String endpoint)
-            throws ApiException {
-        try {
-            return endpoints.defaultPost(path, body, clazz);
-        } catch (ApiException apie) {
-            //  rethrow
-            throw apie;
-        } catch (Exception e) {
-            throw new ApiException(POST, endpoint, e);
-        }
-    }
-
-    private <T> T performGet(String path, Class<T> clazz, String endpoint)
-            throws ApiException {
-        try {
-            return endpoints.defaultGet(path, clazz);
-        } catch (ApiException apie) {
-            //  rethrow
-            throw apie;
-        } catch (Exception e) {
-            throw new ApiException(GET, endpoint, e);
-        }
-    }
-
-    private <T> T performPatch(String path, Object body, Class<T> clazz, String endpoint)
-            throws ApiException {
-        try {
-            return endpoints.defaultPatch(path, body, clazz);
-        } catch (ApiException apie) {
-            //  rethrow
-            throw apie;
-        } catch (Exception e) {
-            throw new ApiException(POST, endpoint, e);
-        }
-    }
-
-    private <T> T performDelete(String path, Class<T> clazz, String endpoint)
-            throws ApiException {
-        try {
-            return endpoints.defaultDelete(path, clazz);
-        } catch (ApiException apie) {
-            //  rethrow
-            throw apie;
-        } catch (Exception e) {
-            throw new ApiException(POST, endpoint, e);
-        }
     }
 
     private String messageFormatPath(long channelId, long messageId, String format) {
@@ -218,5 +182,11 @@ public class MessagesEndpointImpl implements MessagesEndpoint, MessagesEndpointA
     public Future<Void> ackMessageAsync(long channelId, long messageId)
             throws ApiException {
         return executorService.submit(() -> ackMessage(channelId, messageId), null);
+    }
+
+    @Override
+    public Future<Message> getMessageAsync(long channelId, long messageId)
+            throws ApiException {
+        return executorService.submit(() -> getMessage(channelId, messageId));
     }
 }
