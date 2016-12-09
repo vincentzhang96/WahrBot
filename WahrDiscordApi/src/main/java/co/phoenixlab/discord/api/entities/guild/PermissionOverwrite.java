@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Permission {
+public class PermissionOverwrite {
 
     private DiscordPermissionSet allow;
     private DiscordPermissionSet deny;
