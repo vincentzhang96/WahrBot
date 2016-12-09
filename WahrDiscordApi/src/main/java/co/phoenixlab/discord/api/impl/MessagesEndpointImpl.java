@@ -81,6 +81,10 @@ public class MessagesEndpointImpl implements MessagesEndpoint, MessagesEndpointA
     @Override
     public Message sendMessage(long channelId, CreateMessageRequest request)
             throws ApiException {
+        if (request.getEmbed() != null && !"rich".equalsIgnoreCase(request.getEmbed().getType())) {
+            throw new InvalidApiRequestException(POST, MESSAGES_ENDPOINT,
+                String.format("Embed must have type set to \"rich\", is set to \"%s\".", request.getEmbed().getType()));
+        }
         return performPost(messageFormatPath(channelId, MESSAGES_ENDPOINT_FMT),
                 request,
                 Message.class,
