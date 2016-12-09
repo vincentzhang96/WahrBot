@@ -12,6 +12,7 @@
 
 package co.phoenixlab.discord.api.request.channel.message;
 
+import co.phoenixlab.discord.api.entities.channel.message.embed.Embed;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,5 +39,9 @@ public class CreateMessageRequest {
      * If this is a TTS message.
      */
     private boolean tts;
+    /**
+     * Embed data. Embed type must be "rich".
+     */
+    private Embed embed;
 
 }
