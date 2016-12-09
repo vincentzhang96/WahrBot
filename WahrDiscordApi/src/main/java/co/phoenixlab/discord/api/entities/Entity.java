@@ -24,6 +24,10 @@ public interface Entity {
 
     long getId();
 
+    default String getIdAsString() {
+        return Long.toUnsignedString(getId());
+    }
+
     default String getBase64EncodedId() {
         return encodeId(getId());
     }
