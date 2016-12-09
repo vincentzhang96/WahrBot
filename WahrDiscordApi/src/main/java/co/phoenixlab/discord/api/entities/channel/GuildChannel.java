@@ -12,7 +12,7 @@
 
 package co.phoenixlab.discord.api.entities.channel;
 
-import co.phoenixlab.discord.api.entities.guild.Permission;
+import co.phoenixlab.discord.api.entities.guild.PermissionOverwrite;
 import co.phoenixlab.discord.api.entities.guild.Guild;
 import co.phoenixlab.discord.api.enums.ChannelType;
 import lombok.AllArgsConstructor;
@@ -29,9 +29,9 @@ public abstract class GuildChannel extends Channel {
      */
     private long guildId;
     /**
-     * An array of {@link Permission} overwrites.
+     * An array of {@link PermissionOverwrite} overwrites.
      */
-    private Permission[] permissionOverwrites;
+    private PermissionOverwrite[] permissionOverwrites;
     /**
      * The ordering position of the channel.
      */
