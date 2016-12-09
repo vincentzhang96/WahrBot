@@ -15,10 +15,8 @@ package co.phoenixlab.discord.api.util;
 import co.phoenixlab.discord.api.entities.channel.Channel;
 import co.phoenixlab.discord.api.entities.GatewayPayload;
 import co.phoenixlab.discord.api.entities.channel.GuildChannel;
-import co.phoenixlab.discord.api.gsonadapters.ChannelDeserializer;
-import co.phoenixlab.discord.api.gsonadapters.GuildChannelDeserializer;
-import co.phoenixlab.discord.api.gsonadapters.InstantTypeAdapter;
-import co.phoenixlab.discord.api.gsonadapters.GatewayPayloadDeserializer;
+import co.phoenixlab.discord.api.entities.user.BasicUser;
+import co.phoenixlab.discord.api.gsonadapters.*;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -40,6 +38,7 @@ public class WahrDiscordApiUtils {
                 registerTypeAdapter(Instant.class, new InstantTypeAdapter()).
                 registerTypeAdapter(Channel.class, new ChannelDeserializer()).
                 registerTypeAdapter(GuildChannel.class, new GuildChannelDeserializer()).
+                registerTypeAdapter(BasicUser.class, new BasicUserDeserializer()).
                 create();
     }
 

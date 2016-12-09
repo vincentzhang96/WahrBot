@@ -12,7 +12,7 @@
 
 package co.phoenixlab.discord.api.entities.guild;
 
-import co.phoenixlab.discord.api.entities.user.User;
+import co.phoenixlab.discord.api.entities.user.HumanUser;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BanMessage {
 
-    private User user;
+    private HumanUser user;
     private long guildId;
 
 }

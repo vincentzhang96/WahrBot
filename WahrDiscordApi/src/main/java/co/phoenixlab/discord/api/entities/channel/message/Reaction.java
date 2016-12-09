@@ -10,10 +10,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.entities.channel;
+package co.phoenixlab.discord.api.entities.channel.message;
 
-import co.phoenixlab.discord.api.entities.Entity;
-import co.phoenixlab.discord.api.entities.user.HumanUser;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,25 +19,36 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DmChannel extends Channel {
+public class Reaction {
 
     /**
-     * The {@link HumanUser} of the DM recipient.
+     * Times the emoji has been used to react.
      */
-    private HumanUser recipient;
+    private int count;
+
     /**
-     * The ID of the last message sent in this DM.
+     * Whether the current user reacted with this emoji.
      */
-    private long lastMessageId;
+    private boolean me;
+
+    /**
+     * The emoji.
+     */
+    private ReactionEmoji emoji;
+
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(Object o) {
-        return Entity.areEqual(this, o);
+        if (o instanceof Reaction) {
+            return ((Reaction) o).getEmoji().equals(emoji);
+        }
+        return false;
     }
 
     @Override
     public int hashCode() {
-        return Entity.hash(this);
+        return emoji.hashCode();
     }
+
 }

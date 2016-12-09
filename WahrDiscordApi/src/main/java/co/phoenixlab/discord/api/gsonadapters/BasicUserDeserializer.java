@@ -10,36 +10,26 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.entities.channel;
+package co.phoenixlab.discord.api.gsonadapters;
 
-import co.phoenixlab.discord.api.entities.Entity;
+import co.phoenixlab.discord.api.entities.user.BasicUser;
 import co.phoenixlab.discord.api.entities.user.HumanUser;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import co.phoenixlab.discord.api.entities.user.WebhookUser;
+import com.google.gson.*;
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-public class DmChannel extends Channel {
+import java.lang.reflect.Type;
 
-    /**
-     * The {@link HumanUser} of the DM recipient.
-     */
-    private HumanUser recipient;
-    /**
-     * The ID of the last message sent in this DM.
-     */
-    private long lastMessageId;
-
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    @Override
-    public boolean equals(Object o) {
-        return Entity.areEqual(this, o);
-    }
+public class BasicUserDeserializer implements JsonDeserializer<BasicUser> {
 
     @Override
-    public int hashCode() {
-        return Entity.hash(this);
+    public BasicUser deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+        throws JsonParseException {
+        JsonObject obj = json.getAsJsonObject();
+        JsonElement typeElement = obj.get("discriminator");
+        if (typeElement == null) {
+            return context.deserialize(obj, WebhookUser.class);
+        } else {
+            return context.deserialize(obj, HumanUser.class);
+        }
     }
 }

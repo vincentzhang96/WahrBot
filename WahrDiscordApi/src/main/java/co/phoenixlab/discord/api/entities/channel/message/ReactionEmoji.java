@@ -10,25 +10,28 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.entities.user;
+package co.phoenixlab.discord.api.entities.channel.message;
 
 import co.phoenixlab.discord.api.entities.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Builder;
 
-@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements Entity {
+public class ReactionEmoji implements Entity {
 
+    /**
+     * ID of emoji, if custom; zero otherwise.
+     */
     private long id;
-    private String username;
-    private short discriminator;
-    private String avatar;
-    private boolean bot;
+
+    /**
+     * Name of emoji
+     */
+    private String name;
+
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
@@ -40,4 +43,5 @@ public class User implements Entity {
     public int hashCode() {
         return Entity.hash(this);
     }
+
 }

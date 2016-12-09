@@ -10,10 +10,9 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.entities.channel;
+package co.phoenixlab.discord.api.entities.user;
 
 import co.phoenixlab.discord.api.entities.Entity;
-import co.phoenixlab.discord.api.entities.user.HumanUser;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,16 +20,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DmChannel extends Channel {
+public abstract class BasicUser implements Entity {
 
-    /**
-     * The {@link HumanUser} of the DM recipient.
-     */
-    private HumanUser recipient;
-    /**
-     * The ID of the last message sent in this DM.
-     */
-    private long lastMessageId;
+    protected long id;
+    protected String username;
+    protected String avatar;
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
