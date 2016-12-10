@@ -24,7 +24,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EditChannelPermissionsRequest {
 
+    public enum Type {
+        MEMBER,
+        ROLE
+    }
+
     private DiscordPermissionSet allow;
     private DiscordPermissionSet deny;
+    private Type type;
 
 }
