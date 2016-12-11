@@ -1,7 +1,7 @@
 package co.phoenixlab.discord.api.request.channel.message;
 
+import co.phoenixlab.discord.api.util.SnowflakeUtils;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -38,13 +38,13 @@ public class BulkMessageDeleteRequest {
 
         public Builder messages(long[] msgIds) {
             pending.addAll(Arrays.stream(msgIds).
-                mapToObj(Long::toUnsignedString).
+                mapToObj(SnowflakeUtils::snowflakeToString).
                 collect(Collectors.toList()));
             return this;
         }
 
         public Builder addMessage(long msgId) {
-            pending.add(Long.toUnsignedString(msgId));
+            pending.add(SnowflakeUtils.snowflakeToString(msgId));
             return this;
         }
 
