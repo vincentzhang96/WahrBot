@@ -9,12 +9,14 @@ import co.phoenixlab.discord.api.exceptions.RequestRequiresBotStatusException;
 import co.phoenixlab.discord.api.request.channel.message.BulkMessageDeleteRequest;
 import co.phoenixlab.discord.api.request.channel.message.CreateMessageRequest;
 import co.phoenixlab.discord.api.request.channel.message.EditMessageRequest;
+import co.phoenixlab.discord.api.util.SnowflakeUtils;
 import com.google.inject.Inject;
 
 import java.util.StringJoiner;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
+import static co.phoenixlab.discord.api.util.SnowflakeUtils.*;
 import static com.mashape.unirest.http.HttpMethod.GET;
 import static com.mashape.unirest.http.HttpMethod.POST;
 
@@ -67,11 +69,11 @@ public class MessagesEndpointImpl implements MessagesEndpoint, MessagesEndpointA
         StringJoiner joiner = new StringJoiner("&", "?", "");
         joiner.setEmptyValue("");   //  Don't send prefix/suffix if we don't have any args
         if (beforeMessageId != MESSAGE_ID_IGNORE_PARAM) {
-            joiner.add(String.format("before=%s", endpoints.snowflakeToString(beforeMessageId)));
+            joiner.add(String.format("before=%s", snowflakeToString(beforeMessageId)));
         } else if (afterMessageId != MESSAGE_ID_IGNORE_PARAM) {
-            joiner.add(String.format("after=%s", endpoints.snowflakeToString(afterMessageId)));
+            joiner.add(String.format("after=%s", snowflakeToString(afterMessageId)));
         } else if (aroundMessageId != MESSAGE_ID_IGNORE_PARAM) {
-            joiner.add(String.format("around=%s", endpoints.snowflakeToString(aroundMessageId)));
+            joiner.add(String.format("around=%s", snowflakeToString(aroundMessageId)));
         }
         if (limit != LIMIT_DEFAULT) {
             joiner.add(String.format("limit=%d", limit));
@@ -148,15 +150,15 @@ public class MessagesEndpointImpl implements MessagesEndpoint, MessagesEndpointA
     }
 
     private String messageFormatPath(long channelId, long messageId, String format) {
-        return String.format(format, endpoints.snowflakeToString(channelId), endpoints.snowflakeToString(messageId));
+        return String.format(format, snowflakeToString(channelId), snowflakeToString(messageId));
     }
 
     private String messageFormatPath(long messageId, String format) {
-        return String.format(format, endpoints.snowflakeToString(messageId));
+        return String.format(format, snowflakeToString(messageId));
     }
 
     private String channelFormatPath(long channelId, String format) {
-        return String.format(format, endpoints.snowflakeToString(channelId));
+        return String.format(format, snowflakeToString(channelId));
     }
 
     @Override

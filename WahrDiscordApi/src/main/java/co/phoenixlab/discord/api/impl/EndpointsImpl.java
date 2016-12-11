@@ -706,15 +706,6 @@ public class EndpointsImpl implements Endpoints {
         return joiner.toString();
     }
 
-    /**
-     * Converts a snowflake int64 into the proper string representation for Discord (unsigned decimal)
-     * @param snowflake The snowflake ID to convert
-     * @return The snowflake in string format
-     */
-    String snowflakeToString(long snowflake) {
-        return Long.toUnsignedString(snowflake);
-    }
-
     <T> T performPost(String path, Object body, Class<T> clazz, String endpoint)
         throws ApiException {
         try {

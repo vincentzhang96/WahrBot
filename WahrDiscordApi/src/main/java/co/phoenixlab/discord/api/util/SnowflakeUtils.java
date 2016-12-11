@@ -76,4 +76,13 @@ public class SnowflakeUtils {
         return CODEX.indexOf(c);
     }
 
+    /**
+     * Converts a snowflake int64 into the proper string representation for Discord (unsigned decimal)
+     * @param snowflake The snowflake ID to convert
+     * @return The snowflake in string format
+     */
+    public static String snowflakeToString(long snowflake) {
+        return Long.toUnsignedString(snowflake);
+    }
+
 }

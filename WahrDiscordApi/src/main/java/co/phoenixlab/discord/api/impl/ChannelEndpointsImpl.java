@@ -23,6 +23,7 @@ import co.phoenixlab.discord.api.request.channel.CreateChannelRequest;
 import co.phoenixlab.discord.api.request.channel.CreatePrivateChannelRequest;
 import co.phoenixlab.discord.api.request.channel.ModifyChannelRequest;
 import co.phoenixlab.discord.api.util.OkFailMeter;
+import co.phoenixlab.discord.api.util.SnowflakeUtils;
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.Inject;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -31,6 +32,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.UnaryOperator;
 
+import static co.phoenixlab.discord.api.util.SnowflakeUtils.*;
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.mashape.unirest.http.HttpMethod.*;
 
@@ -203,11 +205,11 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
     }
 
     private String channelPath(long id) {
-        return CHANNEL_ENDPOINT_BASE + endpoints.snowflakeToString(id);
+        return CHANNEL_ENDPOINT_BASE + snowflakeToString(id);
     }
 
     private String channelFormatPath(long id, String format) {
-        return String.format(format, endpoints.snowflakeToString(id));
+        return String.format(format, snowflakeToString(id));
     }
 
     static class Stats {
