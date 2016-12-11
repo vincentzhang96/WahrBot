@@ -13,6 +13,7 @@
 package co.phoenixlab.discord.api.request.channel;
 
 import co.phoenixlab.discord.api.entities.guild.DiscordPermissionSet;
+import co.phoenixlab.discord.api.enums.PermissionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,13 +25,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EditChannelPermissionsRequest {
 
-    public enum Type {
-        MEMBER,
-        ROLE
-    }
-
     private DiscordPermissionSet allow;
     private DiscordPermissionSet deny;
-    private Type type;
+    private PermissionType type;
 
 }
