@@ -26,6 +26,8 @@ public class MessagesEndpointImpl implements MessagesEndpoint, MessagesEndpointA
     private static final String SPECIFIC_MESSAGE_ENDPOINT_FMT = "/channels/%1$s/%2$s";
     private static final String MESSAGE_ACK_ENDPOINT = "/channels/{channel.id}/{message.id}/ack";
     private static final String MESSAGE_ACK_ENDPOINT_FMT = "/channels/%1$s/%2$s/ack";
+    private static final String MESSAGE_BULK_DELETE_ENDPOINT = "/channels/{channel.id}/messages/bulk-delete";
+    private static final String MESSAGE_BULK_DELETE_ENDPOINT_FMT = "/channels/%1$s/messages/bulk-delete";
 
     @Inject
     private ScheduledExecutorService executorService;
@@ -124,7 +126,13 @@ public class MessagesEndpointImpl implements MessagesEndpoint, MessagesEndpointA
     @Override
     public void bulkDeleteMessages(long channelId, BulkMessageDeleteRequest request)
             throws ApiException {
-
+        if (!api.getSelf().isBot()) {
+            throw new RequestRequiresBotStatusException(POST, MESSAGE_BULK_DELETE_ENDPOINT);
+        }
+        endpoints.performPost(channelFormatPath(channelId, MESSAGE_BULK_DELETE_ENDPOINT_FMT),
+                request,
+                Void.class,
+                MESSAGE_BULK_DELETE_ENDPOINT);
     }
 
     @Override
@@ -145,6 +153,10 @@ public class MessagesEndpointImpl implements MessagesEndpoint, MessagesEndpointA
 
     private String messageFormatPath(long messageId, String format) {
         return String.format(format, endpoints.snowflakeToString(messageId));
+    }
+
+    private String channelFormatPath(long channelId, String format) {
+        return String.format(format, endpoints.snowflakeToString(channelId));
     }
 
     @Override
