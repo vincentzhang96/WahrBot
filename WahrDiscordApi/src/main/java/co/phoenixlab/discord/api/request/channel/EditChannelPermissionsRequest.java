@@ -27,6 +27,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class EditChannelPermissionsRequest {
 
+    private long id;
     @NotNull
     private DiscordPermissionSet allow;
     @NotNull

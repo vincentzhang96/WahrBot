@@ -17,10 +17,10 @@ import co.phoenixlab.discord.api.request.channel.EditChannelPermissionsRequest;
 
 public interface PermissionsEndpoint {
 
-    void editChannelPermissions(long channelId, long overwriteId, EditChannelPermissionsRequest request)
+    void editChannelPermission(long channelId, EditChannelPermissionsRequest request)
             throws ApiException;
 
-    void deletePermission(long channelId, long overwriteId)
+    void deleteChannelPermission(long channelId, long overwriteId)
             throws ApiException;
 
 }

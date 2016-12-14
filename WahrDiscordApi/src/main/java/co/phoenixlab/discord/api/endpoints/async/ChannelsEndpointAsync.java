@@ -13,13 +13,12 @@
 package co.phoenixlab.discord.api.endpoints.async;
 
 import co.phoenixlab.discord.api.entities.channel.Channel;
-import co.phoenixlab.discord.api.entities.channel.message.Message;
-import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.entities.channel.DmChannel;
 import co.phoenixlab.discord.api.entities.channel.GuildChannel;
+import co.phoenixlab.discord.api.entities.channel.message.Message;
+import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.channel.CreateChannelRequest;
 import co.phoenixlab.discord.api.request.channel.CreatePrivateChannelRequest;
-import co.phoenixlab.discord.api.request.channel.EditChannelPermissionsRequest;
 import co.phoenixlab.discord.api.request.channel.ModifyChannelRequest;
 
 import java.util.concurrent.Future;
@@ -46,12 +45,6 @@ public interface ChannelsEndpointAsync {
 
     Future<Channel> getChannelAsync(long channelId)
             throws ApiException;
-
-    Future<Void> editChannelPermissionAsync(long channelId, long overwriteId, EditChannelPermissionsRequest request)
-        throws ApiException;
-
-    Future<Void> deleteChannelPermissionAsync(long channelId, long overwriteId)
-        throws ApiException;
 
     Future<Message[]> getPinnedMessagesAsync(long channelId)
             throws ApiException;

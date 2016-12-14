@@ -97,6 +97,12 @@ public class EndpointsImpl implements Endpoints {
     private MessagesEndpointImpl message;
 
     /**
+     * Permissions endpoint implementation
+     */
+    @Inject
+    private PermissionsEndpointImpl permissions;
+
+    /**
      * GSON instance to use by endpoint implementations
      */
     @Inject
@@ -194,12 +200,12 @@ public class EndpointsImpl implements Endpoints {
 
     @Override
     public PermissionsEndpoint permissions() {
-        return null;
+        return permissions;
     }
 
     @Override
     public PermissionsEndpointAsync permissionsAsync() {
-        return null;
+        return permissions;
     }
 
     @Override

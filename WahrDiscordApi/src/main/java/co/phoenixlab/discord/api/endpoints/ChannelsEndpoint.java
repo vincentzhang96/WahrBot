@@ -19,7 +19,6 @@ import co.phoenixlab.discord.api.entities.channel.message.Message;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.channel.CreateChannelRequest;
 import co.phoenixlab.discord.api.request.channel.CreatePrivateChannelRequest;
-import co.phoenixlab.discord.api.request.channel.EditChannelPermissionsRequest;
 import co.phoenixlab.discord.api.request.channel.ModifyChannelRequest;
 
 public interface ChannelsEndpoint {
@@ -43,12 +42,6 @@ public interface ChannelsEndpoint {
             throws ApiException;
 
     Channel getChannel(long channelId)
-            throws ApiException;
-
-    void editChannelPermission(long channelId, long overwriteId, EditChannelPermissionsRequest request)
-            throws ApiException;
-
-    void deleteChannelPermission(long channelId, long overwriteId)
             throws ApiException;
 
     Message[] getPinnedMessages(long channelId)

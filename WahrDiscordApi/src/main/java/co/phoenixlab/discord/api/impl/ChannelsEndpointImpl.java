@@ -21,7 +21,6 @@ import co.phoenixlab.discord.api.entities.channel.message.Message;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.channel.CreateChannelRequest;
 import co.phoenixlab.discord.api.request.channel.CreatePrivateChannelRequest;
-import co.phoenixlab.discord.api.request.channel.EditChannelPermissionsRequest;
 import co.phoenixlab.discord.api.request.channel.ModifyChannelRequest;
 import com.google.inject.Inject;
 
@@ -40,8 +39,6 @@ public class ChannelsEndpointImpl implements ChannelsEndpoint, ChannelsEndpointA
     private static final String PRIVATE_CHANNEL_ENDPOINT = "/users/@me/channels";
     private static final String TYPING_ENDPOINT = "/channels/{channel.id}/";
     private static final String TYPING_ENDPOINT_FMT = "/channels/%s/typing";
-    private static final String CHANNEL_PERMISSIONS_ENDPOINT = "/channels/{channel.id}/permissions/{overwrite.id}";
-    private static final String CHANNEL_PERMISSIONS_ENDPOINT_FMT = "/channels/%1$s/permissions/%2$s";
     private static final String CHANNEL_PIN_MSG_ENDPOINT = "/channels/{channel.id}/pins/{message.id}";
     private static final String CHANNEL_PIN_MSG_ENDPOINT_FMT = "/channels/%1$s/pins/%2$s";
     private static final String CHANNEL_PINS_ENDPOINT = "/channels/{channel.id}/pins";
@@ -116,32 +113,6 @@ public class ChannelsEndpointImpl implements ChannelsEndpoint, ChannelsEndpointA
     }
 
     @Override
-    public void editChannelPermission(long channelId, long overwriteId, EditChannelPermissionsRequest request)
-            throws ApiException {
-        String url = String.format(CHANNEL_PERMISSIONS_ENDPOINT_FMT,
-            snowflakeToString(channelId),
-            snowflakeToString(overwriteId)
-        );
-        endpoints.performPut(url,
-            request,
-            Void.class,
-            CHANNEL_PERMISSIONS_ENDPOINT
-        );
-    }
-
-    @Override
-    public void deleteChannelPermission(long channelId, long overwriteId) throws ApiException {
-        String url = String.format(CHANNEL_PERMISSIONS_ENDPOINT_FMT,
-            snowflakeToString(channelId),
-            snowflakeToString(overwriteId)
-        );
-        endpoints.performDelete(url,
-            Void.class,
-            CHANNEL_PERMISSIONS_ENDPOINT
-        );
-    }
-
-    @Override
     public Message[] getPinnedMessages(long channelId) throws ApiException {
         return endpoints.performGet(channelFormatPath(channelId, CHANNEL_PINS_ENDPOINT_FMT),
             Message[].class,
@@ -208,18 +179,6 @@ public class ChannelsEndpointImpl implements ChannelsEndpoint, ChannelsEndpointA
     @Override
     public Future<Channel> getChannelAsync(long channelId) throws ApiException {
         return executorService.submit(() -> getChannel(channelId));
-    }
-
-    @Override
-    public Future<Void> editChannelPermissionAsync(long channelId, long overwriteId,
-                                                   EditChannelPermissionsRequest request)
-            throws ApiException {
-        return executorService.submit(() -> editChannelPermission(channelId, overwriteId, request), null);
-    }
-
-    @Override
-    public Future<Void> deleteChannelPermissionAsync(long channelId, long overwriteId) throws ApiException {
-        return executorService.submit(() -> deleteChannelPermission(channelId, overwriteId), null);
     }
 
     @Override
