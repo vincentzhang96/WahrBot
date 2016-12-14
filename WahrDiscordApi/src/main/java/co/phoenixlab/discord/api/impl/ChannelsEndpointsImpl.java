@@ -36,7 +36,7 @@ import static co.phoenixlab.discord.api.util.SnowflakeUtils.snowflakeToString;
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.mashape.unirest.http.HttpMethod.*;
 
-public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointAsync {
+public class ChannelsEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointAsync {
 
     private static final String CHANNEL_ENDPOINT_BASE = "/channels/";
     private static final String GUILD_CHANNEL_ENDPOINT = "/guilds/{guild.id}/channels";

@@ -86,6 +86,18 @@ public class EndpointsImpl implements Endpoints {
     private LoginEndpointsImpl login;
 
     /**
+     * Channels endpoint implementation
+     */
+    @Inject
+    private ChannelsEndpointsImpl channel;
+
+    /**
+     * Messages endpoint implementation
+     */
+    @Inject
+    private MessagesEndpointImpl message;
+
+    /**
      * GSON instance to use by endpoint implementations
      */
     @Inject
@@ -133,12 +145,12 @@ public class EndpointsImpl implements Endpoints {
 
     @Override
     public ChannelsEndpoint channels() {
-        return null;
+        return channel;
     }
 
     @Override
     public ChannelsEndpointAsync channelsAsync() {
-        return null;
+        return channel;
     }
 
     @Override
@@ -173,12 +185,12 @@ public class EndpointsImpl implements Endpoints {
 
     @Override
     public MessagesEndpoint messages() {
-        return null;
+        return message;
     }
 
     @Override
     public MessagesEndpointAsync messagesAsync() {
-        return null;
+        return message;
     }
 
     @Override
