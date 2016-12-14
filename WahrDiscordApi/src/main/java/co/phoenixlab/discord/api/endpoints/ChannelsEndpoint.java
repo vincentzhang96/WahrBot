@@ -18,6 +18,7 @@ import co.phoenixlab.discord.api.entities.channel.GuildChannel;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.channel.CreateChannelRequest;
 import co.phoenixlab.discord.api.request.channel.CreatePrivateChannelRequest;
+import co.phoenixlab.discord.api.request.channel.EditChannelPermissionsRequest;
 import co.phoenixlab.discord.api.request.channel.ModifyChannelRequest;
 
 public interface ChannelsEndpoint {
@@ -42,5 +43,12 @@ public interface ChannelsEndpoint {
 
     Channel getChannel(long channelId)
             throws ApiException;
+
+    void editChannelPermission(long channelId, long overwriteId, EditChannelPermissionsRequest request)
+            throws ApiException;
+
+    void deleteChannelPermission(long channelId, long overwriteId)
+            throws ApiException;
+
 
 }
