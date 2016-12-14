@@ -39,6 +39,7 @@ import java.util.StringJoiner;
 
 import static com.mashape.unirest.http.HttpMethod.GET;
 import static com.mashape.unirest.http.HttpMethod.POST;
+import static com.mashape.unirest.http.HttpMethod.PUT;
 
 public class EndpointsImpl implements Endpoints {
 
@@ -356,6 +357,62 @@ public class EndpointsImpl implements Endpoints {
             if (status == HTTP_NOT_AUTHENTICATED) {
                 //  Authentication failed
                 throw new InvalidTokenException(HttpMethod.POST, path, "Bad token");
+            }
+            if (status == HTTP_TOO_MANY_REQUESTS) {
+                //  We hit the rate limit, throw an exception to let the caller know
+                long retryIn = Long.parseLong(response.getHeaders().getFirst(HTTP_RETRY_AFTER_HEADER));
+                throw new RateLimitExceededException(retryIn);
+            }
+            if (status == HTTP_EMPTY) {
+                //  We expect the response to be empty if we expected Void back
+                //  Otherwise, this is an unexpected situation
+                if (Void.class.equals(type)) {
+                    return null;
+                } else {
+                    throw new UnirestException("Got HTTP 204: Expected a response body, got none");
+                }
+            }
+            if (status != HTTP_OK) {
+                //  Other errors
+                throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
+            }
+            return gson.fromJson(response.getBody(), type);
+        }
+    }
+
+    /**
+     * Performs a PUT request, taking an Object body (serialized to JSON) and returning a typed
+     * result (deserialized from JSON). For endpoints that respond with 204 No Content, the return class should be
+     * {@code Void.class}. For making PUT requests without a body, pass in {@code null} as the body.
+     * @param path The URL path relative to the API {@link #BASE_URL}
+     * @param body The body to send in the request, or null for no body
+     * @param type The class to deserialize the result to, or {@code Void.class} for endpoints that are expected to
+     *             return HTTP 204 No Content
+     * @param <T> Type parameter for the return value type
+     * @return The deserialized response object, or {@code null} if the return type is Void
+     * @throws UnirestException If there was an HTTP exception
+     */
+    <T> T defaultPut(String path, Object body, Class<T> type)
+        throws UnirestException, InvalidTokenException {
+        try (Timer.Context ctx = stats.httpPostTime.time()) {
+            HttpRequestWithBody req = Unirest.put(BASE_URL + path);
+            addDefaultHeaders(req);
+            addAuthHeader(req);
+            //  Only serialize if we have a body to send
+            HttpResponse<String> response;
+            if (body != null) {
+                response = req.body(gson.toJson(body)).
+                    asString();
+            } else {
+                response = req.asString();
+            }
+            //  Log for metrics
+            logResponse(response);
+            //  Check for error conditions
+            int status = response.getStatus();
+            if (status == HTTP_NOT_AUTHENTICATED) {
+                //  Authentication failed
+                throw new InvalidTokenException(HttpMethod.PUT, path, "Bad token");
             }
             if (status == HTTP_TOO_MANY_REQUESTS) {
                 //  We hit the rate limit, throw an exception to let the caller know
@@ -715,6 +772,18 @@ public class EndpointsImpl implements Endpoints {
             throw apie;
         } catch (Exception e) {
             throw new ApiException(POST, endpoint, e);
+        }
+    }
+
+    <T> T performPut(String path, Object body, Class<T> clazz, String endpoint)
+        throws ApiException {
+        try {
+            return defaultPut(path, body, clazz);
+        } catch (ApiException apie) {
+            //  rethrow
+            throw apie;
+        } catch (Exception e) {
+            throw new ApiException(PUT, endpoint, e);
         }
     }
 
