@@ -13,6 +13,8 @@
 package co.phoenixlab.discord.api.endpoints;
 
 import co.phoenixlab.discord.api.entities.channel.message.Message;
+import co.phoenixlab.discord.api.entities.guild.Emoji;
+import co.phoenixlab.discord.api.entities.user.HumanUser;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.channel.message.BulkMessageDeleteRequest;
 import co.phoenixlab.discord.api.request.channel.message.EditMessageRequest;
@@ -90,5 +92,32 @@ public interface MessagesEndpoint {
             throws ApiException;
 
     void bulkDeleteMessages(long channelId, BulkMessageDeleteRequest request)
+            throws ApiException;
+
+    void createReaction(long channelId, long messageId, Emoji emoji)
+            throws ApiException;
+
+    void createReaction(long channelId, long messageId, String emojiString)
+            throws ApiException;
+
+    void deleteOwnReaction(long channelId, long messageId, Emoji emoji)
+            throws ApiException;
+
+    void deleteOwnReaction(long channelId, long messageId, String emojiString)
+            throws ApiException;
+
+    void deleteUserReaction(long channelId, long messageId, Emoji emoji, long userId)
+            throws ApiException;
+
+    void deleteUserReaction(long channelId, long messageId, String emojiString, long userId)
+            throws ApiException;
+
+    HumanUser[] getUsersThatReacted(long channelId, long messageId, Emoji emoji)
+            throws ApiException;
+
+    HumanUser[] getUsersThatReacted(long channelId, long messageId, String emojiString)
+            throws ApiException;
+
+    void deleteAllReactions(long channelId, long messageId)
             throws ApiException;
 }

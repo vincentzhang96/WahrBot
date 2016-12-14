@@ -12,6 +12,8 @@
 
 package co.phoenixlab.discord.api.endpoints.async;
 
+import co.phoenixlab.discord.api.entities.guild.Emoji;
+import co.phoenixlab.discord.api.entities.user.HumanUser;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.entities.channel.message.Message;
 import co.phoenixlab.discord.api.request.channel.message.BulkMessageDeleteRequest;
@@ -91,4 +93,31 @@ public interface MessagesEndpointAsync {
 
     Future<Void> bulkDeleteMessagesAsync(long channelId, BulkMessageDeleteRequest request)
             throws ApiException;
+
+    Future<Void> createReactionAsync(long channelId, long messageId, Emoji emoji)
+        throws ApiException;
+
+    Future<Void> createReactionAsync(long channelId, long messageId, String emojiString)
+        throws ApiException;
+
+    Future<Void> deleteOwnReactionAsync(long channelId, long messageId, Emoji emoji)
+        throws ApiException;
+
+    Future<Void> deleteOwnReactionAsync(long channelId, long messageId, String emojiString)
+        throws ApiException;
+
+    Future<Void> deleteUserReactionAsync(long channelId, long messageId, Emoji emoji, long userId)
+        throws ApiException;
+
+    Future<Void> deleteUserReactionAsync(long channelId, long messageId, String emojiString, long userId)
+        throws ApiException;
+
+    Future<HumanUser[]> getUsersThatReactedAsync(long channelId, long messageId, Emoji emoji)
+        throws ApiException;
+
+    Future<HumanUser[]> getUsersThatReactedAsync(long channelId, long messageId, String emojiString)
+        throws ApiException;
+
+    Future<Void> deleteAllReactionsAsync(long channelId, long messageId)
+        throws ApiException;
 }
