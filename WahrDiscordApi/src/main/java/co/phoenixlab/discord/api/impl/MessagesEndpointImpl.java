@@ -17,6 +17,7 @@ import java.util.StringJoiner;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
+import static co.phoenixlab.discord.api.enums.ValidateRequestOption.REQUEST_MUST_BE_NULL;
 import static co.phoenixlab.discord.api.util.SnowflakeUtils.snowflakeToString;
 import static co.phoenixlab.discord.api.util.WahrDiscordApiUtils.urlEncode;
 import static com.mashape.unirest.http.HttpMethod.GET;
@@ -171,7 +172,9 @@ public class MessagesEndpointImpl implements MessagesEndpoint, MessagesEndpointA
         endpoints.performPut(url,
             null,
             Void.class,
-            USER_REACTION_ENDPOINT);
+            USER_REACTION_ENDPOINT,
+            REQUEST_MUST_BE_NULL
+        );
     }
 
     @Override
@@ -252,9 +255,11 @@ public class MessagesEndpointImpl implements MessagesEndpoint, MessagesEndpointA
             throw new InvalidApiRequestException(POST, MESSAGE_ACK_ENDPOINT, "Cannot ack as a bot");
         }
         endpoints.performPost(messageFormatPath(channelId, messageId, MESSAGE_ACK_ENDPOINT_FMT),
-                null,
-                Void.class,
-                MESSAGE_ACK_ENDPOINT);
+            null,
+            Void.class,
+            MESSAGE_ACK_ENDPOINT,
+            REQUEST_MUST_BE_NULL
+        );
     }
 
     private String messageFormatPath(long channelId, long messageId, String format) {

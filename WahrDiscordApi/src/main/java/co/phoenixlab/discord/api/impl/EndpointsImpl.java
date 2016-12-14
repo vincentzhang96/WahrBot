@@ -14,6 +14,7 @@ package co.phoenixlab.discord.api.impl;
 
 import co.phoenixlab.discord.api.endpoints.*;
 import co.phoenixlab.discord.api.endpoints.async.*;
+import co.phoenixlab.discord.api.enums.ValidateRequestOption;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.exceptions.InvalidApiRequestException;
 import co.phoenixlab.discord.api.exceptions.InvalidTokenException;
@@ -37,9 +38,7 @@ import javax.validation.ValidatorFactory;
 import java.util.Set;
 import java.util.StringJoiner;
 
-import static com.mashape.unirest.http.HttpMethod.GET;
-import static com.mashape.unirest.http.HttpMethod.POST;
-import static com.mashape.unirest.http.HttpMethod.PUT;
+import static com.mashape.unirest.http.HttpMethod.*;
 
 public class EndpointsImpl implements Endpoints {
 
@@ -747,16 +746,51 @@ public class EndpointsImpl implements Endpoints {
 
     /**
      * Performs validation on the given object according to its validation rules, throwing an exception containing
-     * the HTTP method and endpoint if it fails
+     * the HTTP method and endpoint if it fails. If the passed object is null, then it implicitly passes.
      * @param method The HTTP method being invoked
      * @param endpoint The endpoint being invoked
      * @param o The object to validate, annotated with validation constraints
      * @throws ApiException If the validation fails
      */
     void validate(HttpMethod method, String endpoint, Object o) throws ApiException {
+        if (o == null) {
+            return;
+        }
         Set<ConstraintViolation<Object>> validate = validator.validate(o);
         if (!validate.isEmpty()) {
             throw new InvalidApiRequestException(method, endpoint, getViolations(validate));
+        }
+    }
+
+    /**
+     * Performs validation on the given object according to its validation rules, throwing an exception containing
+     * the HTTP method and endpoint if it fails or if the value is null.
+     * @param method The HTTP method being invoked
+     * @param endpoint The endpoint being invoked
+     * @param o The object to validate, annotated with validation constraints
+     * @throws ApiException If the validation fails
+     */
+    void notNullAndValidate(HttpMethod method, String endpoint, Object o) throws ApiException {
+        if (o == null) {
+            throw new InvalidApiRequestException(method, endpoint, "Parameter cannot be null");
+        }
+        Set<ConstraintViolation<Object>> validate = validator.validate(o);
+        if (!validate.isEmpty()) {
+            throw new InvalidApiRequestException(method, endpoint, getViolations(validate));
+        }
+    }
+
+    /**
+     * Performs validation on the given object that it is null, throwing an exception containing
+     * the HTTP method and endpoint if the value is not null.
+     * @param method The HTTP method being invoked
+     * @param endpoint The endpoint being invoked
+     * @param o The object that must be null
+     * @throws ApiException If the validation fails
+     */
+    void mustBeNull(HttpMethod method, String endpoint, Object o) throws ApiException {
+        if (o != null) {
+            throw new InvalidApiRequestException(method, endpoint, "Parameter must be null");
         }
     }
 
@@ -775,9 +809,13 @@ public class EndpointsImpl implements Endpoints {
         return joiner.toString();
     }
 
-    <T> T performPost(String path, Object body, Class<T> clazz, String endpoint)
+    <T> T performPost(String path, Object body, Class<T> clazz, String endpoint, ValidateRequestOption... options)
         throws ApiException {
         try {
+            ValidateRequestOption.chain(options)
+                .doIfAndEnd(ValidateRequestOption.REQUEST_MUST_BE_NULL, () -> mustBeNull(POST, endpoint, body))
+                .doIf(ValidateRequestOption.REQUEST_CAN_BE_NULL, () -> validate(POST, endpoint, body))
+                .elseDo(() -> notNullAndValidate(POST, endpoint, body));
             return defaultPost(path, body, clazz);
         } catch (ApiException apie) {
             //  rethrow
@@ -787,9 +825,13 @@ public class EndpointsImpl implements Endpoints {
         }
     }
 
-    <T> T performPut(String path, Object body, Class<T> clazz, String endpoint)
+    <T> T performPut(String path, Object body, Class<T> clazz, String endpoint, ValidateRequestOption... options)
         throws ApiException {
         try {
+            ValidateRequestOption.chain(options)
+                .doIfAndEnd(ValidateRequestOption.REQUEST_MUST_BE_NULL, () -> mustBeNull(PUT, endpoint, body))
+                .doIf(ValidateRequestOption.REQUEST_CAN_BE_NULL, () -> validate(PUT, endpoint, body))
+                .elseDo(() -> notNullAndValidate(PUT, endpoint, body));
             return defaultPut(path, body, clazz);
         } catch (ApiException apie) {
             //  rethrow
@@ -811,9 +853,13 @@ public class EndpointsImpl implements Endpoints {
         }
     }
 
-    <T> T performPatch(String path, Object body, Class<T> clazz, String endpoint)
+    <T> T performPatch(String path, Object body, Class<T> clazz, String endpoint, ValidateRequestOption... options)
         throws ApiException {
         try {
+            ValidateRequestOption.chain(options)
+                .doIfAndEnd(ValidateRequestOption.REQUEST_MUST_BE_NULL, () -> mustBeNull(PATCH, endpoint, body))
+                .doIf(ValidateRequestOption.REQUEST_CAN_BE_NULL, () -> validate(PATCH, endpoint, body))
+                .elseDo(() -> notNullAndValidate(PATCH, endpoint, body));
             return defaultPatch(path, body, clazz);
         } catch (ApiException apie) {
             //  rethrow

@@ -12,7 +12,6 @@
 
 package co.phoenixlab.discord.api.impl;
 
-import co.phoenixlab.discord.api.WahrDiscordApi;
 import co.phoenixlab.discord.api.endpoints.ChannelsEndpoint;
 import co.phoenixlab.discord.api.endpoints.async.ChannelsEndpointAsync;
 import co.phoenixlab.discord.api.entities.channel.Channel;
@@ -24,21 +23,18 @@ import co.phoenixlab.discord.api.request.channel.CreateChannelRequest;
 import co.phoenixlab.discord.api.request.channel.CreatePrivateChannelRequest;
 import co.phoenixlab.discord.api.request.channel.EditChannelPermissionsRequest;
 import co.phoenixlab.discord.api.request.channel.ModifyChannelRequest;
-import co.phoenixlab.discord.api.util.OkFailMeter;
-import com.codahale.metrics.MetricRegistry;
 import com.google.inject.Inject;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.function.UnaryOperator;
 
+import static co.phoenixlab.discord.api.enums.ValidateRequestOption.REQUEST_MUST_BE_NULL;
 import static co.phoenixlab.discord.api.util.SnowflakeUtils.snowflakeToString;
-import static com.codahale.metrics.MetricRegistry.name;
-import static com.mashape.unirest.http.HttpMethod.*;
 
 public class ChannelsEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointAsync {
 
     private static final String CHANNEL_ENDPOINT_BASE = "/channels/";
+    private static final String CHANNEL_ENDPOINT = "/channels/{channel.id}";
     private static final String GUILD_CHANNEL_ENDPOINT = "/guilds/{guild.id}/channels";
     private static final String GUILD_CHANNEL_ENDPOINT_FMT = "/guilds/%s/channels";
     private static final String PRIVATE_CHANNEL_ENDPOINT = "/users/@me/channels";
@@ -57,122 +53,66 @@ public class ChannelsEndpointsImpl implements ChannelsEndpoint, ChannelsEndpoint
     private EndpointsImpl endpoints;
     @Inject
     private WahrDiscordApiImpl api;
-    @Inject
-    private Stats stats;
 
     @Override
     public GuildChannel createChannel(long guildId, CreateChannelRequest request) throws ApiException {
-        endpoints.validate(POST, GUILD_CHANNEL_ENDPOINT, request);
-        try {
-            GuildChannel ret = endpoints.defaultPost(channelFormatPath(guildId, GUILD_CHANNEL_ENDPOINT_FMT),
-                    request, GuildChannel.class);
-            stats.createChannel.ok();
-            return ret;
-        } catch (ApiException apie) {
-            stats.createChannel.fail();
-            //  rethrow
-            throw apie;
-        } catch (Exception e) {
-            stats.createChannel.fail();
-            throw new ApiException(POST, GUILD_CHANNEL_ENDPOINT, e);
-        }
+        return endpoints.performPost(channelFormatPath(guildId, GUILD_CHANNEL_ENDPOINT_FMT),
+            request,
+            GuildChannel.class,
+            GUILD_CHANNEL_ENDPOINT
+        );
     }
 
     @Override
     public DmChannel createPrivateChannel(CreatePrivateChannelRequest request) throws ApiException {
-        endpoints.validate(POST, PRIVATE_CHANNEL_ENDPOINT, request);
-        try {
-            DmChannel ret = endpoints.defaultPost(PRIVATE_CHANNEL_ENDPOINT, request, DmChannel.class);
-            stats.createPrivateChannel.ok();
-            return ret;
-        } catch (ApiException apie) {
-            stats.createPrivateChannel.fail();
-            //  rethrow
-            throw apie;
-        } catch (Exception e) {
-            stats.createPrivateChannel.fail();
-            throw new ApiException(POST, PRIVATE_CHANNEL_ENDPOINT, e);
-        }
+        return endpoints.performPost(PRIVATE_CHANNEL_ENDPOINT,
+            request,
+            DmChannel.class,
+            PRIVATE_CHANNEL_ENDPOINT
+        );
     }
 
     @Override
     public GuildChannel editChannel(long channelId, ModifyChannelRequest request) throws ApiException {
-        endpoints.validate(PATCH, CHANNEL_ENDPOINT_BASE, request);
-        try {
-            GuildChannel ret = endpoints.defaultPatch(channelPath(channelId), request, GuildChannel.class);
-            stats.editChannel.ok();
-            return ret;
-        } catch (ApiException apie) {
-            stats.editChannel.fail();
-            //  rethrow
-            throw apie;
-        } catch (Exception e) {
-            stats.editChannel.fail();
-            throw new ApiException(PATCH, CHANNEL_ENDPOINT_BASE, e);
-        }
+        return endpoints.performPatch(channelPath(channelId),
+            request,
+            GuildChannel.class,
+            CHANNEL_ENDPOINT
+        );
     }
 
     @Override
     public void deleteChannel(long channelId) throws ApiException {
-        try {
-            endpoints.defaultDelete(channelPath(channelId), Void.class);
-            stats.deleteChannel.ok();
-        } catch (ApiException apie) {
-            stats.deleteChannel.fail();
-            //  rethrow
-            throw apie;
-        } catch (Exception e) {
-            stats.deleteChannel.fail();
-            throw new ApiException(DELETE, CHANNEL_ENDPOINT_BASE, e);
-        }
+        endpoints.performDelete(channelPath(channelId),
+            Void.class,
+            CHANNEL_ENDPOINT
+        );
     }
 
     @Override
     public GuildChannel[] getGuildChannels(long guildId) throws ApiException {
-        try {
-            GuildChannel[] ret = endpoints.defaultGet(channelFormatPath(guildId, GUILD_CHANNEL_ENDPOINT_FMT),
-                    GuildChannel[].class);
-            stats.getGuildChannels.ok();
-            return ret;
-        } catch (ApiException apie) {
-            stats.getGuildChannels.fail();
-            //  rethrow
-            throw apie;
-        } catch (Exception e) {
-            stats.getGuildChannels.fail();
-            throw new ApiException(GET, GUILD_CHANNEL_ENDPOINT, e);
-        }
+        return endpoints.performGet(channelFormatPath(guildId, GUILD_CHANNEL_ENDPOINT_FMT),
+            GuildChannel[].class,
+            GUILD_CHANNEL_ENDPOINT
+        );
     }
 
     @Override
     public void broadcastTyping(long channelId) throws ApiException {
-        try {
-            endpoints.defaultPost(channelFormatPath(channelId, TYPING_ENDPOINT_FMT), null, Void.class);
-            stats.broadcastTyping.ok();
-        } catch (ApiException apie) {
-            stats.broadcastTyping.fail();
-            //  rethrow
-            throw apie;
-        } catch (Exception e) {
-            stats.broadcastTyping.fail();
-            throw new ApiException(POST, TYPING_ENDPOINT, e);
-        }
+        endpoints.performPost(channelFormatPath(channelId, TYPING_ENDPOINT_FMT),
+            null,
+            Void.class,
+            TYPING_ENDPOINT,
+            REQUEST_MUST_BE_NULL
+        );
     }
 
     @Override
     public Channel getChannel(long channelId) throws ApiException {
-        try {
-            Channel ret = endpoints.defaultGet(channelPath(channelId), Channel.class);
-            stats.getChannel.ok();
-            return ret;
-        } catch (ApiException apie) {
-            stats.getChannel.fail();
-            //  rethrow
-            throw apie;
-        } catch (Exception e) {
-            stats.getChannel.fail();
-            throw new ApiException(GET, CHANNEL_ENDPOINT_BASE, e);
-        }
+        return endpoints.performGet(channelPath(channelId),
+            Channel.class,
+            CHANNEL_ENDPOINT
+        );
     }
 
     @Override
@@ -185,7 +125,8 @@ public class ChannelsEndpointsImpl implements ChannelsEndpoint, ChannelsEndpoint
         endpoints.performPut(url,
             request,
             Void.class,
-            CHANNEL_PERMISSIONS_ENDPOINT);
+            CHANNEL_PERMISSIONS_ENDPOINT
+        );
     }
 
     @Override
@@ -196,14 +137,16 @@ public class ChannelsEndpointsImpl implements ChannelsEndpoint, ChannelsEndpoint
         );
         endpoints.performDelete(url,
             Void.class,
-            CHANNEL_PERMISSIONS_ENDPOINT);
+            CHANNEL_PERMISSIONS_ENDPOINT
+        );
     }
 
     @Override
     public Message[] getPinnedMessages(long channelId) throws ApiException {
         return endpoints.performGet(channelFormatPath(channelId, CHANNEL_PINS_ENDPOINT_FMT),
             Message[].class,
-            CHANNEL_PINS_ENDPOINT);
+            CHANNEL_PINS_ENDPOINT
+        );
     }
 
     @Override
@@ -215,7 +158,9 @@ public class ChannelsEndpointsImpl implements ChannelsEndpoint, ChannelsEndpoint
         endpoints.performPut(url,
             null,
             Void.class,
-            CHANNEL_PIN_MSG_ENDPOINT);
+            CHANNEL_PIN_MSG_ENDPOINT,
+            REQUEST_MUST_BE_NULL
+        );
     }
 
     @Override
@@ -226,7 +171,8 @@ public class ChannelsEndpointsImpl implements ChannelsEndpoint, ChannelsEndpoint
         );
         endpoints.performDelete(url,
             Void.class,
-            CHANNEL_PIN_MSG_ENDPOINT);
+            CHANNEL_PIN_MSG_ENDPOINT
+        );
     }
 
     @Override
@@ -299,31 +245,4 @@ public class ChannelsEndpointsImpl implements ChannelsEndpoint, ChannelsEndpoint
         return String.format(format, snowflakeToString(id));
     }
 
-    static class Stats {
-
-        final OkFailMeter createChannel;
-        final OkFailMeter createPrivateChannel;
-        final OkFailMeter editChannel;
-        final OkFailMeter deleteChannel;
-        final OkFailMeter getGuildChannels;
-        final OkFailMeter broadcastTyping;
-        final OkFailMeter getChannel;
-
-        @Inject
-        Stats(MetricRegistry metrics, WahrDiscordApi api) {
-            String instanceId = api.getInstanceId();
-            Class<EndpointsImpl> baseClass = EndpointsImpl.class;
-            createChannel = meter((s) -> name(baseClass, "channel", "create", s, instanceId), metrics);
-            createPrivateChannel = meter((s) -> name(baseClass, "channel", "createPrivate", s, instanceId), metrics);
-            editChannel = meter((s) -> name(baseClass, "channel", "edit", s, instanceId), metrics);
-            deleteChannel = meter((s) -> name(baseClass, "channel", "delete", s, instanceId), metrics);
-            getGuildChannels = meter((s) -> name(baseClass, "channel", "getGuildChannels", s, instanceId), metrics);
-            broadcastTyping = meter((s) -> name(baseClass, "channel", "broadcastTyping", s, instanceId), metrics);
-            getChannel = meter((s) -> name(baseClass, "channel", "get", s, instanceId), metrics);
-        }
-
-        private final OkFailMeter meter(UnaryOperator<String> builder, MetricRegistry metrics) {
-            return new OkFailMeter(builder, metrics);
-        }
-    }
 }
