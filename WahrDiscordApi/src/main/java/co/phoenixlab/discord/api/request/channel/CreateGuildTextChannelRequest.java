@@ -12,22 +12,16 @@
 
 package co.phoenixlab.discord.api.request.channel;
 
-import co.phoenixlab.discord.api.enums.ChannelType;
+
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class CreateChannelRequest {
-
-    @Size(min = 2, max = 100)
-    private String name;
-    @NotNull
-    private ChannelType type;
-
+@Builder
+public class CreateGuildTextChannelRequest extends CreateChannelRequest {
+    //  No extra fields
 }
