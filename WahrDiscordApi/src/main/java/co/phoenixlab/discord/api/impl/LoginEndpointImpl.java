@@ -30,7 +30,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import static com.mashape.unirest.http.HttpMethod.GET;
 import static com.mashape.unirest.http.HttpMethod.POST;
 
-public class LoginEndpointsImpl
+public class LoginEndpointImpl
         implements AuthenticationEndpoint, AuthenticationEndpointAsync,
         GatewayEndpoint, GatewayEndpointAsync {
 

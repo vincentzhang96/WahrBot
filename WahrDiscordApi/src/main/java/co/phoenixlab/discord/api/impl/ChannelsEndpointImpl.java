@@ -31,7 +31,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import static co.phoenixlab.discord.api.enums.ValidateRequestOption.REQUEST_MUST_BE_NULL;
 import static co.phoenixlab.discord.api.util.SnowflakeUtils.snowflakeToString;
 
-public class ChannelsEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointAsync {
+public class ChannelsEndpointImpl implements ChannelsEndpoint, ChannelsEndpointAsync {
 
     private static final String CHANNEL_ENDPOINT_BASE = "/channels/";
     private static final String CHANNEL_ENDPOINT = "/channels/{channel.id}";

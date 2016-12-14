@@ -82,13 +82,13 @@ public class EndpointsImpl implements Endpoints {
      * Login endpoints implementation
      */
     @Inject
-    private LoginEndpointsImpl login;
+    private LoginEndpointImpl login;
 
     /**
      * Channels endpoint implementation
      */
     @Inject
-    private ChannelsEndpointsImpl channel;
+    private ChannelsEndpointImpl channel;
 
     /**
      * Messages endpoint implementation
