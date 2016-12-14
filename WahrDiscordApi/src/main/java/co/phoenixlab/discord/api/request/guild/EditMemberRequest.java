@@ -23,6 +23,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EditMemberRequest {
 
+    private String nick;
     private long[] roles;
+    private Boolean mute;
+    private Boolean deaf;
+    private long channelId;
 
 }

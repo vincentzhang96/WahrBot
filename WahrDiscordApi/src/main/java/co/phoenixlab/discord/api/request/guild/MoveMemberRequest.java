@@ -23,6 +23,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MoveMemberRequest {
 
-    private String channelId;
+    private long channelId;
 
 }

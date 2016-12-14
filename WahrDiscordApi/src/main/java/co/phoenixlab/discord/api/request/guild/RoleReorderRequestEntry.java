@@ -18,6 +18,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Builder;
 
+import javax.validation.constraints.Min;
+
 @Builder
 @Getter
 @NoArgsConstructor
@@ -25,6 +27,8 @@ import lombok.Builder;
 public class RoleReorderRequestEntry implements Entity {
 
     private long id;
+
+    @Min(0)
     private int position;
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

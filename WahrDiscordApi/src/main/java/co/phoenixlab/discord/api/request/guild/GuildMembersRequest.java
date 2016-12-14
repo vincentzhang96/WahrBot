@@ -17,6 +17,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Min;
+
 @Builder
 @Getter
 @NoArgsConstructor
@@ -25,6 +27,7 @@ public class GuildMembersRequest {
 
     private long guildId;
     private String query;
+    @Min(0)
     private int limit;
 
 }

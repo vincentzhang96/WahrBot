@@ -18,16 +18,22 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Size;
+
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class EditGuildRequest {
 
+    @Size(min = 2, max = 100)
     private String name;
+
+    @Size(min = 1)
     private String region;
     private String icon;
     private long afkChannelId;
     private AfkTimeout afkTimeout;
+    private Long ownerId;
 
 }

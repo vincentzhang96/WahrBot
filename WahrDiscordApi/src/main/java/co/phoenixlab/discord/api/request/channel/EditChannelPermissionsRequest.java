@@ -19,14 +19,19 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
+
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class EditChannelPermissionsRequest {
 
+    @NotNull
     private DiscordPermissionSet allow;
+    @NotNull
     private DiscordPermissionSet deny;
+    @NotNull
     private PermissionType type;
 
 }
