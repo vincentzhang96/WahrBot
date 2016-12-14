@@ -13,10 +13,11 @@
 package co.phoenixlab.discord.api.entities.guild;
 
 import co.phoenixlab.discord.api.entities.Entity;
+import co.phoenixlab.discord.api.util.SnowflakeUtils;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Builder;
 
 @Getter
 @NoArgsConstructor
@@ -39,5 +40,9 @@ public class Emoji implements Entity {
     @Override
     public int hashCode() {
         return Entity.hash(this);
+    }
+
+    public String getEmojiCode() {
+        return name + ":" + SnowflakeUtils.snowflakeToString(id);
     }
 }
