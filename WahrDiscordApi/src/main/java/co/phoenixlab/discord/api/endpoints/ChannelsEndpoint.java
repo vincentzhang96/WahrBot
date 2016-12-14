@@ -15,6 +15,7 @@ package co.phoenixlab.discord.api.endpoints;
 import co.phoenixlab.discord.api.entities.channel.Channel;
 import co.phoenixlab.discord.api.entities.channel.DmChannel;
 import co.phoenixlab.discord.api.entities.channel.GuildChannel;
+import co.phoenixlab.discord.api.entities.channel.message.Message;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.channel.CreateChannelRequest;
 import co.phoenixlab.discord.api.request.channel.CreatePrivateChannelRequest;
@@ -50,5 +51,13 @@ public interface ChannelsEndpoint {
     void deleteChannelPermission(long channelId, long overwriteId)
             throws ApiException;
 
+    Message[] getPinnedMessages(long channelId)
+            throws ApiException;
+
+    void pinMessage(long channelId, long messageId)
+            throws ApiException;
+
+    void deletePinnedMessage(long channelId, long messageId)
+            throws ApiException;
 
 }

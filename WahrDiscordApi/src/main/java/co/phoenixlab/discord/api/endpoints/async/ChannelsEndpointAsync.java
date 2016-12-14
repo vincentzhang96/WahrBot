@@ -13,6 +13,7 @@
 package co.phoenixlab.discord.api.endpoints.async;
 
 import co.phoenixlab.discord.api.entities.channel.Channel;
+import co.phoenixlab.discord.api.entities.channel.message.Message;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.entities.channel.DmChannel;
 import co.phoenixlab.discord.api.entities.channel.GuildChannel;
@@ -51,4 +52,13 @@ public interface ChannelsEndpointAsync {
 
     Future<Void> deleteChannelPermissionAsync(long channelId, long overwriteId)
         throws ApiException;
+
+    Future<Message[]> getPinnedMessagesAsync(long channelId)
+            throws ApiException;
+
+    Future<Void> pinMessageAsync(long channelId, long messageId)
+            throws ApiException;
+
+    Future<Void> deletePinnedMessageAsync(long channelId, long messageId)
+            throws ApiException;
 }

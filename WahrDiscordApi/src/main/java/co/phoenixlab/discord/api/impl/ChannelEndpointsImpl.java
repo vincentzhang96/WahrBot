@@ -18,6 +18,7 @@ import co.phoenixlab.discord.api.endpoints.async.ChannelsEndpointAsync;
 import co.phoenixlab.discord.api.entities.channel.Channel;
 import co.phoenixlab.discord.api.entities.channel.DmChannel;
 import co.phoenixlab.discord.api.entities.channel.GuildChannel;
+import co.phoenixlab.discord.api.entities.channel.message.Message;
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.channel.CreateChannelRequest;
 import co.phoenixlab.discord.api.request.channel.CreatePrivateChannelRequest;
@@ -45,6 +46,10 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
     private static final String TYPING_ENDPOINT_FMT = "/channels/%s/typing";
     private static final String CHANNEL_PERMISSIONS_ENDPOINT = "/channels/{channel.id}/permissions/{overwrite.id}";
     private static final String CHANNEL_PERMISSIONS_ENDPOINT_FMT = "/channels/%1$s/permissions/%2$s";
+    private static final String CHANNEL_PIN_MSG_ENDPOINT = "/channels/{channel.id}/pins/{message.id}";
+    private static final String CHANNEL_PIN_MSG_ENDPOINT_FMT = "/channels/%1$s/pins/%2$s";
+    private static final String CHANNEL_PINS_ENDPOINT = "/channels/{channel.id}/pins";
+    private static final String CHANNEL_PINS_ENDPOINT_FMT = "/channels/%1$s/pins";
 
     @Inject
     private ScheduledExecutorService executorService;
@@ -195,6 +200,36 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
     }
 
     @Override
+    public Message[] getPinnedMessages(long channelId) throws ApiException {
+        return endpoints.performGet(channelFormatPath(channelId, CHANNEL_PINS_ENDPOINT_FMT),
+            Message[].class,
+            CHANNEL_PINS_ENDPOINT);
+    }
+
+    @Override
+    public void pinMessage(long channelId, long messageId) throws ApiException {
+        String url = String.format(CHANNEL_PIN_MSG_ENDPOINT_FMT,
+            snowflakeToString(channelId),
+            snowflakeToString(messageId)
+        );
+        endpoints.performPut(url,
+            null,
+            Void.class,
+            CHANNEL_PIN_MSG_ENDPOINT);
+    }
+
+    @Override
+    public void deletePinnedMessage(long channelId, long messageId) throws ApiException {
+        String url = String.format(CHANNEL_PIN_MSG_ENDPOINT_FMT,
+            snowflakeToString(channelId),
+            snowflakeToString(messageId)
+        );
+        endpoints.performDelete(url,
+            Void.class,
+            CHANNEL_PIN_MSG_ENDPOINT);
+    }
+
+    @Override
     public Future<GuildChannel> createChannelAsync(long guildId, CreateChannelRequest request) throws ApiException {
         return executorService.submit(() -> createChannel(guildId, request));
     }
@@ -239,6 +274,21 @@ public class ChannelEndpointsImpl implements ChannelsEndpoint, ChannelsEndpointA
     @Override
     public Future<Void> deleteChannelPermissionAsync(long channelId, long overwriteId) throws ApiException {
         return executorService.submit(() -> deleteChannelPermission(channelId, overwriteId), null);
+    }
+
+    @Override
+    public Future<Message[]> getPinnedMessagesAsync(long channelId) throws ApiException {
+        return executorService.submit(() -> getPinnedMessages(channelId));
+    }
+
+    @Override
+    public Future<Void> pinMessageAsync(long channelId, long messageId) throws ApiException {
+        return executorService.submit(() -> pinMessage(channelId, messageId), null);
+    }
+
+    @Override
+    public Future<Void> deletePinnedMessageAsync(long channelId, long messageId) throws ApiException {
+        return executorService.submit(() -> deletePinnedMessage(channelId, messageId), null);
     }
 
     private String channelPath(long id) {
