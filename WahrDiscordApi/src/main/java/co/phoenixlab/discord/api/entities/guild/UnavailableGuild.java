@@ -13,7 +13,6 @@
 package co.phoenixlab.discord.api.entities.guild;
 
 import co.phoenixlab.discord.api.entities.Entity;
-import co.phoenixlab.discord.api.enums.AfkTimeout;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,23 +22,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Guild extends UserGuild implements Entity {
+public class UnavailableGuild implements Entity {
 
-    public static long NO_AFK_CHANNEL_ID = -1;
-
-    protected String splash;
-    protected String region;
-    protected long afkChannelId;
-    protected AfkTimeout afkTimeout;
-    protected boolean embedEnabled;
-    protected long embedChannelId;
-    protected int verificationLevel;
-    protected int defaultMessageNotifications;
-    protected Role[] roles;
-    protected Emoji[] emojis;
-    protected String[] features;
-    protected int mfaLevel;
-    protected int memberCount;
+    protected long id;
+    private boolean unavailable;
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
