@@ -26,7 +26,7 @@ public class UserGuild extends UnavailableGuild implements Entity {
 
     protected String name;
     protected String icon;
-    private long ownerId;
+    protected boolean owner;
     protected int permissions;
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

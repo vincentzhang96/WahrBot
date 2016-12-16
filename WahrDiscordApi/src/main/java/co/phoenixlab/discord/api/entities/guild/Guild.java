@@ -28,6 +28,7 @@ public class Guild extends UserGuild implements Entity {
     public static long NO_AFK_CHANNEL_ID = -1;
 
     protected String splash;
+    private long ownerId;
     protected String region;
     protected long afkChannelId;
     protected AfkTimeout afkTimeout;

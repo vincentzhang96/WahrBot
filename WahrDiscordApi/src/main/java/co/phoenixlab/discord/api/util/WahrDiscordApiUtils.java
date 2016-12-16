@@ -13,9 +13,6 @@
 package co.phoenixlab.discord.api.util;
 
 import co.phoenixlab.discord.api.entities.GatewayPayload;
-import co.phoenixlab.discord.api.entities.channel.Channel;
-import co.phoenixlab.discord.api.entities.channel.GuildChannel;
-import co.phoenixlab.discord.api.entities.user.BasicUser;
 import co.phoenixlab.discord.api.gsonadapters.*;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -33,15 +30,16 @@ public class WahrDiscordApiUtils {
     }
 
     public static Gson createGson() {
-        return new GsonBuilder().
+        GsonBuilder builder = new GsonBuilder().
                 setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).
                 setLongSerializationPolicy(LongSerializationPolicy.STRING).
                 registerTypeAdapter(GatewayPayload.class, new GatewayPayloadDeserializer()).
-                registerTypeAdapter(Instant.class, new InstantTypeAdapter()).
-                registerTypeAdapter(Channel.class, new ChannelDeserializer()).
-                registerTypeAdapter(GuildChannel.class, new GuildChannelDeserializer()).
-                registerTypeAdapter(BasicUser.class, new BasicUserDeserializer()).
-                create();
+                registerTypeAdapter(Instant.class, new InstantTypeAdapter());
+        builder = ChannelDeserializer.register(builder);
+        builder = GuildDeserializer.register(builder);
+        builder = UserDeserializer.register(builder);
+
+        return builder.create();
     }
 
     public static String urlEncode(String s) {

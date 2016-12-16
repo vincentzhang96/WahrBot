@@ -19,7 +19,12 @@ import com.google.gson.*;
 
 import java.lang.reflect.Type;
 
-public class BasicUserDeserializer implements JsonDeserializer<BasicUser> {
+public class UserDeserializer implements JsonDeserializer<BasicUser> {
+
+    public static GsonBuilder register(GsonBuilder builder) {
+        UserDeserializer d = new UserDeserializer();
+        return builder.registerTypeAdapter(BasicUser.class, d);
+    }
 
     @Override
     public BasicUser deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)

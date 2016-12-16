@@ -12,29 +12,46 @@
 
 package co.phoenixlab.discord.api.gsonadapters;
 
-import co.phoenixlab.discord.api.entities.channel.Channel;
-import co.phoenixlab.discord.api.entities.channel.DmChannel;
-import co.phoenixlab.discord.api.entities.channel.GuildChannel;
+import co.phoenixlab.discord.api.entities.channel.*;
+import co.phoenixlab.discord.api.enums.ChannelType;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;
 
 public class ChannelDeserializer implements JsonDeserializer<Channel> {
 
+    public static GsonBuilder register(GsonBuilder builder) {
+        ChannelDeserializer d = new ChannelDeserializer();
+        return builder.registerTypeAdapter(Channel.class, d)
+            .registerTypeAdapter(GuildChannel.class, d);
+    }
+
     @Override
     public Channel deserialize(JsonElement json,
                                Type typeOfT,
                                JsonDeserializationContext context) throws JsonParseException {
         JsonObject obj = json.getAsJsonObject();
-        JsonElement typeElement = obj.get("is_private");
-        if (typeElement == null) {
+        JsonElement privateElement = obj.get("is_private");
+        if (privateElement == null) {
             throw new JsonParseException("Object is missing required field \"is_private\"");
         }
-        boolean isPrivate = typeElement.getAsBoolean();
+        boolean isPrivate = privateElement.getAsBoolean();
         if (isPrivate) {
             return context.deserialize(obj, DmChannel.class);
         } else {
-            return context.deserialize(obj, GuildChannel.class);
+            JsonElement typeElement = obj.get("type");
+            if (typeElement == null) {
+                throw new JsonParseException("Object is missing required field \"type\"");
+            }
+            ChannelType type = context.deserialize(typeElement, ChannelType.class);
+            switch(type) {
+                case TEXT:
+                    return context.deserialize(obj, GuildTextChannel.class);
+                case VOICE:
+                    return context.deserialize(obj, GuildVoiceChannel.class);
+                default:
+                    throw new JsonParseException("Unknown channel type: " + typeElement.toString());
+            }
         }
     }
 }
