@@ -14,6 +14,7 @@ package co.phoenixlab.discord.api.entities;
 
 
 import co.phoenixlab.discord.api.util.SnowflakeUtils;
+import co.phoenixlab.discord.api.util.WahrDiscordApiUtils;
 
 import java.util.Objects;
 
@@ -21,16 +22,6 @@ import java.util.Objects;
  * A uniquely identifiable entity from Discord
  */
 public interface Entity {
-
-    long getId();
-
-    default String getIdAsString() {
-        return Long.toUnsignedString(getId());
-    }
-
-    default String getBase64EncodedId() {
-        return encodeId(getId());
-    }
 
     static String encodeId(long l) {
         return SnowflakeUtils.encodeSnowflake(l);
@@ -43,14 +34,15 @@ public interface Entity {
     /**
      * Checks if two objects are entities and the entities are of the same type
      * and have the same ID.
+     *
      * @param a The first entity to check for equality. Can be null.
      * @param b The second entity to check for equality. Can be null.
      * @return True iff both objects are entities, same kind of entity, and have the same ID.
      */
     static boolean areEqual(Object a, Object b) {
         return a instanceof Entity && b instanceof Entity &&
-                (a == b || a.getClass() == b.getClass() &&
-                        ((Entity) a).getId() == ((Entity) b).getId());
+            ((a == b || WahrDiscordApiUtils.areSiblingClasses(a.getClass(), b.getClass())) &&
+                ((Entity) a).getId() == ((Entity) b).getId());
     }
 
     static int hash(Entity a) {
@@ -58,6 +50,16 @@ public interface Entity {
             return 0;
         }
         return Objects.hash(a.getId());
+    }
+
+    long getId();
+
+    default String getIdAsString() {
+        return Long.toUnsignedString(getId());
+    }
+
+    default String getBase64EncodedId() {
+        return encodeId(getId());
     }
 
 }
