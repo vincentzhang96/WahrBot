@@ -52,4 +52,25 @@ public class WahrDiscordApiUtils {
         }
     }
 
+    public static boolean areSiblingClasses(Class<?> a, Class<?> b) {
+        if (a == b) {
+            return true;
+        }
+        Class<?> aSuperclass = a.getSuperclass();
+        Class<?> bSuperclass = b.getSuperclass();
+        if (aSuperclass == null ||  bSuperclass == null) {
+            return false;
+        }
+        if (aSuperclass == Object.class || bSuperclass == Object.class) {
+            return false;
+        }
+        if (aSuperclass == bSuperclass || aSuperclass == b || bSuperclass == a) {
+            return true;
+        }
+        //  Check parents
+        return areSiblingClasses(aSuperclass, bSuperclass)
+            || areSiblingClasses(aSuperclass, b)
+            || areSiblingClasses(a, bSuperclass);
+    }
+
 }
