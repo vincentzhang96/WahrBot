@@ -59,7 +59,7 @@ public class WahrDiscordApiUtils {
         if (aSuperclass == null ||  bSuperclass == null) {
             return false;
         }
-        if (aSuperclass == Object.class || bSuperclass == Object.class) {
+        if (aSuperclass == Object.class && bSuperclass == Object.class) {
             return false;
         }
         if (aSuperclass == bSuperclass || aSuperclass == b || bSuperclass == a) {
