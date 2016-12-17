@@ -13,19 +13,15 @@
 package co.phoenixlab.discord.api.entities.guild;
 
 import co.phoenixlab.discord.api.entities.Entity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class UnavailableGuild implements Entity {
 
     protected long id;
-    private boolean unavailable;
+    protected Boolean unavailable;
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
@@ -36,5 +32,13 @@ public class UnavailableGuild implements Entity {
     @Override
     public int hashCode() {
         return Entity.hash(this);
+    }
+
+    public boolean wasUserRemovedFromGuild() {
+        //  If a guild becomes unavailable due to outage or initial connect, then unavailable will be set to true
+        //  but if its not set, then the user was removed
+        //  Make sure we only check this if this is an UnavailableGuild, as the subclassed guild types may not have
+        //  this field
+        return unavailable == null && getClass() == UnavailableGuild.class;
     }
 }

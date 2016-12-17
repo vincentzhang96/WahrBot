@@ -14,21 +14,17 @@ package co.phoenixlab.discord.api.entities.guild;
 
 import co.phoenixlab.discord.api.entities.Entity;
 import co.phoenixlab.discord.api.enums.AfkTimeout;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Guild extends UserGuild implements Entity {
 
     public static long NO_AFK_CHANNEL_ID = -1;
 
     protected String splash;
-    private long ownerId;
+    protected long ownerId;
     protected String region;
     protected long afkChannelId;
     protected AfkTimeout afkTimeout;

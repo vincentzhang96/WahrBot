@@ -14,8 +14,6 @@ package co.phoenixlab.discord.api.entities.guild;
 
 import co.phoenixlab.discord.api.entities.Entity;
 import co.phoenixlab.discord.api.entities.channel.GuildChannel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,8 +21,6 @@ import java.time.Instant;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class CreatedGuild extends Guild implements Entity {
 
     private Instant joinedAt;

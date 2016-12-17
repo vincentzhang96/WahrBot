@@ -13,13 +13,14 @@
 package co.phoenixlab.discord.api.entities;
 
 import co.phoenixlab.discord.api.entities.channel.DmChannel;
-import co.phoenixlab.discord.api.entities.guild.Guild;
 import co.phoenixlab.discord.api.entities.guild.Presence;
+import co.phoenixlab.discord.api.entities.guild.UnavailableGuild;
 import co.phoenixlab.discord.api.entities.user.SelfUser;
+import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Builder;
 
 @Builder
 @Getter
@@ -29,10 +30,12 @@ public class ReadyMessage {
 
     private int v;
     private Presence[] presences;
-    private Guild[] guilds;
+    private UnavailableGuild[] guilds;
     private String sessionId;
     private DmChannel[] privateChannels;
     private SelfUser user;
     private int heartbeatInterval;
+    @SerializedName("_trace")
+    private String[] serverTrace;
 
 }

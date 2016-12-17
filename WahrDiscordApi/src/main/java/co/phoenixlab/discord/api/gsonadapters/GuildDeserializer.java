@@ -24,9 +24,7 @@ public class GuildDeserializer implements JsonDeserializer<UnavailableGuild> {
 
     public static GsonBuilder register(GsonBuilder builder) {
         GuildDeserializer d = new GuildDeserializer();
-        return builder.registerTypeAdapter(UnavailableGuild.class, d)
-            .registerTypeAdapter(UserGuild.class, d)
-            .registerTypeAdapter(Guild.class, d);
+        return builder.registerTypeAdapter(UnavailableGuild.class, d);
     }
 
     @Override
@@ -47,12 +45,7 @@ public class GuildDeserializer implements JsonDeserializer<UnavailableGuild> {
                 }
             }
         } else {
-            JsonElement unavailableElement = obj.get("unavailable");
-            if (unavailableElement != null && unavailableElement.getAsBoolean()) {
-                return context.deserialize(obj, UnavailableGuild.class);
-            } else {
-                throw new JsonParseException("Not a valid guild object");
-            }
+            return context.deserialize(obj, UnavailableGuild.class);
         }
     }
 }
