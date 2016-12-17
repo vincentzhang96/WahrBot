@@ -631,7 +631,7 @@ public class EndpointsImpl implements Endpoints {
             int status = response.getStatus();
             if (status == HTTP_NOT_AUTHENTICATED) {
                 //  Authentication failed
-                throw new InvalidTokenException(HttpMethod.POST, path, "Bad token");
+                throw new InvalidTokenException(HttpMethod.GET, path, "Bad token: " + response.getBody());
             }
             if (status == HTTP_TOO_MANY_REQUESTS) {
                 //  We hit the rate limit, throw an exception to let the caller know
@@ -649,7 +649,8 @@ public class EndpointsImpl implements Endpoints {
             }
             if (status != HTTP_OK) {
                 //  Other errors
-                throw new UnirestException("HTTP " + status + ": " + response.getStatusText());
+                throw new UnirestException("HTTP " + status + ": " + response.getStatusText()
+                    + ": " + response.getBody());
             }
             return gson.fromJson(response.getBody(), type);
         }
@@ -691,7 +692,7 @@ public class EndpointsImpl implements Endpoints {
             int status = response.getStatus();
             if (status == HTTP_NOT_AUTHENTICATED) {
                 //  Authentication failed
-                throw new InvalidTokenException(HttpMethod.POST, path, "Bad token");
+                throw new InvalidTokenException(HttpMethod.DELETE, path, "Bad token: " + response.getBody());
             }
             if (status == HTTP_TOO_MANY_REQUESTS) {
                 //  We hit the rate limit, throw an exception to let the caller know
