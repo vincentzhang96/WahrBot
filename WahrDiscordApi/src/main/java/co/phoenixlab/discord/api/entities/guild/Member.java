@@ -14,24 +14,21 @@ package co.phoenixlab.discord.api.entities.guild;
 
 import co.phoenixlab.discord.api.entities.Entity;
 import co.phoenixlab.discord.api.entities.user.HumanUser;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Builder;
 
 import java.time.Instant;
 
-@Builder
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Member implements Entity {
 
     private HumanUser user;
-    private String[] roles;
+    private long[] roles;
     private Instant joinedAt;
     private boolean deaf;
     private boolean mute;
+    private String nick;
 
     @Override
     public long getId() {
