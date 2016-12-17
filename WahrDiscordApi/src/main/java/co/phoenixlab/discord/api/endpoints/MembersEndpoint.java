@@ -27,4 +27,9 @@ public interface MembersEndpoint {
     Member getMember(long guildId, long userId)
             throws ApiException;
 
+    int getMemberCountForPrune(long guildId, int days)
+            throws ApiException;
+
+    int pruneMembers(long guildId, int days)
+            throws ApiException;
 }

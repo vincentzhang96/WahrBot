@@ -29,4 +29,10 @@ public interface MembersEndpointAsync {
     Future<Member> getMemberAsync(long guildId, long userId)
             throws ApiException;
 
+    Future<Integer> getMemberCountForPruneAsync(long guildId, int days)
+            throws ApiException;
+
+    Future<Integer> pruneMembersAsync(long guildId, int days)
+            throws ApiException;
+
 }

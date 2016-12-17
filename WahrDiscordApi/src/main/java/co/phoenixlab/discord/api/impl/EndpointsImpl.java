@@ -103,6 +103,12 @@ public class EndpointsImpl implements Endpoints {
     private GuildsEndpointImpl guild;
 
     /**
+     * Members endpoint implementation
+     */
+    @Inject
+    private MembersEndpointImpl member;
+
+    /**
      * Permissions endpoint implementation
      */
     @Inject
@@ -186,12 +192,12 @@ public class EndpointsImpl implements Endpoints {
 
     @Override
     public MembersEndpoint members() {
-        return null;
+        return member;
     }
 
     @Override
     public MembersEndpointAsync membersAsync() {
-        return null;
+        return member;
     }
 
     @Override
