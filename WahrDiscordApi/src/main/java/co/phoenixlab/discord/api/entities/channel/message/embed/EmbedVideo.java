@@ -13,12 +13,14 @@
 package co.phoenixlab.discord.api.entities.channel.message.embed;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class EmbedVideo {
 
     /**

@@ -12,17 +12,13 @@
 
 package co.phoenixlab.discord.api.entities.guild;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class GuildIntegrationsUpdate {
 
-    private String guildId;
+    private long guildId;
 
 }

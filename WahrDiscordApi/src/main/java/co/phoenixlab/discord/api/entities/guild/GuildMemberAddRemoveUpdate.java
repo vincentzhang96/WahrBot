@@ -10,32 +10,27 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api.entities.channel.message.embed;
+package co.phoenixlab.discord.api.entities.guild;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import co.phoenixlab.discord.api.entities.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class EmbedField {
+public class GuildMemberAddRemoveUpdate extends Member implements Entity {
 
-    /**
-     * Name of the field.
-     */
-    private String name;
+    private long guildId;
 
-    /**
-     * Value of the field.
-     */
-    private String value;
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
 
-    /**
-     * Whether or not this field should display inline.
-     */
-    private boolean inline;
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 
 }

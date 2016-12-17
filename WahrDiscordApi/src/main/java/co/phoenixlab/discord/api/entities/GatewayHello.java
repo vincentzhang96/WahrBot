@@ -14,11 +14,9 @@ package co.phoenixlab.discord.api.entities;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

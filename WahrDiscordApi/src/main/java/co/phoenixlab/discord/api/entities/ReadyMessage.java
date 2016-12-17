@@ -18,11 +18,9 @@ import co.phoenixlab.discord.api.entities.guild.UnavailableGuild;
 import co.phoenixlab.discord.api.entities.user.SelfUser;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

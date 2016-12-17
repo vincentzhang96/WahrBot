@@ -16,9 +16,7 @@ import co.phoenixlab.discord.api.entities.user.HumanUser;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Builder;
 
-@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

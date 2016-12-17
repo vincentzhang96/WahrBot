@@ -15,9 +15,7 @@ package co.phoenixlab.discord.api.entities.guild;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Builder;
 
-@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

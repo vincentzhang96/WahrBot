@@ -12,19 +12,32 @@
 
 package co.phoenixlab.discord.api.entities.guild;
 
+import co.phoenixlab.discord.api.entities.Entity;
 import co.phoenixlab.discord.api.entities.user.HumanUser;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-public class BanMessage {
+public class GuildMemberUpdateUpdate implements Entity {
 
     private HumanUser user;
-    private long guildId;
+    private long[] roles;
+    private String nick;
 
+    @Override
+    public long getId() {
+        return user.getId();
+    }
+
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    @Override
+    public boolean equals(Object o) {
+        return Entity.areEqual(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Entity.hash(this);
+    }
 }

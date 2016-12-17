@@ -15,14 +15,12 @@ package co.phoenixlab.discord.api.entities.guild;
 import co.phoenixlab.discord.api.entities.Entity;
 import co.phoenixlab.discord.api.util.SnowflakeUtils;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Emoji implements Entity {
 
     private long id;
