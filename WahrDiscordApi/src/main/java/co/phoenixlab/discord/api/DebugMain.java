@@ -12,7 +12,6 @@
 
 package co.phoenixlab.discord.api;
 
-import co.phoenixlab.discord.api.entities.TokenResponse;
 import co.phoenixlab.discord.api.impl.WahrDiscordApiImpl;
 import com.codahale.metrics.JmxReporter;
 
@@ -24,17 +23,9 @@ public class DebugMain {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter your email, or enter TOKEN <token> to use an existing token:");
+        System.out.println("Enter token:");
         String emailOrToken = scanner.nextLine();
-        WahrDiscordApi api;
-        if (emailOrToken.startsWith("TOKEN ")) {
-            api = new WahrDiscordApiImpl(USER_AGENT, "test", emailOrToken.substring("TOKEN ".length()));
-        } else {
-            System.out.print("Enter your password: ");
-            String pass = scanner.nextLine();
-            api = new WahrDiscordApiImpl(USER_AGENT, "test");
-            TokenResponse tokenResponse = api.getAndSetToken(emailOrToken, pass);
-        }
+        WahrDiscordApi api = new WahrDiscordApiImpl(USER_AGENT, "test", emailOrToken.substring("TOKEN ".length()));
         JmxReporter reporter = JmxReporter.
                 forRegistry(api.getMetrics()).
                 build();
