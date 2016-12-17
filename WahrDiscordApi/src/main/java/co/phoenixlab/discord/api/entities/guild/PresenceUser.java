@@ -13,16 +13,13 @@
 package co.phoenixlab.discord.api.entities.guild;
 
 import co.phoenixlab.discord.api.entities.Entity;
-import lombok.AllArgsConstructor;
+import co.phoenixlab.discord.api.entities.user.HumanUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-public class PresenceUser implements Entity {
-
-    private long id;
+public class PresenceUser extends HumanUser implements Entity {
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override

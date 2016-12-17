@@ -17,6 +17,10 @@ import com.google.gson.annotations.SerializedName;
 public enum PresenceStatus {
     @SerializedName("online")
     ONLINE,
+    @SerializedName("offline")
+    OFFLINE,
+    @SerializedName("dnd")
+    DO_NOT_DISTURB,
     @SerializedName("idle")
     IDLE
 

@@ -27,5 +27,6 @@ public class Presence {
     private PresenceGame game;
     private PresenceUser user;
     private PresenceStatus status;
+    private long guildId;
 
 }

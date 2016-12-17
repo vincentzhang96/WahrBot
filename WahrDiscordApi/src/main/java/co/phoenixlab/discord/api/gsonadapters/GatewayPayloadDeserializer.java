@@ -16,6 +16,8 @@ import co.phoenixlab.discord.api.entities.*;
 import co.phoenixlab.discord.api.entities.channel.*;
 import co.phoenixlab.discord.api.entities.channel.message.DeletedMessage;
 import co.phoenixlab.discord.api.entities.channel.message.Message;
+import co.phoenixlab.discord.api.entities.channel.message.MessageDeleteBulkUpdate;
+import co.phoenixlab.discord.api.entities.channel.message.MessageReactionUpdate;
 import co.phoenixlab.discord.api.entities.guild.*;
 import co.phoenixlab.discord.api.entities.user.SelfUser;
 import co.phoenixlab.discord.api.entities.user.UserSettings;
@@ -101,17 +103,21 @@ public class GatewayPayloadDeserializer implements JsonDeserializer<GatewayPaylo
                 break;
             case CHANNEL_CREATE:
             case CHANNEL_DELETE:
-            case CHANNEL_UPDATE:
                 clazz = Channel.class;
+                break;
+            case CHANNEL_UPDATE:
+                clazz = GuildChannel.class;
                 break;
             case GUILD_BAN_ADD:
             case GUILD_BAN_REMOVE:
-                clazz = BanMessage.class;
+                clazz = GuildBanAddRemoveUpdate.class;
                 break;
             case GUILD_CREATE:
             case GUILD_UPDATE:
-            case GUILD_DELETE:
                 clazz = Guild.class;
+                break;
+            case GUILD_DELETE:
+                clazz = UnavailableGuild.class;
                 break;
             case GUILD_EMOJI_UPDATE:
                 clazz = GuildEmojisUpdate.class;
@@ -121,9 +127,10 @@ public class GatewayPayloadDeserializer implements JsonDeserializer<GatewayPaylo
                 break;
             case GUILD_MEMBER_ADD:
             case GUILD_MEMBER_REMOVE:
-            case GUILD_MEMBER_UPDATE:
-                clazz = Member.class;
+                clazz = GuildMemberAddRemoveUpdate.class;
                 break;
+            case GUILD_MEMBER_UPDATE:
+
             case GUILD_MEMBERS_CHUNK:
                 clazz = GuildMembersChunk.class;
                 break;
@@ -143,6 +150,13 @@ public class GatewayPayloadDeserializer implements JsonDeserializer<GatewayPaylo
                 break;
             case MESSAGE_DELETE:
                 clazz = DeletedMessage.class;
+                break;
+            case MESSAGE_DELETE_BULK:
+                clazz = MessageDeleteBulkUpdate.class;
+                break;
+            case MESSAGE_REACTION_ADD:
+            case MESSAGE_REACTION_REMOVE:
+                clazz = MessageReactionUpdate.class;
                 break;
             case PRESENCE_UPDATE:
                 clazz = Presence.class;
