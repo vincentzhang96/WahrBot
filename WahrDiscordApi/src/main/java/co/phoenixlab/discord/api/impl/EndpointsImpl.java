@@ -97,6 +97,12 @@ public class EndpointsImpl implements Endpoints {
     private MessagesEndpointImpl message;
 
     /**
+     * Guild endpoint implementation
+     */
+    @Inject
+    private GuildsEndpointImpl guild;
+
+    /**
      * Permissions endpoint implementation
      */
     @Inject
@@ -170,12 +176,12 @@ public class EndpointsImpl implements Endpoints {
 
     @Override
     public GuildsEndpoint guilds() {
-        return null;
+        return guild;
     }
 
     @Override
     public GuildsEndpointAsync guildsAsync() {
-        return null;
+        return guild;
     }
 
     @Override

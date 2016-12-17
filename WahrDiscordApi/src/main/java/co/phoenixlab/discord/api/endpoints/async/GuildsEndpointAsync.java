@@ -12,28 +12,36 @@
 
 package co.phoenixlab.discord.api.endpoints.async;
 
-import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.entities.guild.Guild;
+import co.phoenixlab.discord.api.entities.guild.UserGuild;
+import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.request.guild.CreateGuildRequest;
 import co.phoenixlab.discord.api.request.guild.EditGuildRequest;
+import co.phoenixlab.discord.api.request.guild.GuildMembersRequest;
 
 import java.util.concurrent.Future;
 
 public interface GuildsEndpointAsync {
 
     Future<Guild> createGuildAsync(CreateGuildRequest request)
-            throws ApiException;
+        throws ApiException;
 
     Future<Guild> editGuildAsync(long guildId, EditGuildRequest request)
-            throws ApiException;
+        throws ApiException;
 
-    Future<Guild> leaveGuildAsync(long guildId)
-            throws ApiException;
+    Future<Void> leaveGuildAsync(long guildId)
+        throws ApiException;
 
     Future<Guild> deleteGuildAsync(long guildId)
-            throws ApiException;
+        throws ApiException;
 
-    Future<Guild[]> getGuildsAsync()
-            throws ApiException;
+    Future<Guild> getGuildAsync(long guildId)
+        throws ApiException;
+
+    Future<UserGuild[]> getGuildsAsync()
+        throws ApiException;
+
+    Future<Void> requestMembersAsync(GuildMembersRequest request)
+        throws ApiException;
 
 }
