@@ -102,6 +102,7 @@ public class GuildsEndpointImpl implements GuildsEndpoint, GuildsEndpointAsync {
 
     @Override
     public void requestMembers(GuildMembersRequest request) throws ApiException {
+        endpoints.validate(request);
         api.getWebSocketClient().send(WSRequest.requestGuildMembers(request));
     }
 
