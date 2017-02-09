@@ -14,20 +14,24 @@ package co.phoenixlab.discord.api.endpoints;
 
 import co.phoenixlab.discord.api.entities.guild.Role;
 import co.phoenixlab.discord.api.exceptions.ApiException;
+import co.phoenixlab.discord.api.request.guild.CreateEditRoleRequest;
 import co.phoenixlab.discord.api.request.guild.RoleReorderRequestEntry;
 
 public interface RolesEndpoint {
 
-    Role createRole(long guildId)
+    Role createRole(long guildId, CreateEditRoleRequest request)
             throws ApiException;
 
-    Role editRole(long guildId, long roleId)
+    Role editRole(long guildId, long roleId, CreateEditRoleRequest request)
             throws ApiException;
 
     Role[] reorderRoles(long guildId, RoleReorderRequestEntry[] request)
             throws ApiException;
 
     void deleteRole(long guildId, long roleId)
+            throws ApiException;
+
+    Role[] getRoles(long guildId)
             throws ApiException;
     
 }

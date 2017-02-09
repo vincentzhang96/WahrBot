@@ -14,22 +14,26 @@ package co.phoenixlab.discord.api.endpoints.async;
 
 import co.phoenixlab.discord.api.exceptions.ApiException;
 import co.phoenixlab.discord.api.entities.guild.Role;
+import co.phoenixlab.discord.api.request.guild.CreateEditRoleRequest;
 import co.phoenixlab.discord.api.request.guild.RoleReorderRequestEntry;
 
 import java.util.concurrent.Future;
 
 public interface RolesEndpointAsync {
 
-    Future<Role> createRoleAsync(long guildId)
+    Future<Role> createRoleAsync(long guildId, CreateEditRoleRequest request)
             throws ApiException;
 
-    Future<Role> editRoleAsync(long guildId, long roleId)
+    Future<Role> editRoleAsync(long guildId, long roleId, CreateEditRoleRequest request)
             throws ApiException;
 
     Future<Role[]> reorderRolesAsync(long guildId, RoleReorderRequestEntry[] request)
             throws ApiException;
 
     Future<Void> deleteRoleAsync(long guildId, long roleId)
+            throws ApiException;
+
+    Future<Role[]> getRolesAsync(long guildId)
             throws ApiException;
 
 }

@@ -115,6 +115,12 @@ public class EndpointsImpl implements Endpoints {
     private PermissionsEndpointImpl permissions;
 
     /**
+     * Roles endpoint implementation
+     */
+    @Inject
+    private RolesEndpointImpl roles;
+
+    /**
      * GSON instance to use by endpoint implementations
      */
     @Inject
@@ -222,12 +228,12 @@ public class EndpointsImpl implements Endpoints {
 
     @Override
     public RolesEndpoint roles() {
-        return null;
+        return roles;
     }
 
     @Override
     public RolesEndpointAsync rolesAsync() {
-        return null;
+        return roles;
     }
 
     @Override
