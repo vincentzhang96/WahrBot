@@ -10,34 +10,26 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package co.phoenixlab.discord.api;
+package co.phoenixlab.discord.api.impl;
 
-import co.phoenixlab.discord.api.impl.WahrDiscordApiImpl;
-import co.phoenixlab.discord.api.util.WahrDiscordApiUtils;
-import com.codahale.metrics.JmxReporter;
-import com.google.gson.Gson;
+import co.phoenixlab.discord.api.endpoints.BansEndpoint;
+import co.phoenixlab.discord.api.entities.guild.BannedUser;
+import co.phoenixlab.discord.api.exceptions.ApiException;
 
-import java.util.Scanner;
+public class BansEndpointImpl implements BansEndpoint {
 
-public class DebugMain {
+    @Override
+    public BannedUser[] getBans(long guildId) throws ApiException {
+        return new BannedUser[0];
+    }
 
-    public static final String USER_AGENT = "DiscordBot (https://github.com/vincentzhang96/WahrBot, 1)";
-
-    public static void main(String[] args) throws Exception {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter token:");
-        String token = scanner.nextLine();
-        WahrDiscordApi api = new WahrDiscordApiImpl("test", USER_AGENT, "Bot " + token);
-        JmxReporter reporter = JmxReporter.
-                forRegistry(api.getMetrics()).
-                build();
-        reporter.start();
-        api.open();
-        while (!api.isReady()) {
-            Thread.sleep(500);
-        }
-        Gson gson = WahrDiscordApiUtils.createGson();
+    @Override
+    public void addBan(long guildId, long userId, int deleteMessageDays) throws ApiException {
 
     }
 
+    @Override
+    public void removeBan(long guildId, long userId) {
+
+    }
 }
